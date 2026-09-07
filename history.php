@@ -20,7 +20,7 @@ if ($q !== '') {
     $page = 1;
 } else {
     $page = max(1, (int) ($_GET['page'] ?? 1));
-    $perPage = 10;
+    $perPage = 5;
     $totalDates = count_distinct_dates($childId);
     $totalPages = max(1, (int) ceil($totalDates / $perPage));
     $page = min($page, $totalPages);

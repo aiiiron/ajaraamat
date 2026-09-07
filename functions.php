@@ -458,52 +458,36 @@ function render_entries_table(array $entries, bool $editable = false, int $child
 
     $colors = ['blue', 'green', 'peach', 'purple'];
     $colorIndex = 0;
-    $groupKeys = array_keys($groups);
-    $lastGroupKey = end($groupKeys);
     ?>
-    <div class="table-scroll">
-    <table class="entries-table spreadsheet-style">
-        <thead>
-            <tr>
-                <th>Kuupäev</th>
-                <th>Tegevus</th>
-                <th>Kommentaar</th>
-            </tr>
-        </thead>
-        <tbody>
+    <div class="entries-list">
         <?php foreach ($groups as $date => $rows):
-            $colorClass = 'row-' . $colors[$colorIndex % count($colors)];
+            $colorClass = 'day-' . $colors[$colorIndex % count($colors)];
             $colorIndex++;
-            $rowspan = count($rows);
-            $lastRowIndex = $rowspan - 1;
-            foreach ($rows as $i => $a): ?>
-                <tr class="<?= $colorClass ?> <?= $i === 0 ? 'group-first' : '' ?> <?= $i === $lastRowIndex ? 'group-last' : '' ?>">
-                    <?php if ($i === 0): ?>
-                        <td class="date-cell" rowspan="<?= $rowspan ?>">
-                            <div class="date-cell-row">
-                                <span><?= htmlspecialchars(date('d.M', strtotime($date))) ?></span>
-                                <?php if ($editable): ?>
-                                    <a href="edit_day.php?date=<?= urlencode($date) ?>&child=<?= $childId ?>" class="btn-edit-day" aria-label="Muuda seda päeva" title="Muuda seda päeva">✎</a>
-                                <?php endif; ?>
-                            </div>
-                        </td>
+            ?>
+            <div class="day-group <?= $colorClass ?>">
+                <div class="day-head">
+                    <span class="day-date"><?= htmlspecialchars(date('d.M', strtotime($date))) ?></span>
+                    <?php if ($editable): ?>
+                        <a href="edit_day.php?date=<?= urlencode($date) ?>&child=<?= $childId ?>" class="btn-edit-day" aria-label="Muuda seda päeva" title="Muuda seda päeva">✎ Muuda</a>
                     <?php endif; ?>
-                    <td>
-                        <?php if ($a['type'] === 'raamat'): ?>
-                            <span class="tag tag-reading">📖 <?= $a['minutes'] ?> min</span>
-                        <?php else: ?>
-                            <span class="tag tag-screen">📱 <?= $a['minutes'] ?> min</span>
-                        <?php endif; ?>
-                    </td>
-                    <td><?= $a['label'] ? htmlspecialchars($a['label']) : '–' ?><?php if ($a['sub']): ?><br><span style="font-size:12px;color:var(--text-muted);"><?= htmlspecialchars($a['sub']) ?></span><?php endif; ?></td>
-                </tr>
-            <?php endforeach;
-            if ($date !== $lastGroupKey): ?>
-                <tr class="row-spacer"><td colspan="3"></td></tr>
-            <?php endif;
-        endforeach; ?>
-        </tbody>
-    </table>
+                </div>
+                <div class="day-rows">
+                    <?php foreach ($rows as $a): ?>
+                        <div class="entry-row">
+                            <?php if ($a['type'] === 'raamat'): ?>
+                                <span class="tag tag-reading">📖 <?= $a['minutes'] ?> min</span>
+                            <?php else: ?>
+                                <span class="tag tag-screen">📱 <?= $a['minutes'] ?> min</span>
+                            <?php endif; ?>
+                            <div class="entry-label">
+                                <?= $a['label'] ? htmlspecialchars($a['label']) : '–' ?>
+                                <?php if ($a['sub']): ?><span class="entry-sub"><?= htmlspecialchars($a['sub']) ?></span><?php endif; ?>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        <?php endforeach; ?>
     </div>
     <?php
 }
