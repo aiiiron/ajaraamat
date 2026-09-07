@@ -232,15 +232,26 @@ h2 { font-size: 18px; margin: 0 0 16px; }
 }
 .pt-row {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
   gap: 8px;
   font-family: var(--font-heading);
   font-weight: 700;
   font-size: 15px;
 }
-.pt-row + .pt-row { margin-top: 4px; }
-.pt-k { font-size: 15px; flex: none; }
+.pt-row + .pt-row { margin-top: 6px; }
+.pt-k {
+  flex: none;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+}
+.pt-row.pt-reading .pt-k { background: var(--reading-bg); }
+.pt-row.pt-screen .pt-k  { background: var(--screen-bg); }
 .pt-v {
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
