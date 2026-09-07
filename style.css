@@ -367,6 +367,8 @@ h2 { font-size: 18px; margin: 0 0 16px; }
   flex: none;
   white-space: nowrap;
   margin-top: 1px;
+  min-width: 92px;
+  text-align: center;
 }
 .entry-label {
   flex: 1 1 auto;
@@ -396,13 +398,9 @@ h2 { font-size: 18px; margin: 0 0 16px; }
 }
 .btn-edit-day:hover { opacity: 1; }
 
-/* Roomier screens: line the pills up in a column for quicker scanning. */
 @media (min-width: 560px) {
   .entry-row { align-items: center; }
-  .entry-row .tag {
-    min-width: 104px;
-    text-align: center;
-  }
+  .entry-row .tag { min-width: 104px; }
 }
 
 .totals-table {
