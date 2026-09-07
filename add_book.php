@@ -14,6 +14,7 @@ $child = get_child($childId);
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_csrf();
     $title = trim($_POST['title'] ?? '');
     $author = trim($_POST['author'] ?? '');
     $statusIn = $_POST['status'] ?? 'lugemata';
@@ -66,6 +67,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h2>Lisa raamat — <?= htmlspecialchars($child['name']) ?></h2>
         <?php if ($error): ?><p class="error"><?= htmlspecialchars($error) ?></p><?php endif; ?>
         <form method="post">
+            <?= csrf_field() ?>
             <input type="hidden" name="child" value="<?= $childId ?>">
             <label for="title">Pealkiri</label>
             <input type="text" id="title" name="title" required autofocus placeholder="nt. Nukitsamees">

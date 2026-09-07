@@ -7,6 +7,7 @@ $familyId = current_family_id();
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_csrf();
     if (isset($_POST['delete_id'])) {
         $childId = (int) $_POST['delete_id'];
         if (child_belongs_to_family($childId, $familyId)) {
@@ -78,6 +79,7 @@ $baseUrl = $scheme . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['SCRIPT_NAME
         <div style="display:flex;gap:10px;">
             <a href="paren.php?child=<?= $c['id'] ?>" class="btn btn-add" style="flex:1;text-align:center;">Vaata andmeid</a>
             <form method="post" onsubmit="return confirm('Kustutada <?= htmlspecialchars(addslashes($c['name'])) ?> ja kõik tema kanded/raamatud jäädavalt?');">
+                <?= csrf_field() ?>
                 <input type="hidden" name="delete_id" value="<?= $c['id'] ?>">
                 <button type="submit" class="btn-delete-full">Kustuta laps</button>
             </form>
@@ -89,6 +91,7 @@ $baseUrl = $scheme . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['SCRIPT_NAME
         <h2>Lisa uus laps</h2>
         <?php if ($error): ?><p class="error"><?= htmlspecialchars($error) ?></p><?php endif; ?>
         <form method="post">
+            <?= csrf_field() ?>
             <label for="name">Nimi</label>
             <input type="text" id="name" name="name" placeholder="nt. Mari" required>
             <button type="submit" class="btn btn-add full-width">Lisa laps</button>

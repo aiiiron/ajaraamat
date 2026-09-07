@@ -11,24 +11,37 @@ if (!empty($_SESSION['family_id'])) {
 
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $email = trim($_POST['email'] ?? '');
-    $password = $_POST['password'] ?? '';
+    $now = time();
+    $lockUntil = (int) ($_SESSION['login_lock_until'] ?? 0);
 
-    $pdo = get_db();
-    $stmt = $pdo->prepare("SELECT * FROM families WHERE email = :email");
-    $stmt->execute([':email' => $email]);
-    $family = $stmt->fetch();
-
-    if (!$family || !password_verify($password, $family['password_hash'])) {
-        $error = 'Vale e-post või parool.';
-    } elseif ($family['status'] === 'pending') {
-        $error = 'Sinu konto ootab veel kinnitust. Anname e-postiga teada, kui see on kinnitatud.';
-    } elseif ($family['status'] === 'rejected') {
-        $error = 'Sinu kontoga on probleem. Võta ühendust saidi omanikuga.';
+    if ($now < $lockUntil) {
+        $error = 'Liiga palju ebaõnnestunud katseid. Proovi ' . ($lockUntil - $now) . ' sekundi pärast uuesti.';
     } else {
-        $_SESSION['family_id'] = $family['id'];
-        header('Location: paren.php');
-        exit;
+        $email = trim($_POST['email'] ?? '');
+        $password = $_POST['password'] ?? '';
+
+        $pdo = get_db();
+        $stmt = $pdo->prepare("SELECT * FROM families WHERE email = :email");
+        $stmt->execute([':email' => $email]);
+        $family = $stmt->fetch();
+
+        if (!$family || !password_verify($password, $family['password_hash'])) {
+            $_SESSION['login_fails'] = (int) ($_SESSION['login_fails'] ?? 0) + 1;
+            if ($_SESSION['login_fails'] >= 5) {
+                $_SESSION['login_lock_until'] = $now + 60;
+                $_SESSION['login_fails'] = 0;
+            }
+            $error = 'Vale e-post või parool.';
+        } elseif ($family['status'] === 'pending') {
+            $error = 'Sinu konto ootab veel kinnitust. Anname e-postiga teada, kui see on kinnitatud.';
+        } elseif ($family['status'] === 'rejected') {
+            $error = 'Sinu kontoga on probleem. Võta ühendust saidi omanikuga.';
+        } else {
+            unset($_SESSION['login_fails'], $_SESSION['login_lock_until']);
+            $_SESSION['family_id'] = $family['id'];
+            header('Location: paren.php');
+            exit;
+        }
     }
 }
 ?>

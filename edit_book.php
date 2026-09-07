@@ -23,6 +23,8 @@ if (!$book || (int) $book['family_id'] !== $familyId) {
 $childId = (int) $book['child_id'];
 $error = '';
 
+require_csrf();
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'delete') {
     $stmt = $pdo->prepare("DELETE FROM books WHERE id = :id");
     $stmt->execute([':id' => $id]);
@@ -89,6 +91,7 @@ $note = $_POST['note'] ?? $book['note'];
         <h2>Muuda raamatut — <?= htmlspecialchars($book['child_name']) ?></h2>
         <?php if ($error): ?><p class="error"><?= htmlspecialchars($error) ?></p><?php endif; ?>
         <form method="post">
+            <?= csrf_field() ?>
             <input type="hidden" name="id" value="<?= $book['id'] ?>">
 
             <label for="title">Pealkiri</label>
@@ -125,6 +128,7 @@ $note = $_POST['note'] ?? $book['note'];
             <button type="submit" class="btn btn-add full-width">Salvesta muudatused</button>
         </form>
         <form method="post" onsubmit="return confirm('Kustutada see raamat?');" class="day-entry-delete-form">
+            <?= csrf_field() ?>
             <input type="hidden" name="id" value="<?= $book['id'] ?>">
             <input type="hidden" name="action" value="delete">
             <button type="submit" class="btn-delete-full">Kustuta see raamat</button>

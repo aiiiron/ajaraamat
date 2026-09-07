@@ -17,8 +17,10 @@ $fromDay = $_GET['date'] ?? $_POST['from_day'] ?? '';
 $recentEkraan = array_column(get_top_comments($childId, 'ekraan', 4), 'comment');
 
 $type = ($_POST['type'] ?? $_GET['type'] ?? 'raamat') === 'ekraan' ? 'ekraan' : 'raamat';
+$currentBooks = array_values(array_filter($books, fn($b) => $b['status'] === 'loeb'));
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_csrf();
     $date = $_POST['entry_date'] ?? date('Y-m-d');
     $raamat = $type === 'raamat' ? (int) ($_POST['raamat'] ?? 0) : 0;
     $ekraan = $type === 'ekraan' ? (int) ($_POST['ekraan'] ?? 0) : 0;
@@ -61,7 +63,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($fromDay !== '') {
             header('Location: edit_day.php?date=' . urlencode($fromDay) . '&child=' . $childId);
         } else {
-            header('Location: paren.php?child=' . $childId);
+            header('Location: paren.php?child=' . $childId . '&saved=1');
         }
         exit;
     }
@@ -92,6 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <h2>Lisa kanne — <?= htmlspecialchars($child['name']) ?></h2>
         <?php if ($error): ?><p class="error"><?= htmlspecialchars($error) ?></p><?php endif; ?>
         <form method="post">
+            <?= csrf_field() ?>
             <input type="hidden" name="child" value="<?= $childId ?>">
             <input type="hidden" name="from_day" value="<?= htmlspecialchars($fromDay) ?>">
 
@@ -110,7 +113,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <div class="type-fields" data-type="raamat" <?= $type === 'raamat' ? '' : 'hidden' ?>>
                 <label for="raamat">📖 Raamat (min)</label>
-                <input type="number" id="raamat" name="raamat" min="0" placeholder="nt. 30" inputmode="numeric" value="<?= htmlspecialchars($_POST['raamat'] ?? '') ?>">
+                <input type="number" id="raamat" name="raamat" min="0" placeholder="nt. 30" inputmode="numeric" value="<?= htmlspecialchars($_POST['raamat'] ?? '') ?>" <?= $type === 'raamat' ? 'autofocus' : '' ?>>
 
                 <label for="book_id">Milline raamat?</label>
                 <select id="book_id" name="book_id" onchange="document.getElementById('new_book_title').style.display = this.value === 'new' ? 'block' : 'none';">
@@ -121,6 +124,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <option value="new" <?= ($_POST['book_id'] ?? '') === 'new' ? 'selected' : '' ?>>+ Uus raamat…</option>
                 </select>
                 <input type="text" id="new_book_title" name="new_book_title" placeholder="Uue raamatu pealkiri" value="<?= htmlspecialchars($_POST['new_book_title'] ?? '') ?>" style="display:<?= ($_POST['book_id'] ?? '') === 'new' ? 'block' : 'none' ?>;margin-top:8px;">
+                <?php if (!empty($currentBooks)): ?>
+                <div class="quick-add-row">
+                    <?php foreach (array_slice($currentBooks, 0, 4) as $b): ?>
+                        <button type="button" class="quick-add-btn" onclick="var s=document.getElementById('book_id');s.value='<?= $b['id'] ?>';document.getElementById('new_book_title').style.display='none';document.getElementById('raamat').focus();">📖 <?= htmlspecialchars($b['title']) ?></button>
+                    <?php endforeach; ?>
+                </div>
+                <?php endif; ?>
 
                 <label for="raamat_comment">Märkus (valikuline)</label>
                 <input type="text" id="raamat_comment" name="raamat_comment" placeholder="nt. hea peatükk!" value="<?= htmlspecialchars($_POST['raamat_comment'] ?? '') ?>">
@@ -128,7 +138,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <div class="type-fields" data-type="ekraan" <?= $type === 'ekraan' ? '' : 'hidden' ?>>
                 <label for="ekraan">📱 Ekraan (min)</label>
-                <input type="number" id="ekraan" name="ekraan" min="0" placeholder="nt. 30" inputmode="numeric" value="<?= htmlspecialchars($_POST['ekraan'] ?? '') ?>">
+                <input type="number" id="ekraan" name="ekraan" min="0" placeholder="nt. 30" inputmode="numeric" value="<?= htmlspecialchars($_POST['ekraan'] ?? '') ?>" <?= $type === 'ekraan' ? 'autofocus' : '' ?>>
 
                 <label for="ekraan_comment">Ekraani kommentaar (valikuline)</label>
                 <input type="text" id="ekraan_comment" name="ekraan_comment" placeholder="nt. Youtube, Operatsioon AI" value="<?= htmlspecialchars($_POST['ekraan_comment'] ?? '') ?>">

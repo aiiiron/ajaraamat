@@ -6,11 +6,22 @@ if (session_status() === PHP_SESSION_NONE) {
 
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (($_POST['password'] ?? '') === ADMIN_PASSWORD) {
+    $now = time();
+    $lockUntil = (int) ($_SESSION['admin_lock_until'] ?? 0);
+
+    if ($now < $lockUntil) {
+        $error = 'Liiga palju ebaõnnestunud katseid. Proovi hiljem uuesti.';
+    } elseif (hash_equals(ADMIN_PASSWORD, (string) ($_POST['password'] ?? ''))) {
+        unset($_SESSION['admin_fails'], $_SESSION['admin_lock_until']);
         $_SESSION['is_admin'] = true;
         header('Location: admin.php');
         exit;
     } else {
+        $_SESSION['admin_fails'] = (int) ($_SESSION['admin_fails'] ?? 0) + 1;
+        if ($_SESSION['admin_fails'] >= 5) {
+            $_SESSION['admin_lock_until'] = $now + 120;
+            $_SESSION['admin_fails'] = 0;
+        }
         $error = 'Vale parool.';
     }
 }

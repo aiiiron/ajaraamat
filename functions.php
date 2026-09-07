@@ -27,6 +27,37 @@ function format_duration(int $minutes): string {
 }
 
 // =========================================================
+// CSRF (session-authenticated forms)
+// =========================================================
+
+function csrf_token(): string {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    if (empty($_SESSION['csrf'])) {
+        $_SESSION['csrf'] = bin2hex(random_bytes(16));
+    }
+    return $_SESSION['csrf'];
+}
+
+/** Hidden field to drop inside every session-authenticated <form method="post">. */
+function csrf_field(): string {
+    return '<input type="hidden" name="csrf" value="' . htmlspecialchars(csrf_token(), ENT_QUOTES) . '">';
+}
+
+/** Call once before handling a POST on a session-authenticated page. No-op on GET. */
+function require_csrf(): void {
+    if (($_SERVER['REQUEST_METHOD'] ?? 'GET') !== 'POST') {
+        return;
+    }
+    $sent = $_POST['csrf'] ?? '';
+    if (!is_string($sent) || empty($_SESSION['csrf']) || !hash_equals($_SESSION['csrf'], $sent)) {
+        http_response_code(400);
+        exit('Vigane või aegunud vorm. Mine tagasi, värskenda lehte ja proovi uuesti.');
+    }
+}
+
+// =========================================================
 // Families & children
 // =========================================================
 

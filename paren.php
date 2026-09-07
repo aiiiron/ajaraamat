@@ -74,6 +74,10 @@ $chartEkraan = array_map(fn($d) => $d['ekraan'], $daily);
 
     <?php render_child_switcher($children, $childId, 'paren.php'); ?>
 
+    <?php if (($_GET['saved'] ?? '') === '1'): ?>
+        <div class="milestone-banner">✅ Kanne salvestatud!</div>
+    <?php endif; ?>
+
     <?php if ($streak > 0): ?>
         <div class="streak-badge">🔥 <?= $streak ?> päeva järjest tasakaalus</div>
     <?php endif; ?>

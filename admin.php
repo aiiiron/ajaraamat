@@ -4,6 +4,7 @@ require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/functions.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_csrf();
     $id = (int) ($_POST['family_id'] ?? 0);
     $action = $_POST['action'] ?? '';
     if ($id > 0 && in_array($action, ['approved', 'rejected', 'pending'], true)) {
@@ -46,11 +47,13 @@ $all = get_all_families();
                     <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">Registreeris: <?= htmlspecialchars(date('d.m.Y H:i', strtotime($f['created_at']))) ?></p>
                     <div style="display:flex;gap:10px;">
                         <form method="post" style="flex:1;">
+                            <?= csrf_field() ?>
                             <input type="hidden" name="family_id" value="<?= $f['id'] ?>">
                             <input type="hidden" name="action" value="approved">
                             <button type="submit" class="btn btn-add full-width">Kinnita</button>
                         </form>
                         <form method="post" style="flex:1;">
+                            <?= csrf_field() ?>
                             <input type="hidden" name="family_id" value="<?= $f['id'] ?>">
                             <input type="hidden" name="action" value="rejected">
                             <button type="submit" class="btn-delete-full">Lükka tagasi</button>
@@ -86,6 +89,7 @@ $all = get_all_families();
                     <td>
                         <?php if ($f['status'] !== 'approved'): ?>
                         <form method="post" style="display:inline;">
+                            <?= csrf_field() ?>
                             <input type="hidden" name="family_id" value="<?= $f['id'] ?>">
                             <input type="hidden" name="action" value="approved">
                             <button type="submit" class="btn-edit" style="border:none;background:none;cursor:pointer;">Kinnita</button>
@@ -93,6 +97,7 @@ $all = get_all_families();
                         <?php endif; ?>
                         <?php if ($f['status'] !== 'rejected'): ?>
                         <form method="post" style="display:inline;">
+                            <?= csrf_field() ?>
                             <input type="hidden" name="family_id" value="<?= $f['id'] ?>">
                             <input type="hidden" name="action" value="rejected">
                             <button type="submit" class="btn-delete" style="cursor:pointer;">Blokeeri</button>

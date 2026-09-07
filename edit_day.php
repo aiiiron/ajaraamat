@@ -21,6 +21,7 @@ $pdo = get_db();
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_csrf();
     $action = $_POST['action'] ?? '';
     $id = (int) ($_POST['id'] ?? 0);
 
@@ -133,6 +134,7 @@ $dateLabel = date('d.m.Y', strtotime($date));
     ?>
     <div class="card day-entry-card">
         <form method="post">
+            <?= csrf_field() ?>
             <input type="hidden" name="date" value="<?= htmlspecialchars($date) ?>">
             <input type="hidden" name="child" value="<?= $childId ?>">
             <input type="hidden" name="action" value="update">
@@ -183,6 +185,7 @@ $dateLabel = date('d.m.Y', strtotime($date));
             </div>
         </form>
         <form method="post" onsubmit="return confirm('Kustutada see kanne täielikult?');" class="day-entry-delete-form">
+            <?= csrf_field() ?>
             <input type="hidden" name="date" value="<?= htmlspecialchars($date) ?>">
             <input type="hidden" name="child" value="<?= $childId ?>">
             <input type="hidden" name="action" value="delete">
