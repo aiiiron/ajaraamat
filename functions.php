@@ -156,6 +156,54 @@ function get_today_totals(int $childId): array {
     return ['raamat' => (int) $row['raamat'], 'ekraan' => (int) $row['ekraan']];
 }
 
+/**
+ * Reading vs screen minutes for today / this ISO week (Mon–Sun) / this
+ * calendar month / all time, in one query. All values are plain ints.
+ */
+function get_stats_matrix(int $childId): array {
+    $pdo = get_db();
+    $sql = "SELECT
+        COALESCE(SUM(CASE WHEN entry_date = CURDATE() THEN raamat END), 0) AS today_raamat,
+        COALESCE(SUM(CASE WHEN entry_date = CURDATE() THEN ekraan END), 0) AS today_ekraan,
+        COALESCE(SUM(CASE WHEN YEARWEEK(entry_date, 3) = YEARWEEK(CURDATE(), 3) THEN raamat END), 0) AS week_raamat,
+        COALESCE(SUM(CASE WHEN YEARWEEK(entry_date, 3) = YEARWEEK(CURDATE(), 3) THEN ekraan END), 0) AS week_ekraan,
+        COALESCE(SUM(CASE WHEN entry_date >= DATE_FORMAT(CURDATE(), '%Y-%m-01') AND entry_date <= CURDATE() THEN raamat END), 0) AS month_raamat,
+        COALESCE(SUM(CASE WHEN entry_date >= DATE_FORMAT(CURDATE(), '%Y-%m-01') AND entry_date <= CURDATE() THEN ekraan END), 0) AS month_ekraan,
+        COALESCE(SUM(raamat), 0) AS all_raamat,
+        COALESCE(SUM(ekraan), 0) AS all_ekraan
+      FROM entries WHERE child_id = :cid";
+    $stmt = $pdo->prepare($sql);
+    $stmt->execute([':cid' => $childId]);
+    $row = $stmt->fetch() ?: [];
+    foreach (['today_raamat', 'today_ekraan', 'week_raamat', 'week_ekraan',
+              'month_raamat', 'month_ekraan', 'all_raamat', 'all_ekraan'] as $k) {
+        $row[$k] = (int) ($row[$k] ?? 0);
+    }
+    return $row;
+}
+
+/** Four period tiles (today / week / month / all time), each with a reading
+ *  and a screen figure. Keeps the playful card look of the old stat grid. */
+function render_stats_tiles(array $s): void {
+    $tiles = [
+        ['Täna',      $s['today_raamat'], $s['today_ekraan'], false],
+        ['See nädal',  $s['week_raamat'],  $s['week_ekraan'],  false],
+        ['See kuu',    $s['month_raamat'], $s['month_ekraan'], false],
+        ['Kokku',      $s['all_raamat'],   $s['all_ekraan'],   true],
+    ];
+    ?>
+    <div class="period-grid">
+        <?php foreach ($tiles as [$label, $raamat, $ekraan, $isTotal]): ?>
+            <div class="period-tile<?= $isTotal ? ' pt-total' : '' ?>">
+                <div class="pt-label"><?= htmlspecialchars($label) ?></div>
+                <div class="pt-row pt-reading"><span class="pt-k">📖</span><span class="pt-v"><?= format_duration($raamat) ?></span></div>
+                <div class="pt-row pt-screen"><span class="pt-k">📱</span><span class="pt-v"><?= format_duration($ekraan) ?></span></div>
+            </div>
+        <?php endforeach; ?>
+    </div>
+    <?php
+}
+
 function count_distinct_dates(int $childId): int {
     $pdo = get_db();
     $stmt = $pdo->prepare("SELECT COUNT(DISTINCT entry_date) FROM entries WHERE child_id = :cid");
@@ -272,50 +320,52 @@ function get_top_books(int $childId, int $limit = 5): array {
     return $stmt->fetchAll();
 }
 
-/** Renders the books table. $editable adds a "Muuda" button. */
+/** Renders the book list, grouped by status. $editable adds a "Muuda" link. */
 function render_books_table(array $books, bool $editable = false): void {
     if (empty($books)) {
         echo '<p class="empty">Raamatuid pole veel lisatud.</p>';
         return;
     }
+
+    // get_books() already orders loeb -> lugemata -> loetud.
+    $sections = [
+        'loeb'     => ['Loeb praegu', 'bl-reading'],
+        'lugemata' => ['Lugemata',    'bl-unread'],
+        'loetud'   => ['Loetud',      'bl-done'],
+    ];
+    $groups = [];
+    foreach ($books as $b) {
+        $groups[$b['status']][] = $b;
+    }
     ?>
-    <div class="table-scroll">
-    <table class="entries-table books-table">
-        <thead>
-            <tr>
-                <th>Pealkiri</th>
-                <th>Autor</th>
-                <th>Staatus</th>
-                <th>Loetud (min)</th>
-                <th>Lõpetatud</th>
-                <?php if ($editable): ?><th></th><?php endif; ?>
-            </tr>
-        </thead>
-        <tbody>
-        <?php foreach ($books as $b): ?>
-            <tr>
-                <td><?= htmlspecialchars($b['title']) ?></td>
-                <td><?= $b['author'] ? htmlspecialchars($b['author']) : '–' ?></td>
-                <td>
-                    <?php if ($b['status'] === 'loetud'): ?>
-                        <span class="tag tag-reading">Loetud</span>
-                    <?php elseif ($b['status'] === 'loeb'): ?>
-                        <span class="tag tag-screen">Loeb praegu</span>
-                    <?php else: ?>
-                        <span class="tag tag-unread">Lugemata</span>
-                    <?php endif; ?>
-                </td>
-                <td><?= isset($b['total_minutes']) ? (int) $b['total_minutes'] : '–' ?></td>
-                <td><?= $b['finished_date'] ? htmlspecialchars(date('d.M', strtotime($b['finished_date']))) : '–' ?></td>
-                <?php if ($editable): ?>
-                <td class="row-actions">
-                    <a href="edit_book.php?id=<?= $b['id'] ?>" class="btn-edit" aria-label="Muuda">✎</a>
-                </td>
-                <?php endif; ?>
-            </tr>
+    <div class="books-list">
+        <?php foreach ($sections as $status => [$heading, $cls]):
+            if (empty($groups[$status])) { continue; } ?>
+            <div class="bl-group">
+                <p class="bl-group-head <?= $cls ?>"><?= $heading ?><span class="bl-count"><?= count($groups[$status]) ?></span></p>
+                <?php foreach ($groups[$status] as $b):
+                    $mins = isset($b['total_minutes']) ? (int) $b['total_minutes'] : 0;
+                    $hasMeta = $mins > 0 || !empty($b['finished_date']); ?>
+                    <div class="bl-item <?= $cls ?>">
+                        <div class="bl-main">
+                            <span class="bl-title"><?= htmlspecialchars($b['title']) ?></span>
+                            <?php if (!empty($b['author'])): ?>
+                                <span class="bl-author"><?= htmlspecialchars($b['author']) ?></span>
+                            <?php endif; ?>
+                        </div>
+                        <?php if ($hasMeta): ?>
+                            <div class="bl-meta">
+                                <?php if ($mins > 0): ?><span class="bl-mins">📖 <?= format_duration($mins) ?></span><?php endif; ?>
+                                <?php if (!empty($b['finished_date'])): ?><span class="bl-date">✓ <?= htmlspecialchars(date('d.M.Y', strtotime($b['finished_date']))) ?></span><?php endif; ?>
+                            </div>
+                        <?php endif; ?>
+                        <?php if ($editable): ?>
+                            <a href="edit_book.php?id=<?= $b['id'] ?>" class="bl-edit" aria-label="Muuda" title="Muuda">✎</a>
+                        <?php endif; ?>
+                    </div>
+                <?php endforeach; ?>
+            </div>
         <?php endforeach; ?>
-        </tbody>
-    </table>
     </div>
     <?php
 }

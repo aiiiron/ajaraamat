@@ -209,6 +209,49 @@ h2 { font-size: 18px; margin: 0 0 16px; }
 .stat-label { font-size: 11px; color: var(--text-muted); margin-bottom: 2px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
 .stat-value { font-family: var(--font-heading); font-size: 19px; font-weight: 700; color: var(--ink); }
 
+/* Statistika — one tile per period (Täna / See nädal / See kuu / Kokku) */
+.period-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.period-tile {
+  background: var(--card-bg);
+  border-radius: 18px;
+  padding: 14px;
+  box-shadow: 0 10px 24px -16px rgba(57, 47, 77, 0.22);
+}
+.pt-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+.pt-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 15px;
+}
+.pt-row + .pt-row { margin-top: 4px; }
+.pt-k { font-size: 15px; flex: none; }
+.pt-v {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+.pt-row.pt-reading .pt-v { color: #C93E68; }
+.pt-row.pt-screen .pt-v  { color: #5069C9; }
+.period-tile.pt-total {
+  background: linear-gradient(135deg, rgba(139, 92, 246, 0.13), rgba(236, 72, 153, 0.13));
+  box-shadow: 0 12px 26px -14px rgba(139, 92, 246, 0.4);
+}
+
 .actions {
   display: flex;
   gap: 12px;
@@ -563,11 +606,89 @@ select:focus { outline: 2px solid var(--accent-purple); border-color: transparen
 }
 .page-status { color: var(--text-muted); font-size: 13px; }
 
-/* Books table */
-.books-table th, .books-table td {
-  border-bottom: 1px solid var(--border);
-  padding: 10px 6px;
+/* Book list — grouped by status (Loeb praegu / Lugemata / Loetud) */
+.books-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
+.bl-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.bl-group-head {
+  margin: 0 0 2px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-heading);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.bl-group-head.bl-reading { color: #5069C9; }
+.bl-group-head.bl-unread  { color: #8B7FB0; }
+.bl-group-head.bl-done    { color: #C93E68; }
+.bl-count {
+  min-width: 20px;
+  padding: 1px 7px;
+  border-radius: var(--radius-pill);
+  background: rgba(57, 47, 77, 0.07);
+  color: var(--text-muted);
+  font-size: 11px;
+  text-align: center;
+}
+.bl-item {
+  position: relative;
+  border-radius: 14px;
+  padding: 12px 14px 12px 16px;
+  border-left: 4px solid transparent;
+}
+.bl-item.bl-reading { background: #EEF3FF; border-left-color: #5B7FE8; }
+.bl-item.bl-unread  { background: #F7F4FC; border-left-color: #C9BEE4; }
+.bl-item.bl-done    { background: #FFF3F8; border-left-color: #F0578F; }
+.bl-main {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding-right: 26px;
+}
+.bl-title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.bl-author {
+  font-size: 13px;
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+.bl-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
+  margin-top: 8px;
+  font-size: 13px;
+  font-weight: 700;
+}
+.bl-mins { color: #C93E68; }
+.bl-date { color: var(--text-muted); }
+.bl-edit {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 2px 7px;
+  color: var(--accent-purple);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 700;
+  opacity: 0.75;
+}
+.bl-edit:hover { opacity: 1; }
 
 .table-scroll {
   overflow-x: auto;

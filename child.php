@@ -24,7 +24,7 @@ if (!$child) {
 
 $childId = (int) $child['id'];
 $totals = get_totals($childId);
-$today = get_today_totals($childId);
+$stats = get_stats_matrix($childId);
 $streak = get_current_streak($childId);
 
 $hour = (int) date('G');
@@ -98,37 +98,8 @@ if ($owed > 0) {
         <?php render_balance_bar($totals['raamat'], $totals['ekraan']); ?>
     </div>
 
-    <div class="grid">
-        <div class="stat-card">
-            <div class="stat-icon reading">📖</div>
-            <div class="stat-body">
-                <div class="stat-label">Raamat kokku</div>
-                <div class="stat-value"><?= format_duration((int) $totals['raamat']) ?></div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon screen">📱</div>
-            <div class="stat-body">
-                <div class="stat-label">Ekraan kokku</div>
-                <div class="stat-value"><?= format_duration((int) $totals['ekraan']) ?></div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon reading">📖</div>
-            <div class="stat-body">
-                <div class="stat-label">Täna — Raamat</div>
-                <div class="stat-value"><?= format_duration((int) $today['raamat']) ?></div>
-            </div>
-        </div>
-        <div class="stat-card">
-            <div class="stat-icon screen">📱</div>
-            <div class="stat-body">
-                <div class="stat-label">Täna — Ekraan</div>
-                <div class="stat-value"><?= format_duration((int) $today['ekraan']) ?></div>
-            </div>
-        </div>
-    </div>
-    <?php if ($today['raamat'] === 0 && $today['ekraan'] === 0): ?>
+    <?php render_stats_tiles($stats); ?>
+    <?php if ($stats['today_raamat'] === 0 && $stats['today_ekraan'] === 0): ?>
         <p class="child-link-note" style="margin-top:-8px;margin-bottom:16px;">Täna pole veel midagi lisatud.</p>
     <?php endif; ?>
 
