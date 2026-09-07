@@ -435,6 +435,22 @@ input[type="text"], input[type="number"], input[type="date"], input[type="passwo
   color: var(--text);
 }
 
+/* iOS Safari gives date inputs an intrinsic width that ignores width:100%
+   until the native appearance is stripped. */
+input[type="date"] {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  min-height: 46px;
+}
+input[type="date"]::-webkit-date-and-time-value {
+  text-align: left;
+  min-width: 0;
+}
+input[type="date"]::-webkit-calendar-picker-indicator {
+  margin-left: auto;
+}
+
 /* Add / edit entry — one entry is either a book or a screen record */
 .type-fields[hidden] { display: none; }
 input:focus { outline: 2px solid var(--accent-purple); border-color: transparent; }
