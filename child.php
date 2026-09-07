@@ -13,7 +13,7 @@ if (!$child) {
     <title>Ei leitud — Ajaraamat</title><link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css"></head>
+<link rel="stylesheet" href="style.css?v=<?= @filemtime(__DIR__ . "/style.css") ?>"></head>
     <body><div class="wrap narrow"><div class="card" style="text-align:center;margin-top:60px;">
     <h2>Seda linki ei leitud</h2>
     <p style="margin-top:8px;color:var(--text-muted);">Palu vanemal link uuesti jagada.</p>
@@ -66,7 +66,7 @@ if ($owed > 0) {
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.php?token=<?= urlencode($token) ?>">
 <meta name="theme-color" content="#8B5CF6">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=<?= @filemtime(__DIR__ . "/style.css") ?>">
 </head>
 <body>
 <div class="wrap">
