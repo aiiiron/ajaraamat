@@ -428,10 +428,15 @@ input[type="text"], input[type="number"], input[type="date"], input[type="passwo
   border-radius: 14px;
   font-size: 15px;
   width: 100%;
+  min-width: 0;
+  max-width: 100%;
   font-family: var(--font-body);
   background: #FFFDFE;
   color: var(--text);
 }
+
+/* Add / edit entry — one entry is either a book or a screen record */
+.type-fields[hidden] { display: none; }
 input:focus { outline: 2px solid var(--accent-purple); border-color: transparent; }
 
 select {

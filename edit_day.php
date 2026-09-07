@@ -37,15 +37,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     if ($action === 'update' && $id > 0 && $ownsEntry) {
+        $type = $_POST['type'] ?? 'mixed';
         $raamat = (int) ($_POST['raamat'] ?? 0);
+        $ekraan = (int) ($_POST['ekraan'] ?? 0);
         $bookChoice = $_POST['book_id'] ?? '';
         $newBookTitle = trim($_POST['new_book_title'] ?? '');
         $raamatComment = trim($_POST['raamat_comment'] ?? '');
-        $ekraan = (int) ($_POST['ekraan'] ?? 0);
         $ekraanComment = trim($_POST['ekraan_comment'] ?? '');
 
+        // A single-type entry only keeps its own side.
+        if ($type === 'raamat') {
+            $ekraan = 0;
+            $ekraanComment = '';
+        } elseif ($type === 'ekraan') {
+            $raamat = 0;
+            $raamatComment = '';
+            $bookChoice = '';
+        }
+
         if ($raamat <= 0 && $ekraan <= 0) {
-            $error = 'Igal kandel peab olema vähemalt üks väärtus (Raamat või Ekraan) suurem kui 0.';
+            $error = 'Kandel peab olema väärtus suurem kui 0.';
         } elseif ($raamat > 0 && $bookChoice === 'new' && $newBookTitle === '') {
             $error = 'Sisesta uue raamatu pealkiri.';
         } else {
@@ -114,7 +125,12 @@ $dateLabel = date('d.m.Y', strtotime($date));
         <p class="empty">Sellel päeval pole enam kandeid.</p>
     <?php endif; ?>
 
-    <?php foreach ($dayEntries as $e): ?>
+    <?php foreach ($dayEntries as $e):
+        $eHasR = (int) $e['raamat'] > 0;
+        $eHasE = (int) $e['ekraan'] > 0;
+        $eMixed = $eHasR && $eHasE;
+        $eType = ($eHasE && !$eHasR) ? 'ekraan' : 'raamat';
+    ?>
     <div class="card day-entry-card">
         <form method="post">
             <input type="hidden" name="date" value="<?= htmlspecialchars($date) ?>">
@@ -122,27 +138,45 @@ $dateLabel = date('d.m.Y', strtotime($date));
             <input type="hidden" name="action" value="update">
             <input type="hidden" name="id" value="<?= $e['id'] ?>">
 
-            <label for="raamat_<?= $e['id'] ?>">📖 Raamat (min)</label>
-            <input type="number" id="raamat_<?= $e['id'] ?>" name="raamat" min="0" value="<?= (int) $e['raamat'] ?>" inputmode="numeric">
+            <?php if ($eMixed): ?>
+                <input type="hidden" name="type" value="mixed">
+                <p class="child-link-note" style="text-align:left;margin:0 0 10px;">Vana kanne — sisaldab nii raamatut kui ekraani.</p>
+            <?php else: ?>
+                <div class="toggle-group">
+                    <label class="toggle-btn <?= $eType === 'raamat' ? 'active' : '' ?>">
+                        <input type="radio" name="type" value="raamat" <?= $eType === 'raamat' ? 'checked' : '' ?> hidden> 📖 Raamat
+                    </label>
+                    <label class="toggle-btn <?= $eType === 'ekraan' ? 'active' : '' ?>">
+                        <input type="radio" name="type" value="ekraan" <?= $eType === 'ekraan' ? 'checked' : '' ?> hidden> 📱 Ekraan
+                    </label>
+                </div>
+            <?php endif; ?>
 
-            <label for="book_id_<?= $e['id'] ?>">Milline raamat?</label>
-            <select id="book_id_<?= $e['id'] ?>" name="book_id" onchange="document.getElementById('new_book_title_<?= $e['id'] ?>').style.display = this.value === 'new' ? 'block' : 'none';">
-                <option value="">— vali raamat —</option>
-                <?php foreach ($books as $b): ?>
-                    <option value="<?= $b['id'] ?>" <?= (int) $e['book_id'] === (int) $b['id'] ? 'selected' : '' ?>><?= htmlspecialchars($b['title']) ?><?= book_status_suffix($b['status']) ?></option>
-                <?php endforeach; ?>
-                <option value="new">+ Uus raamat…</option>
-            </select>
-            <input type="text" id="new_book_title_<?= $e['id'] ?>" name="new_book_title" placeholder="Uue raamatu pealkiri" style="display:none;margin-top:8px;">
+            <div class="type-fields" data-type="raamat" <?= ($eMixed || $eType === 'raamat') ? '' : 'hidden' ?>>
+                <label for="raamat_<?= $e['id'] ?>">📖 Raamat (min)</label>
+                <input type="number" id="raamat_<?= $e['id'] ?>" name="raamat" min="0" value="<?= (int) $e['raamat'] ?>" inputmode="numeric">
 
-            <label for="raamat_comment_<?= $e['id'] ?>">Märkus (valikuline)</label>
-            <input type="text" id="raamat_comment_<?= $e['id'] ?>" name="raamat_comment" value="<?= htmlspecialchars($e['raamat_comment'] ?? '') ?>">
+                <label for="book_id_<?= $e['id'] ?>">Milline raamat?</label>
+                <select id="book_id_<?= $e['id'] ?>" name="book_id" onchange="document.getElementById('new_book_title_<?= $e['id'] ?>').style.display = this.value === 'new' ? 'block' : 'none';">
+                    <option value="">— vali raamat —</option>
+                    <?php foreach ($books as $b): ?>
+                        <option value="<?= $b['id'] ?>" <?= (int) $e['book_id'] === (int) $b['id'] ? 'selected' : '' ?>><?= htmlspecialchars($b['title']) ?><?= book_status_suffix($b['status']) ?></option>
+                    <?php endforeach; ?>
+                    <option value="new">+ Uus raamat…</option>
+                </select>
+                <input type="text" id="new_book_title_<?= $e['id'] ?>" name="new_book_title" placeholder="Uue raamatu pealkiri" style="display:none;margin-top:8px;">
 
-            <label for="ekraan_<?= $e['id'] ?>">📱 Ekraan (min)</label>
-            <input type="number" id="ekraan_<?= $e['id'] ?>" name="ekraan" min="0" value="<?= (int) $e['ekraan'] ?>" inputmode="numeric">
+                <label for="raamat_comment_<?= $e['id'] ?>">Märkus (valikuline)</label>
+                <input type="text" id="raamat_comment_<?= $e['id'] ?>" name="raamat_comment" value="<?= htmlspecialchars($e['raamat_comment'] ?? '') ?>">
+            </div>
 
-            <label for="ekraan_comment_<?= $e['id'] ?>">Ekraani kommentaar (valikuline)</label>
-            <input type="text" id="ekraan_comment_<?= $e['id'] ?>" name="ekraan_comment" value="<?= htmlspecialchars($e['ekraan_comment'] ?? '') ?>">
+            <div class="type-fields" data-type="ekraan" <?= ($eMixed || $eType === 'ekraan') ? '' : 'hidden' ?>>
+                <label for="ekraan_<?= $e['id'] ?>">📱 Ekraan (min)</label>
+                <input type="number" id="ekraan_<?= $e['id'] ?>" name="ekraan" min="0" value="<?= (int) $e['ekraan'] ?>" inputmode="numeric">
+
+                <label for="ekraan_comment_<?= $e['id'] ?>">Ekraani kommentaar (valikuline)</label>
+                <input type="text" id="ekraan_comment_<?= $e['id'] ?>" name="ekraan_comment" value="<?= htmlspecialchars($e['ekraan_comment'] ?? '') ?>">
+            </div>
 
             <div class="day-entry-actions">
                 <button type="submit" class="btn btn-add">Salvesta</button>
@@ -162,5 +196,21 @@ $dateLabel = date('d.m.Y', strtotime($date));
         <a href="add.php?child=<?= $childId ?>&date=<?= urlencode($date) ?>" class="btn btn-add full-width">+ Lisa uus kanne sellele päevale</a>
     </div>
 </div>
+<script>
+document.querySelectorAll('.toggle-group').forEach(function (group) {
+    var scope = group.closest('form') || document;
+    group.querySelectorAll('input[type=radio]').forEach(function (radio) {
+        radio.addEventListener('change', function () {
+            var val = group.querySelector('input:checked').value;
+            group.querySelectorAll('.toggle-btn').forEach(function (btn) {
+                btn.classList.toggle('active', btn.querySelector('input').value === val);
+            });
+            scope.querySelectorAll('.type-fields').forEach(function (f) {
+                f.hidden = f.dataset.type !== val;
+            });
+        });
+    });
+});
+</script>
 </body>
 </html>

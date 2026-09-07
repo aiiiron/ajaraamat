@@ -77,6 +77,10 @@ $totals = get_totals($childId);
         <div class="pt-row pt-balance <?= $balClass ?>"><span class="pt-k">⚖️</span><span class="pt-t">Tasakaal</span><span class="pt-v"><?= htmlspecialchars($balText) ?></span></div>
     </div>
 
+    <div class="actions">
+        <a href="add.php?child=<?= $childId ?>" class="btn btn-add full-width">+ Lisa kanne</a>
+    </div>
+
     <div class="card">
         <h2><?= htmlspecialchars($child['name']) ?> — kõik kanded</h2>
         <form method="get" class="search-row">
