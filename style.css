@@ -233,13 +233,16 @@ h2 { font-size: 18px; margin: 0 0 16px; }
 .pt-row {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 8px;
   font-family: var(--font-heading);
   font-weight: 700;
   font-size: 15px;
 }
 .pt-row + .pt-row { margin-top: 6px; }
+.pt-t {
+  color: var(--text-muted);
+  font-size: 13px;
+}
 .pt-k {
   flex: none;
   width: 26px;
@@ -253,6 +256,7 @@ h2 { font-size: 18px; margin: 0 0 16px; }
 .pt-row.pt-reading .pt-k { background: var(--reading-bg); }
 .pt-row.pt-screen .pt-k  { background: var(--screen-bg); }
 .pt-v {
+  margin-left: auto;
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
 }
@@ -787,38 +791,55 @@ select:focus { outline: 2px solid var(--accent-purple); border-color: transparen
 }
 .heatmap-legend .hm-cell { width: 10px; height: 10px; margin-right: 4px; vertical-align: middle; }
 
-/* "Enim aega" — stacked reading / screen lists */
-.top-block + .top-block { margin-top: 18px; }
+/* "Enim aega" — same grouped tinted-card look as the book list */
+.top-block + .top-block { margin-top: 20px; }
 .top-heading {
-  margin: 0 0 4px;
-  font-size: 11px;
+  margin: 0 0 8px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-heading);
+  font-size: 12px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
-  color: var(--text-muted);
+  letter-spacing: 0.04em;
 }
+.top-block.tb-reading .top-heading { color: #C93E68; }
+.top-block.tb-screen  .top-heading { color: #5069C9; }
 .top-list {
   list-style: none;
   padding: 0;
   margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 .top-list li {
   display: flex;
   justify-content: space-between;
   align-items: baseline;
   gap: 12px;
-  padding: 9px 0;
-  border-bottom: 1px solid var(--border);
+  padding: 11px 14px;
+  border-radius: 14px;
+  border-left: 4px solid transparent;
   font-size: 14px;
 }
-.top-list li:last-child { border-bottom: none; }
-.top-name { min-width: 0; overflow-wrap: anywhere; }
+.top-block.tb-reading .top-list li { background: #FFF3F8; border-left-color: #F0578F; }
+.top-block.tb-screen  .top-list li { background: #EEF3FF; border-left-color: #5B7FE8; }
+.top-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  color: var(--ink);
+}
 .top-minutes {
   flex: none;
   color: var(--text-muted);
   font-size: 13px;
   font-weight: 700;
   white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
 /* Quick-add presets */

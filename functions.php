@@ -196,8 +196,8 @@ function render_stats_tiles(array $s): void {
         <?php foreach ($tiles as [$label, $raamat, $ekraan, $isTotal]): ?>
             <div class="period-tile<?= $isTotal ? ' pt-total' : '' ?>">
                 <div class="pt-label"><?= htmlspecialchars($label) ?></div>
-                <div class="pt-row pt-reading"><span class="pt-k">📖</span><span class="pt-v"><?= format_duration($raamat) ?></span></div>
-                <div class="pt-row pt-screen"><span class="pt-k">📱</span><span class="pt-v"><?= format_duration($ekraan) ?></span></div>
+                <div class="pt-row pt-reading"><span class="pt-k">📖</span><span class="pt-t">Raamat</span><span class="pt-v"><?= format_duration($raamat) ?></span></div>
+                <div class="pt-row pt-screen"><span class="pt-k">📱</span><span class="pt-t">Ekraan</span><span class="pt-v"><?= format_duration($ekraan) ?></span></div>
             </div>
         <?php endforeach; ?>
     </div>

@@ -112,8 +112,8 @@ $chartEkraan = array_map(fn($d) => $d['ekraan'], $daily);
     <section class="card">
         <h2>Enim aega</h2>
         <?php if (!empty($topBooks)): ?>
-            <div class="top-block">
-                <p class="top-heading">📖 Raamatud</p>
+            <div class="top-block tb-reading">
+                <p class="top-heading">📖 Raamatud <span class="bl-count"><?= count($topBooks) ?></span></p>
                 <ul class="top-list">
                     <?php foreach ($topBooks as $t): ?>
                         <li><span class="top-name"><?= htmlspecialchars($t['title']) ?></span><span class="top-minutes"><?= format_duration((int) $t['minutes']) ?></span></li>
@@ -122,8 +122,8 @@ $chartEkraan = array_map(fn($d) => $d['ekraan'], $daily);
             </div>
         <?php endif; ?>
         <?php if (!empty($topScreen)): ?>
-            <div class="top-block">
-                <p class="top-heading">📱 Ekraan</p>
+            <div class="top-block tb-screen">
+                <p class="top-heading">📱 Ekraan <span class="bl-count"><?= count($topScreen) ?></span></p>
                 <ul class="top-list">
                     <?php foreach ($topScreen as $t): ?>
                         <li><span class="top-name"><?= htmlspecialchars($t['comment']) ?></span><span class="top-minutes"><?= format_duration((int) $t['minutes']) ?></span></li>
