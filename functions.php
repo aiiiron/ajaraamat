@@ -480,14 +480,27 @@ function render_heatmap(array $dailyTotals): void {
         <?php foreach ($dailyTotals as $d):
             $hasData = $d['raamat'] > 0 || $d['ekraan'] > 0;
             $owed = round($d['ekraan'] * READING_RATIO) - $d['raamat'];
-            $class = !$hasData ? 'hm-empty' : ($owed <= 0 ? 'hm-good' : 'hm-debt');
-            $label = date('d.m', strtotime($d['date'])) . ': ' . $d['raamat'] . ' min raamat, ' . $d['ekraan'] . ' min ekraan';
+            if (!$hasData) {
+                $class = 'hm-empty';
+                $state = 'Kandeid pole';
+            } elseif ($owed > 0) {
+                $class = 'hm-debt';
+                $state = 'Võlgu';
+            } elseif ($owed < 0) {
+                $class = 'hm-bonus';
+                $state = 'Boonuses';
+            } else {
+                $class = 'hm-good';
+                $state = 'Tasakaalus';
+            }
+            $label = date('d.m', strtotime($d['date'])) . ': ' . $d['raamat'] . ' min raamat, ' . $d['ekraan'] . ' min ekraan — ' . $state;
         ?>
             <div class="hm-cell <?= $class ?>" title="<?= htmlspecialchars($label) ?>"></div>
         <?php endforeach; ?>
     </div>
     <div class="heatmap-legend">
         <span><span class="hm-cell hm-good" style="display:inline-block;"></span> Tasakaalus</span>
+        <span><span class="hm-cell hm-bonus" style="display:inline-block;"></span> Boonuses</span>
         <span><span class="hm-cell hm-debt" style="display:inline-block;"></span> Võlgu</span>
         <span><span class="hm-cell hm-empty" style="display:inline-block;"></span> Kandeid pole</span>
     </div>

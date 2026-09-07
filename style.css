@@ -780,11 +780,13 @@ select:focus { outline: 2px solid var(--accent-purple); border-color: transparen
   border-radius: 4px;
 }
 .hm-good { background: var(--success-color); }
+.hm-bonus { background: var(--screen-color); }
 .hm-debt { background: var(--owed-color); }
 .hm-empty { background: var(--border); }
 .heatmap-legend {
   display: flex;
-  gap: 14px;
+  flex-wrap: wrap;
+  gap: 8px 14px;
   font-size: 12px;
   color: var(--text-muted);
   margin-top: 4px;
