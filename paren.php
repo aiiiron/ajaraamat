@@ -64,7 +64,7 @@ $chartEkraan = array_map(fn($d) => $d['ekraan'], $daily);
     <header class="topbar">
         <h1 class="app-logo"><img src="logo-mark.png" alt="" width="44" height="44">Ajaraamat</h1>
         <div class="header-actions">
-            <button type="button" class="icon-btn" onclick="location.reload();" aria-label="Värskenda" title="Värskenda">⟳</button>
+            <button type="button" class="icon-btn" onclick="location.reload();" aria-label="Värskenda" title="Värskenda"><?= icon("refresh") ?></button>
             <a href="logout.php" class="link-muted">Logi välja</a>
         </div>
     </header>
@@ -79,11 +79,11 @@ $chartEkraan = array_map(fn($d) => $d['ekraan'], $daily);
     <?php render_child_switcher($children, $childId, 'paren.php'); ?>
 
     <?php if (($_GET['saved'] ?? '') === '1'): ?>
-        <div class="milestone-banner">✅ Kanne salvestatud!</div>
+        <div class="milestone-banner"><?= icon("check") ?> Kanne salvestatud!</div>
     <?php endif; ?>
 
     <?php if ($streak > 0): ?>
-        <div class="streak-badge">🔥 <?= $streak ?> päeva järjest tasakaalus</div>
+        <div class="streak-badge"><?= icon("flame") ?> <?= $streak ?> päeva järjest tasakaalus</div>
     <?php endif; ?>
 
     <div class="balance-card <?= $balanceClass ?>">
@@ -98,7 +98,7 @@ $chartEkraan = array_map(fn($d) => $d['ekraan'], $daily);
     <?php endif; ?>
 
     <div class="actions">
-        <a href="add.php?child=<?= $childId ?>" class="btn btn-add full-width">+ Lisa kanne</a>
+        <a href="add.php?child=<?= $childId ?>" class="btn btn-add full-width"><?= icon("plus") ?> Lisa kanne</a>
     </div>
 
     <section class="card">

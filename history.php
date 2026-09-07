@@ -53,7 +53,7 @@ $totals = get_totals($childId);
     <header class="topbar">
         <h1 class="app-logo"><img src="logo-mark.png" alt="" width="44" height="44">Ajaraamat</h1>
         <div class="header-actions">
-            <button type="button" class="icon-btn" onclick="location.reload();" aria-label="Värskenda" title="Värskenda">⟳</button>
+            <button type="button" class="icon-btn" onclick="location.reload();" aria-label="Värskenda" title="Värskenda"><?= icon("refresh") ?></button>
             <a href="logout.php" class="link-muted">Logi välja</a>
         </div>
     </header>
@@ -82,7 +82,7 @@ $totals = get_totals($childId);
     </div>
 
     <div class="actions">
-        <a href="add.php?child=<?= $childId ?>" class="btn btn-add full-width">+ Lisa kanne</a>
+        <a href="add.php?child=<?= $childId ?>" class="btn btn-add full-width"><?= icon("plus") ?> Lisa kanne</a>
     </div>
 
     <div class="card">
@@ -90,7 +90,7 @@ $totals = get_totals($childId);
         <form method="get" class="search-row">
             <input type="hidden" name="child" value="<?= $childId ?>">
             <input type="text" name="q" value="<?= htmlspecialchars($q) ?>" placeholder="Otsi kommentaari järgi (nt. Youtube, Karlsson)">
-            <button type="submit" class="btn btn-add">Otsi</button>
+            <button type="submit" class="btn btn-add"><?= icon("search") ?> Otsi</button>
         </form>
         <?php if ($q !== ''): ?>
             <p class="child-link-note" style="text-align:left;margin:-8px 0 12px;">

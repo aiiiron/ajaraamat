@@ -92,7 +92,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 <div class="wrap narrow">
     <header class="topbar">
-        <a href="<?= $fromDay !== '' ? 'edit_day.php?date=' . urlencode($fromDay) . '&child=' . $childId : 'paren.php?child=' . $childId ?>" class="link-muted">← Tagasi</a>
+        <a href="<?= $fromDay !== '' ? 'edit_day.php?date=' . urlencode($fromDay) . '&child=' . $childId : 'paren.php?child=' . $childId ?>" class="link-muted"><?= icon("arrow-left") ?> Tagasi</a>
     </header>
     <div class="card">
         <h2>Lisa kanne — <?= htmlspecialchars($child['name']) ?></h2>

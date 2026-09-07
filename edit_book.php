@@ -89,7 +89,7 @@ $note = $_POST['note'] ?? $book['note'];
 <body>
 <div class="wrap narrow">
     <header class="topbar">
-        <a href="books.php?child=<?= $childId ?>" class="link-muted">← Tagasi</a>
+        <a href="books.php?child=<?= $childId ?>" class="link-muted"><?= icon("arrow-left") ?> Tagasi</a>
     </header>
     <div class="card">
         <h2>Muuda raamatut — <?= htmlspecialchars($book['child_name']) ?></h2>

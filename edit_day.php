@@ -120,7 +120,7 @@ $dateLabel = date('d.m.Y', strtotime($date));
 <body>
 <div class="wrap narrow">
     <header class="topbar">
-        <a href="history.php?child=<?= $childId ?>" class="link-muted">← Tagasi</a>
+        <a href="history.php?child=<?= $childId ?>" class="link-muted"><?= icon("arrow-left") ?> Tagasi</a>
     </header>
 
     <h2 class="day-edit-title"><?= htmlspecialchars($child['name']) ?> — <?= htmlspecialchars($dateLabel) ?></h2>
@@ -200,7 +200,7 @@ $dateLabel = date('d.m.Y', strtotime($date));
     <?php endforeach; ?>
 
     <div class="actions">
-        <a href="add.php?child=<?= $childId ?>&date=<?= urlencode($date) ?>" class="btn btn-add full-width">+ Lisa uus kanne sellele päevale</a>
+        <a href="add.php?child=<?= $childId ?>&date=<?= urlencode($date) ?>" class="btn btn-add full-width"><?= icon("plus") ?> Lisa uus kanne sellele päevale</a>
     </div>
 </div>
 <script>

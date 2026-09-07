@@ -65,7 +65,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
 <div class="wrap narrow">
     <header class="topbar">
-        <a href="books.php?child=<?= $childId ?>" class="link-muted">← Tagasi</a>
+        <a href="books.php?child=<?= $childId ?>" class="link-muted"><?= icon("arrow-left") ?> Tagasi</a>
     </header>
     <div class="card">
         <h2>Lisa raamat — <?= htmlspecialchars($child['name']) ?></h2>

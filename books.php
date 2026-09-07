@@ -41,7 +41,7 @@ $milestone = get_book_milestone($finishedCount);
     <header class="topbar">
         <h1 class="app-logo"><img src="logo-mark.png" alt="" width="44" height="44">Ajaraamat</h1>
         <div class="header-actions">
-            <button type="button" class="icon-btn" onclick="location.reload();" aria-label="Värskenda" title="Värskenda">⟳</button>
+            <button type="button" class="icon-btn" onclick="location.reload();" aria-label="Värskenda" title="Värskenda"><?= icon("refresh") ?></button>
             <a href="logout.php" class="link-muted">Logi välja</a>
         </div>
     </header>
@@ -65,7 +65,7 @@ $milestone = get_book_milestone($finishedCount);
     <?php endif; ?>
 
     <div class="actions">
-        <a href="add_book.php?child=<?= $childId ?>" class="btn btn-add full-width">+ Lisa raamat</a>
+        <a href="add_book.php?child=<?= $childId ?>" class="btn btn-add full-width"><?= icon("plus") ?> Lisa raamat</a>
     </div>
 
     <div class="card">

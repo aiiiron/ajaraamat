@@ -27,6 +27,27 @@ function format_duration(int $minutes): string {
 }
 
 // =========================================================
+// Icons — inline Lucide (https://lucide.dev, ISC/MIT). 24x24, currentColor
+// so an icon takes the colour of its surrounding text.
+// =========================================================
+
+function icon(string $name, string $class = 'ic'): string {
+    static $paths = [
+        'arrow-left' => '<path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>',
+        'refresh'    => '<path d="M21 12a9 9 0 1 1-9-9c2.52 0 4.93 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/>',
+        'pencil'     => '<path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/><path d="m15 5 4 4"/>',
+        'check'      => '<path d="M20 6 9 17l-5-5"/>',
+        'flame'      => '<path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.07-2.14-.22-4.05 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.15.43-2.29 1-3a2.5 2.5 0 0 0 2.5 2.5"/>',
+        'timer'      => '<line x1="10" x2="14" y1="2" y2="2"/><line x1="12" x2="15" y1="14" y2="11"/><circle cx="12" cy="14" r="8"/>',
+        'search'     => '<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+        'scale'      => '<path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/><path d="M7 21h10"/><path d="M12 3v18"/><path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2"/>',
+        'plus'       => '<path d="M5 12h14"/><path d="M12 5v14"/>',
+    ];
+    $p = $paths[$name] ?? '';
+    return '<svg class="' . htmlspecialchars($class, ENT_QUOTES) . '" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">' . $p . '</svg>';
+}
+
+// =========================================================
 // CSRF (session-authenticated forms)
 // =========================================================
 
@@ -391,7 +412,7 @@ function render_books_table(array $books, bool $editable = false): void {
                             </div>
                         <?php endif; ?>
                         <?php if ($editable): ?>
-                            <a href="edit_book.php?id=<?= $b['id'] ?>" class="bl-edit" aria-label="Muuda" title="Muuda">✎</a>
+                            <a href="edit_book.php?id=<?= $b['id'] ?>" class="bl-edit" aria-label="Muuda" title="Muuda"><?= icon("pencil") ?></a>
                         <?php endif; ?>
                     </div>
                 <?php endforeach; ?>
@@ -586,7 +607,7 @@ function render_entries_table(array $entries, bool $editable = false, int $child
                 <div class="day-head">
                     <span class="day-date"><?= htmlspecialchars(date('d.M', strtotime($date))) ?></span>
                     <?php if ($editable): ?>
-                        <a href="edit_day.php?date=<?= urlencode($date) ?>&child=<?= $childId ?>" class="btn-edit-day" aria-label="Muuda seda päeva" title="Muuda seda päeva">✎ Muuda</a>
+                        <a href="edit_day.php?date=<?= urlencode($date) ?>&child=<?= $childId ?>" class="btn-edit-day" aria-label="Muuda seda päeva" title="Muuda seda päeva"><?= icon("pencil") ?> Muuda</a>
                     <?php endif; ?>
                 </div>
                 <div class="day-rows">

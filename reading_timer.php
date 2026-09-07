@@ -69,7 +69,7 @@ $books = array_filter($books, fn($b) => $b['status'] !== 'loetud') ?: $books; //
 <body>
 <div class="wrap narrow">
     <header class="topbar">
-        <a href="child.php?token=<?= htmlspecialchars($token) ?>" class="link-muted">← Tagasi</a>
+        <a href="child.php?token=<?= htmlspecialchars($token) ?>" class="link-muted"><?= icon("arrow-left") ?> Tagasi</a>
     </header>
 
     <?php if (empty($books)): ?>
@@ -81,7 +81,7 @@ $books = array_filter($books, fn($b) => $b['status'] !== 'loetud') ?: $books; //
 
     <!-- Step 1: pick a book and mode -->
     <div class="card" id="setup-view">
-        <h2>⏱ Alusta lugemist</h2>
+        <h2><?= icon("timer") ?> Alusta lugemist</h2>
 
         <div class="field-stack">
             <label for="book_id">Raamat</label>

@@ -33,6 +33,16 @@
 
 * { box-sizing: border-box; }
 
+.ic {
+  width: 1.15em;
+  height: 1.15em;
+  flex: none;
+  vertical-align: -0.18em;
+  display: inline-block;
+}
+/* icon that sits alone in a round button */
+.icon-btn .ic { width: 1em; height: 1em; vertical-align: 0; }
+
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
@@ -268,28 +278,6 @@ h2 { font-size: 18px; margin: 0 0 16px; }
 .quick-add-btn:active,
 .tab:active { transform: scale(0.97); }
 .btn-delete-full, .toggle-btn, .quick-add-btn, .tab { transition: transform 0.1s ease; }
-
-/* Landscape on a phone: ask for portrait instead of reflowing sideways.
-   Installed PWAs are already pinned via manifest "orientation": "portrait". */
-@media (orientation: landscape) and (max-height: 500px) {
-  body { overflow: hidden; }
-  body::before {
-    content: "Keera telefon püsti";
-    position: fixed;
-    inset: 0;
-    z-index: 99999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 24px;
-    text-align: center;
-    background: var(--bg);
-    color: var(--text-muted);
-    font-family: var(--font-heading);
-    font-weight: 700;
-    font-size: 18px;
-  }
-}
 
 .btn {
   flex: 1;

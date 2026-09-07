@@ -77,7 +77,7 @@ if ($owed > 0) {
     <header class="topbar">
         <h1 class="app-logo"><img src="logo-mark.png" alt="" width="44" height="44">Ajaraamat</h1>
         <div class="header-actions">
-            <button type="button" class="icon-btn" onclick="location.reload();" aria-label="Värskenda" title="Värskenda">⟳</button>
+            <button type="button" class="icon-btn" onclick="location.reload();" aria-label="Värskenda" title="Värskenda"><?= icon("refresh") ?></button>
         </div>
     </header>
 
@@ -89,11 +89,11 @@ if ($owed > 0) {
     </nav>
 
     <?php if (($_GET['saved'] ?? '') === '1'): ?>
-        <div class="milestone-banner">✅ Lugemine salvestatud!</div>
+        <div class="milestone-banner"><?= icon("check") ?> Lugemine salvestatud!</div>
     <?php endif; ?>
 
     <?php if ($streak > 0): ?>
-        <div class="streak-badge">🔥 <?= $streak ?> päeva järjest tasakaalus</div>
+        <div class="streak-badge"><?= icon("flame") ?> <?= $streak ?> päeva järjest tasakaalus</div>
     <?php endif; ?>
 
     <div class="balance-card <?= $balanceClass ?>">
@@ -108,7 +108,7 @@ if ($owed > 0) {
     <?php endif; ?>
 
     <div class="actions">
-        <a href="reading_timer.php?token=<?= htmlspecialchars($token) ?>" class="btn btn-add full-width">⏱ Alusta lugemist</a>
+        <a href="reading_timer.php?token=<?= htmlspecialchars($token) ?>" class="btn btn-add full-width"><?= icon("timer") ?> Alusta lugemist</a>
     </div>
 
     <section class="card">
