@@ -16,6 +16,8 @@ $child = $token !== '' ? get_child_by_token($token) : null;
 $manifest = [
     'name'             => 'Ajaraamat',
     'short_name'       => 'Ajaraamat',
+    'description'      => 'Laste lugemis- ja ekraaniaja jälgija — hoia tasakaalu.',
+    'lang'            => 'et',
     'icons'            => [
         ['src' => 'icon-192.png', 'sizes' => '192x192', 'type' => 'image/png'],
         ['src' => 'icon-512.png', 'sizes' => '512x512', 'type' => 'image/png'],
@@ -23,6 +25,7 @@ $manifest = [
     'theme_color'      => '#8B5CF6',
     'background_color' => '#FFE8D6',
     'display'          => 'standalone',
+    'orientation'      => 'portrait',
     'scope'           => './',
     'start_url'        => 'index.php',
 ];
@@ -33,6 +36,10 @@ if ($child) {
     $manifest['id']         = 'child-' . $t;               // distinct install per child
     $manifest['name']       = $child['name'] . ' — Ajaraamat';
     $manifest['short_name'] = $child['name'];
+    $manifest['shortcuts']  = [
+        ['name' => 'Alusta lugemist', 'short_name' => 'Taimer', 'url' => 'reading_timer.php?token=' . $t],
+        ['name' => 'Raamatud', 'short_name' => 'Raamatud', 'url' => 'child_books.php?token=' . $t],
+    ];
 }
 
 echo json_encode($manifest, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT);

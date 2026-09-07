@@ -1,6 +1,9 @@
 {
   "name": "Ajaraamat",
   "short_name": "Ajaraamat",
+  "description": "Laste lugemis- ja ekraaniaja jälgija — hoia tasakaalu.",
+  "lang": "et",
+  "categories": ["education", "lifestyle", "productivity"],
   "icons": [
     { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
     { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
@@ -8,5 +11,12 @@
   "theme_color": "#8B5CF6",
   "background_color": "#FFE8D6",
   "display": "standalone",
-  "start_url": "index.php"
+  "orientation": "portrait",
+  "start_url": "index.php",
+  "scope": "./",
+  "shortcuts": [
+    { "name": "Töölaud", "short_name": "Töölaud", "url": "paren.php" },
+    { "name": "Kõik kanded", "short_name": "Kanded", "url": "history.php" },
+    { "name": "Raamatud", "short_name": "Raamatud", "url": "books.php" }
+  ]
 }

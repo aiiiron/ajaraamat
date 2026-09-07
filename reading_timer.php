@@ -60,6 +60,10 @@ $books = array_filter($books, fn($b) => $b['status'] !== 'loetud') ?: $books; //
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.php?token=<?= urlencode($token) ?>">
 <meta name="theme-color" content="#8B5CF6">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Ajaraamat">
 <link rel="stylesheet" href="style.css?v=<?= @filemtime(__DIR__ . "/style.css") ?>">
 </head>
 <body>

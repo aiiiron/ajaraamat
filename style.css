@@ -158,7 +158,7 @@ h2 { font-size: 18px; margin: 0 0 16px; }
   border: none;
   border-radius: var(--radius-card);
   padding: 24px 22px 20px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   box-shadow: 0 14px 34px -18px rgba(139, 92, 246, 0.32), 0 3px 10px -6px rgba(236, 72, 153, 0.18);
   position: relative;
   overflow: hidden;
@@ -258,7 +258,37 @@ h2 { font-size: 18px; margin: 0 0 16px; }
 .actions {
   display: flex;
   gap: 12px;
-  margin-bottom: 24px;
+  margin-bottom: 20px;
+}
+
+/* Tactile press feedback across tappable controls */
+.btn:active,
+.btn-delete-full:active,
+.toggle-btn:active,
+.quick-add-btn:active,
+.tab:active { transform: scale(0.97); }
+.btn-delete-full, .toggle-btn, .quick-add-btn, .tab { transition: transform 0.1s ease; }
+
+/* Landscape on a phone: ask for portrait instead of reflowing sideways.
+   Installed PWAs are already pinned via manifest "orientation": "portrait". */
+@media (orientation: landscape) and (max-height: 500px) {
+  body { overflow: hidden; }
+  body::before {
+    content: "Keera telefon püsti";
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    text-align: center;
+    background: var(--bg);
+    color: var(--text-muted);
+    font-family: var(--font-heading);
+    font-weight: 700;
+    font-size: 18px;
+  }
 }
 
 .btn {
@@ -312,7 +342,14 @@ h2 { font-size: 18px; margin: 0 0 16px; }
   border-bottom: 1px solid var(--border);
 }
 
-.empty { color: var(--text-muted); font-size: 14px; }
+.empty {
+  color: var(--text-muted);
+  font-size: 14px;
+  text-align: center;
+  padding: 26px 16px;
+  background: rgba(139, 92, 246, 0.05);
+  border-radius: 14px;
+}
 
 /* Grouped entries list — "Viimased kanded" / "Kõik kanded".
    Stacked day cards instead of a fixed-width table, so the comment text
@@ -756,8 +793,27 @@ select:focus { outline: 2px solid var(--accent-purple); border-color: transparen
   font-size: 14px;
   padding: 11px 14px;
   border-radius: 16px;
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   text-align: center;
+  max-height: 100px;
+  overflow: hidden;
+  animation: banner-in 0.28s ease-out, banner-out 0.45s ease-in 3.2s forwards;
+}
+@keyframes banner-in {
+  from { opacity: 0; transform: translateY(-10px); }
+}
+@keyframes banner-out {
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+    max-height: 0;
+    margin-bottom: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .milestone-banner { animation: banner-out 0.3s ease 4s forwards; }
 }
 
 /* Heatmap */
