@@ -1,0 +1,5 @@
+# Live secrets — never commit. Lives only on the server (see README).
+config.php
+
+# OS cruft
+.DS_Store
