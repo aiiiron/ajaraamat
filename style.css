@@ -403,32 +403,17 @@ h2 { font-size: 18px; margin: 0 0 16px; }
   .entry-row .tag { min-width: 104px; }
 }
 
-.totals-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 16px;
-  border-top: 2px solid var(--border);
-  padding-top: 8px;
+/* Standalone "Kokku" tile at the top of "Kõik kanded" */
+.hist-total { margin-bottom: 16px; }
+.pt-row.pt-balance {
+  margin-top: 8px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(57, 47, 77, 0.12);
 }
-.totals-table th {
-  text-align: center;
-  font-size: 12px;
-  color: var(--text-muted);
-  font-weight: 700;
-  padding: 10px 6px 4px;
-}
-.totals-table td {
-  text-align: center;
-  font-family: var(--font-heading);
-  font-size: 20px;
-  font-weight: 700;
-  padding: 4px 6px 10px;
-}
-.totals-table td.highlight {
-  background: var(--gradient-primary);
-  color: white;
-  border-radius: 12px;
-}
+.pt-row.pt-balance .pt-k { background: rgba(57, 47, 77, 0.06); }
+.pt-balance.bal-owed  .pt-v { color: var(--owed-color); }
+.pt-balance.bal-bonus .pt-v { color: var(--screen-color); }
+.pt-balance.bal-even  .pt-v { color: var(--even-color); }
 
 form { display: flex; flex-direction: column; gap: 6px; }
 label {
@@ -864,19 +849,17 @@ select:focus { outline: 2px solid var(--accent-purple); border-color: transparen
 /* Search box */
 .search-row {
   display: flex;
+  flex-direction: row;
+  align-items: stretch;
   gap: 8px;
   margin-bottom: 16px;
 }
-.search-row input[type="text"] { flex: 1; }
-.search-row button {
-  padding: 0 18px;
+.search-row input[type="text"] { flex: 1 1 auto; min-width: 0; }
+.search-row .btn {
+  flex: 0 0 auto;
+  width: auto;
+  margin-top: 0;
   border-radius: 14px;
-  border: none;
-  background: var(--gradient-primary);
-  color: white;
-  cursor: pointer;
-  font-family: var(--font-heading);
-  font-weight: 700;
 }
 
 /* Reading timer */

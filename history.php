@@ -20,7 +20,7 @@ if ($q !== '') {
     $page = 1;
 } else {
     $page = max(1, (int) ($_GET['page'] ?? 1));
-    $perPage = 5;
+    $perPage = 10;
     $totalDates = count_distinct_dates($childId);
     $totalPages = max(1, (int) ceil($totalDates / $perPage));
     $page = min($page, $totalPages);
@@ -63,12 +63,26 @@ $totals = get_totals($childId);
 
     <?php render_child_switcher($children, $childId, 'history.php'); ?>
 
+    <?php
+    $owed = (int) $totals['owed'];
+    $balClass = $owed > 0 ? 'bal-owed' : ($owed < 0 ? 'bal-bonus' : 'bal-even');
+    $balText  = $owed > 0
+        ? 'Võlgu ' . format_duration($owed)
+        : ($owed < 0 ? 'Boonuses ' . format_duration(abs($owed)) : 'Tasakaalus');
+    ?>
+    <div class="period-tile pt-total hist-total">
+        <div class="pt-label">Kokku</div>
+        <div class="pt-row pt-reading"><span class="pt-k">📖</span><span class="pt-t">Raamat</span><span class="pt-v"><?= format_duration((int) $totals['raamat']) ?></span></div>
+        <div class="pt-row pt-screen"><span class="pt-k">📱</span><span class="pt-t">Ekraan</span><span class="pt-v"><?= format_duration((int) $totals['ekraan']) ?></span></div>
+        <div class="pt-row pt-balance <?= $balClass ?>"><span class="pt-k">⚖️</span><span class="pt-t">Tasakaal</span><span class="pt-v"><?= htmlspecialchars($balText) ?></span></div>
+    </div>
+
     <div class="card">
         <h2><?= htmlspecialchars($child['name']) ?> — kõik kanded</h2>
         <form method="get" class="search-row">
             <input type="hidden" name="child" value="<?= $childId ?>">
             <input type="text" name="q" value="<?= htmlspecialchars($q) ?>" placeholder="Otsi kommentaari järgi (nt. Youtube, Karlsson)">
-            <button type="submit">Otsi</button>
+            <button type="submit" class="btn btn-add">Otsi</button>
         </form>
         <?php if ($q !== ''): ?>
             <p class="child-link-note" style="text-align:left;margin:-8px 0 12px;">
@@ -76,24 +90,9 @@ $totals = get_totals($childId);
                 <a href="history.php?child=<?= $childId ?>">tühjenda otsing</a>
             </p>
         <?php endif; ?>
+        <?php render_pagination($page, $totalPages, 'history.php', ['child' => $childId]); ?>
         <?php render_entries_table($entries, true, $childId); ?>
-        <?php if ($q === ''): ?>
-            <?php render_pagination($page, $totalPages, 'history.php', ['child' => $childId]); ?>
-        <?php endif; ?>
-        <table class="totals-table">
-            <tr>
-                <th>Kokku</th>
-                <th>Raamat</th>
-                <th>Ekraan</th>
-                <th><?= $totals['owed'] >= 0 ? 'Raamat' : 'Ekraan' ?></th>
-            </tr>
-            <tr>
-                <td></td>
-                <td><strong><?= $totals['raamat'] ?></strong></td>
-                <td><strong><?= $totals['ekraan'] ?></strong></td>
-                <td class="highlight"><strong><?= abs($totals['owed']) ?></strong></td>
-            </tr>
-        </table>
+        <?php render_pagination($page, $totalPages, 'history.php', ['child' => $childId]); ?>
     </div>
 </div>
 </body>

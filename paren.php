@@ -20,12 +20,7 @@ $daily = get_daily_totals_range($childId, 30);
 $topBooks = get_top_books($childId, 5);
 $topScreen = get_top_comments($childId, 'ekraan', 5);
 
-$page = max(1, (int) ($_GET['page'] ?? 1));
-$perPage = 5;
-$totalDates = count_distinct_dates($childId);
-$totalPages = max(1, (int) ceil($totalDates / $perPage));
-$page = min($page, $totalPages);
-$recent = get_entries_page($childId, $page, $perPage);
+$recent = get_entries_page($childId, 1, 5); // dashboard shows only the latest 5
 
 $owed = $totals['owed'];
 if ($owed > 0) {
@@ -140,7 +135,6 @@ $chartEkraan = array_map(fn($d) => $d['ekraan'], $daily);
             <a href="history.php?child=<?= $childId ?>" class="link-muted">Kõik kanded →</a>
         </div>
         <?php render_entries_table($recent, false); ?>
-        <?php render_pagination($page, $totalPages, 'paren.php', ['child' => $childId]); ?>
     </section>
 
     <p class="child-link-note">
