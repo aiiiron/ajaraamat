@@ -12,7 +12,7 @@ if (!empty($_SESSION['family_id'])) {
 <html lang="et">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Ajaraamat — tasakaal lugemise ja ekraaniaja vahel</title>
 <meta name="description" content="Ajaraamat aitab peredel lihtsalt jälgida lapse lugemis- ja ekraaniaega, nii et üks ei kao teise varju.">
 <link rel="icon" href="favicon.ico" sizes="any">

@@ -33,6 +33,11 @@
 
 * { box-sizing: border-box; }
 
+html {
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
   font-family: var(--font-body);
@@ -40,6 +45,9 @@ body {
   min-height: 100vh;
   background: linear-gradient(160deg, var(--bg-grad-start) 0%, var(--bg-grad-mid) 45%, var(--bg-grad-end) 100%);
   background-repeat: no-repeat;
+  /* app-like: kill the double-tap-to-zoom gesture and its 300ms delay */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body.centered {
