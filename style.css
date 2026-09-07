@@ -655,7 +655,16 @@ select:focus { outline: 2px solid var(--accent-purple); border-color: transparen
 }
 .heatmap-legend .hm-cell { width: 10px; height: 10px; margin-right: 4px; vertical-align: middle; }
 
-/* Top comments list */
+/* "Enim aega" — stacked reading / screen lists */
+.top-block + .top-block { margin-top: 18px; }
+.top-heading {
+  margin: 0 0 4px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+}
 .top-list {
   list-style: none;
   padding: 0;
@@ -664,12 +673,21 @@ select:focus { outline: 2px solid var(--accent-purple); border-color: transparen
 .top-list li {
   display: flex;
   justify-content: space-between;
-  padding: 8px 0;
+  align-items: baseline;
+  gap: 12px;
+  padding: 9px 0;
   border-bottom: 1px solid var(--border);
   font-size: 14px;
 }
 .top-list li:last-child { border-bottom: none; }
-.top-list .top-minutes { color: var(--text-muted); font-size: 13px; font-weight: 700; }
+.top-name { min-width: 0; overflow-wrap: anywhere; }
+.top-minutes {
+  flex: none;
+  color: var(--text-muted);
+  font-size: 13px;
+  font-weight: 700;
+  white-space: nowrap;
+}
 
 /* Quick-add presets */
 .quick-add-row {

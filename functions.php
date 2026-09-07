@@ -3,6 +3,30 @@ require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/config.php';
 
 // =========================================================
+// Formatting
+// =========================================================
+
+/**
+ * Turn a minute count into "1 päev 6 h 46 min". Days and hours appear only
+ * when non-zero; minutes always appear unless a bigger unit already does and
+ * the remainder is zero (so 120 -> "2 h", 1006 -> "16 h 46 min", 43 -> "43 min").
+ * Each unit keeps a non-breaking space so a wrap only ever falls between units.
+ */
+function format_duration(int $minutes): string {
+    $minutes = max(0, $minutes);
+    $days  = intdiv($minutes, 1440);
+    $hours = intdiv($minutes % 1440, 60);
+    $mins  = $minutes % 60;
+
+    $parts = [];
+    if ($days > 0)  { $parts[] = $days . "\u{00A0}" . ($days === 1 ? 'päev' : 'päeva'); }
+    if ($hours > 0) { $parts[] = $hours . "\u{00A0}h"; }
+    if ($mins > 0 || !$parts) { $parts[] = $mins . "\u{00A0}min"; }
+
+    return implode(' ', $parts);
+}
+
+// =========================================================
 // Families & children
 // =========================================================
 

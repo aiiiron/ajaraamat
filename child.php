@@ -103,28 +103,28 @@ if ($owed > 0) {
             <div class="stat-icon reading">📖</div>
             <div class="stat-body">
                 <div class="stat-label">Raamat kokku</div>
-                <div class="stat-value"><?= $totals['raamat'] ?> min</div>
+                <div class="stat-value"><?= format_duration((int) $totals['raamat']) ?></div>
             </div>
         </div>
         <div class="stat-card">
             <div class="stat-icon screen">📱</div>
             <div class="stat-body">
                 <div class="stat-label">Ekraan kokku</div>
-                <div class="stat-value"><?= $totals['ekraan'] ?> min</div>
+                <div class="stat-value"><?= format_duration((int) $totals['ekraan']) ?></div>
             </div>
         </div>
         <div class="stat-card">
             <div class="stat-icon reading">📖</div>
             <div class="stat-body">
                 <div class="stat-label">Täna — Raamat</div>
-                <div class="stat-value"><?= $today['raamat'] ?> min</div>
+                <div class="stat-value"><?= format_duration((int) $today['raamat']) ?></div>
             </div>
         </div>
         <div class="stat-card">
             <div class="stat-icon screen">📱</div>
             <div class="stat-body">
                 <div class="stat-label">Täna — Ekraan</div>
-                <div class="stat-value"><?= $today['ekraan'] ?> min</div>
+                <div class="stat-value"><?= format_duration((int) $today['ekraan']) ?></div>
             </div>
         </div>
     </div>

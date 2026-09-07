@@ -94,28 +94,28 @@ $chartEkraan = array_map(fn($d) => $d['ekraan'], $daily);
             <div class="stat-icon reading">📖</div>
             <div class="stat-body">
                 <div class="stat-label">Raamat kokku</div>
-                <div class="stat-value"><?= $totals['raamat'] ?> min</div>
+                <div class="stat-value"><?= format_duration((int) $totals['raamat']) ?></div>
             </div>
         </div>
         <div class="stat-card">
             <div class="stat-icon screen">📱</div>
             <div class="stat-body">
                 <div class="stat-label">Ekraan kokku</div>
-                <div class="stat-value"><?= $totals['ekraan'] ?> min</div>
+                <div class="stat-value"><?= format_duration((int) $totals['ekraan']) ?></div>
             </div>
         </div>
         <div class="stat-card">
             <div class="stat-icon reading">📖</div>
             <div class="stat-body">
                 <div class="stat-label">Täna — Raamat</div>
-                <div class="stat-value"><?= $today['raamat'] ?> min</div>
+                <div class="stat-value"><?= format_duration((int) $today['raamat']) ?></div>
             </div>
         </div>
         <div class="stat-card">
             <div class="stat-icon screen">📱</div>
             <div class="stat-body">
                 <div class="stat-label">Täna — Ekraan</div>
-                <div class="stat-value"><?= $today['ekraan'] ?> min</div>
+                <div class="stat-value"><?= format_duration((int) $today['ekraan']) ?></div>
             </div>
         </div>
     </div>
@@ -140,24 +140,26 @@ $chartEkraan = array_map(fn($d) => $d['ekraan'], $daily);
     <?php if (!empty($topBooks) || !empty($topScreen)): ?>
     <section class="card">
         <h2>Enim aega</h2>
-        <div class="grid" style="grid-template-columns:1fr 1fr;">
-            <div>
-                <p style="font-size:13px;color:var(--text-muted);margin:0 0 6px;">📖 Raamatud</p>
+        <?php if (!empty($topBooks)): ?>
+            <div class="top-block">
+                <p class="top-heading">📖 Raamatud</p>
                 <ul class="top-list">
                     <?php foreach ($topBooks as $t): ?>
-                        <li><span><?= htmlspecialchars($t['title']) ?></span><span class="top-minutes"><?= (int) $t['minutes'] ?> min</span></li>
+                        <li><span class="top-name"><?= htmlspecialchars($t['title']) ?></span><span class="top-minutes"><?= format_duration((int) $t['minutes']) ?></span></li>
                     <?php endforeach; ?>
                 </ul>
             </div>
-            <div>
-                <p style="font-size:13px;color:var(--text-muted);margin:0 0 6px;">📱 Ekraan</p>
+        <?php endif; ?>
+        <?php if (!empty($topScreen)): ?>
+            <div class="top-block">
+                <p class="top-heading">📱 Ekraan</p>
                 <ul class="top-list">
                     <?php foreach ($topScreen as $t): ?>
-                        <li><span><?= htmlspecialchars($t['comment']) ?></span><span class="top-minutes"><?= (int) $t['minutes'] ?> min</span></li>
+                        <li><span class="top-name"><?= htmlspecialchars($t['comment']) ?></span><span class="top-minutes"><?= format_duration((int) $t['minutes']) ?></span></li>
                     <?php endforeach; ?>
                 </ul>
             </div>
-        </div>
+        <?php endif; ?>
     </section>
     <?php endif; ?>
 
