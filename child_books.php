@@ -35,7 +35,7 @@ $milestone = get_book_milestone($finishedCount);
 <link rel="icon" href="favicon.ico" sizes="any">
 <link rel="icon" href="icon-192.png" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="manifest" href="manifest.json">
+<link rel="manifest" href="manifest.php?token=<?= urlencode($token) ?>">
 <meta name="theme-color" content="#8B5CF6">
 <link rel="stylesheet" href="style.css">
 </head>

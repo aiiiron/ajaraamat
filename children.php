@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $children = get_children($familyId);
 $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
-$baseUrl = $scheme . $_SERVER['HTTP_HOST'] . dirname($_SERVER['SCRIPT_NAME']);
+$baseUrl = $scheme . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
 ?>
 <!DOCTYPE html>
 <html lang="et">
