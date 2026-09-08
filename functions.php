@@ -1175,7 +1175,7 @@ function render_entries_table(array $entries, bool $editable = false, int $child
                                 <span class="tag tag-screen"><?= emoji_svg('screen') ?> <?= $a['minutes'] ?> min</span>
                             <?php endif; ?>
                             <div class="entry-label">
-                                <?php if ($a['type'] === 'luuletus'): ?><span class="poem-star" title="Luuletus pähe õpitud — 2× boonus">★</span> <?php endif; ?><?= $a['label'] ? htmlspecialchars($a['label']) : '–' ?>
+                                <?= $a['label'] ? htmlspecialchars($a['label']) : '–' ?><?php if ($a['type'] === 'luuletus'): ?> <span class="poem-star" title="Luuletus pähe õpitud — 2× boonus">★</span><?php endif; ?>
                                 <?php if ($a['sub']): ?><span class="entry-sub"><?= htmlspecialchars($a['sub']) ?></span><?php endif; ?>
                             </div>
                         </div>
