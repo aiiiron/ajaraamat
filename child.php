@@ -106,6 +106,19 @@ if ($owed > 0) {
 
     <?php render_goal_card((int) $stats['today_raamat'], (int) $stats['week_raamat'], (int) ($child['daily_goal_min'] ?? 0), (int) ($child['weekly_goal_min'] ?? 0)); ?>
 
+    <?php
+    $todayDate = date('Y-m-d');
+    $activeChallenges = array_filter(get_challenges($childId), fn($ch) => $todayDate >= $ch['start_date'] && $todayDate <= $ch['end_date']);
+    ?>
+    <?php if ($activeChallenges): ?>
+        <div class="card">
+            <h2>Väljakutse<?= count($activeChallenges) > 1 ? 'd' : '' ?></h2>
+            <?php foreach ($activeChallenges as $ch): ?>
+                <?php render_challenge_card($ch, get_challenge_progress($ch), false); ?>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+
     <?php render_stats_tiles($stats); ?>
     <?php if ($stats['today_raamat'] === 0 && $stats['today_ekraan'] === 0): ?>
         <p class="child-link-note" style="margin-top:-8px;margin-bottom:16px;">Täna pole veel midagi lisatud.</p>
