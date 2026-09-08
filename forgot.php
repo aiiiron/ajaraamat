@@ -35,9 +35,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Only approved accounts self-serve a reset; pending/rejected
             // accounts are still the site owner's call.
             if ($family && $family['status'] === 'approved') {
-                $token = create_password_reset((int) $family['id']);
-                $link = base_url() . '/reset.php?token=' . $token;
-                send_password_reset_email($family['email'], $link);
+                try {
+                    $token = create_password_reset((int) $family['id']);
+                    $link = base_url() . '/reset.php?token=' . $token;
+                    send_password_reset_email($family['email'], $link);
+                } catch (PDOException $e) {
+                    // `password_resets` table not created yet — fall through to
+                    // the same neutral response rather than 500ing.
+                }
             }
         }
 
