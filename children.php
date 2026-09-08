@@ -114,7 +114,7 @@ $baseUrl = $scheme . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['SCRIPT_NAME
                     <input type="number" id="wg<?= $c['id'] ?>" name="weekly_goal_min" min="0" inputmode="numeric" placeholder="nt. 210" value="<?= (int) ($c['weekly_goal_min'] ?? 0) ?: '' ?>">
                 </div>
             </div>
-            <button type="submit" class="quick-add-btn">Salvesta eesmärk</button>
+            <button type="submit" class="btn btn-add">Salvesta eesmärk</button>
         </form>
     </div>
     <?php endforeach; ?>

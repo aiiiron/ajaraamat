@@ -293,7 +293,13 @@ h2 { font-size: 18px; margin: 0 0 16px; }
 }
 .goal-form-row { display: flex; gap: 10px; }
 .goal-form-row > div { flex: 1; }
-.goal-form .quick-add-btn { margin-top: 10px; }
+.goal-form .btn {
+  flex: none;
+  align-self: flex-start;
+  margin-top: 12px;
+  padding: 11px 20px;
+  font-size: 14px;
+}
 
 /* Statistika — one tile per period (Täna / See nädal / See kuu / Kokku) */
 .period-grid {
