@@ -168,16 +168,18 @@ function clearState() {
     try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
 }
 
-document.querySelectorAll('.mode-radio').forEach(function(label) {
-    var input = label.querySelector('input');
-    function sync() {
-        document.querySelectorAll('.mode-radio').forEach(function(l) { l.classList.remove('active'); });
-        if (input.checked) label.classList.add('active');
-        document.getElementById('target-picker').style.display = (input.checked && input.value === 'down') ? 'block' : 'none';
-    }
-    input.addEventListener('change', sync);
-    sync();
+function syncMode() {
+    var checked = document.querySelector('.mode-radio input:checked');
+    document.querySelectorAll('.mode-radio').forEach(function (l) {
+        l.classList.toggle('active', l.querySelector('input').checked);
+    });
+    document.getElementById('target-picker').style.display =
+        (checked && checked.value === 'down') ? 'block' : 'none';
+}
+document.querySelectorAll('.mode-radio input').forEach(function (i) {
+    i.addEventListener('change', syncMode);
 });
+syncMode();
 
 function setTarget(min) {
     document.getElementById('target_minutes').value = min;

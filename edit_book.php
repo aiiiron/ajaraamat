@@ -152,15 +152,15 @@ $currentPage = $_POST['current_page'] ?? $book['current_page'] ?? '';
     </div>
 </div>
 <script>
-document.querySelectorAll('.status-radio').forEach(function(label) {
-    var input = label.querySelector('input');
-    function sync() {
-        document.querySelectorAll('.status-radio').forEach(function(l) { l.classList.remove('active'); });
-        if (input.checked) label.classList.add('active');
-    }
-    input.addEventListener('change', sync);
-    sync();
+function syncStatus() {
+    document.querySelectorAll('.status-radio').forEach(function (l) {
+        l.classList.toggle('active', l.querySelector('input').checked);
+    });
+}
+document.querySelectorAll('.status-radio input').forEach(function (i) {
+    i.addEventListener('change', syncStatus);
 });
+syncStatus();
 </script>
 </body>
 </html>
