@@ -206,7 +206,7 @@ function resolve_current_child(int $familyId): ?array {
     $children = get_children($familyId);
     if (empty($children)) return null;
 
-    $requested = (int) ($_GET['child'] ?? 0);
+    $requested = (int) ($_GET['child'] ?? $_POST['child'] ?? 0);
     foreach ($children as $c) {
         if ((int) $c['id'] === $requested) return $c;
     }
@@ -463,6 +463,107 @@ function get_year_summary(int $childId, int $year): array {
         'screen_minutes'  => (int) ($row['screen_minutes'] ?? 0),
         'reading_days'    => (int) ($row['reading_days'] ?? 0),
     ];
+}
+
+// =========================================================
+// Reading challenges (per child)
+// =========================================================
+
+function create_challenge(int $childId, string $title, string $type, int $value, string $start, string $end): void {
+    $pdo = get_db();
+    $stmt = $pdo->prepare("INSERT INTO challenges (child_id, title, goal_type, goal_value, start_date, end_date)
+        VALUES (:cid, :t, :gt, :gv, :s, :e)");
+    $stmt->execute([
+        ':cid' => $childId,
+        ':t'   => mb_substr($title, 0, 120),
+        ':gt'  => $type === 'minutes' ? 'minutes' : 'books',
+        ':gv'  => max(1, $value),
+        ':s'   => $start,
+        ':e'   => $end,
+    ]);
+}
+
+function delete_challenge(int $id, int $childId): void {
+    $pdo = get_db();
+    $stmt = $pdo->prepare("DELETE FROM challenges WHERE id = :id AND child_id = :cid");
+    $stmt->execute([':id' => $id, ':cid' => $childId]);
+}
+
+/** A child's challenges: active first, then upcoming, then past (newest end first). */
+function get_challenges(int $childId): array {
+    $pdo = get_db();
+    $stmt = $pdo->prepare("SELECT * FROM challenges WHERE child_id = :cid
+        ORDER BY
+          (CURDATE() BETWEEN start_date AND end_date) DESC,
+          (start_date > CURDATE()) DESC,
+          end_date DESC");
+    $stmt->execute([':cid' => $childId]);
+    return $stmt->fetchAll();
+}
+
+/** Books finished / reading minutes logged inside the challenge window. */
+function get_challenge_progress(array $ch): int {
+    $pdo = get_db();
+    if (($ch['goal_type'] ?? 'books') === 'minutes') {
+        $stmt = $pdo->prepare("SELECT COALESCE(SUM(raamat), 0) FROM entries
+            WHERE child_id = :cid AND entry_date BETWEEN :s AND :e");
+    } else {
+        $stmt = $pdo->prepare("SELECT COUNT(*) FROM books
+            WHERE child_id = :cid AND status = 'loetud' AND finished_date BETWEEN :s AND :e");
+    }
+    $stmt->execute([':cid' => (int) $ch['child_id'], ':s' => $ch['start_date'], ':e' => $ch['end_date']]);
+    return (int) $stmt->fetchColumn();
+}
+
+/** One challenge with a progress bar (and a dot row for small book goals). */
+function render_challenge_card(array $ch, int $progress, bool $editable): void {
+    $goal = max(1, (int) $ch['goal_value']);
+    $type = ($ch['goal_type'] ?? 'books') === 'minutes' ? 'minutes' : 'books';
+    $pct  = min(100, (int) round($progress / $goal * 100));
+    $done = $progress >= $goal;
+    $today = date('Y-m-d');
+
+    if ($today < $ch['start_date']) {
+        $status = 'Algab ' . date('d.m', strtotime($ch['start_date']));
+        $statusCls = 'chal-upcoming';
+    } elseif ($today > $ch['end_date']) {
+        $status = 'Lõppenud';
+        $statusCls = 'chal-ended';
+    } else {
+        $daysLeft = (int) ceil((strtotime($ch['end_date']) - strtotime($today)) / 86400);
+        $status = $daysLeft . ' ' . ($daysLeft === 1 ? 'päev' : 'päeva') . ' jäänud';
+        $statusCls = 'chal-active';
+    }
+
+    $progText = $type === 'minutes'
+        ? format_duration($progress) . ' / ' . format_duration($goal)
+        : $progress . ' / ' . $goal . ' raamatut';
+    ?>
+    <div class="chal<?= $done ? ' chal-done' : '' ?>">
+        <div class="chal-head">
+            <span class="chal-title"><?= htmlspecialchars($ch['title']) ?></span>
+            <span class="chal-status <?= $statusCls ?>"><?= $done ? 'Valmis! 🎉' : htmlspecialchars($status) ?></span>
+        </div>
+        <div class="chal-dates"><?= date('d.m', strtotime($ch['start_date'])) ?> – <?= date('d.m.Y', strtotime($ch['end_date'])) ?></div>
+        <div class="chal-bar"><div class="chal-bar-fill" style="width: <?= $pct ?>%"></div></div>
+        <div class="chal-prog"><?= htmlspecialchars($progText) ?> · <?= $pct ?>%</div>
+        <?php if ($type === 'books' && $goal <= 24): ?>
+            <div class="chal-dots">
+                <?php for ($i = 0; $i < $goal; $i++): ?>
+                    <span class="chal-dot<?= $i < $progress ? ' filled' : '' ?>"></span>
+                <?php endfor; ?>
+            </div>
+        <?php endif; ?>
+        <?php if ($editable): ?>
+            <form method="post" class="chal-del" onsubmit="return confirm('Kustuta väljakutse?');">
+                <?= csrf_field() ?>
+                <input type="hidden" name="action" value="challenge_del">
+                <input type="hidden" name="challenge_id" value="<?= (int) $ch['id'] ?>">
+                <button type="submit" class="link-muted chal-del-btn">Kustuta</button>
+            </form>
+        <?php endif; ?>
+    </div>
+    <?php
 }
 
 /** [minYear, maxYear] covering a child's data; always includes the current year. */

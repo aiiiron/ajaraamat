@@ -12,7 +12,29 @@ if (empty($children)) {
 $child = resolve_current_child($familyId);
 $childId = (int) $child['id'];
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_csrf();
+    $act = $_POST['action'] ?? '';
+    if ($act === 'challenge_new') {
+        $title = trim($_POST['title'] ?? '');
+        $type  = $_POST['goal_type'] ?? 'books';
+        $value = (int) ($_POST['goal_value'] ?? 0);
+        $start = $_POST['start_date'] ?? '';
+        $end   = $_POST['end_date'] ?? '';
+        $validDates = preg_match('/^\d{4}-\d{2}-\d{2}$/', $start)
+            && preg_match('/^\d{4}-\d{2}-\d{2}$/', $end) && $end >= $start;
+        if ($title !== '' && $value > 0 && $validDates) {
+            create_challenge($childId, $title, $type, $value, $start, $end);
+        }
+    } elseif ($act === 'challenge_del') {
+        delete_challenge((int) ($_POST['challenge_id'] ?? 0), $childId);
+    }
+    header('Location: books.php?child=' . $childId);
+    exit;
+}
+
 $books = get_books($childId);
+$challenges = get_challenges($childId);
 $finishedCount = count_finished_books($childId);
 $milestone = get_book_milestone($finishedCount);
 
@@ -71,6 +93,41 @@ $yearSummary = get_year_summary($childId, $year);
     <?php if ($milestone): ?>
         <div class="milestone-banner">🎉 Verstapost saavutatud: <?= $milestone ?> raamatut loetud!</div>
     <?php endif; ?>
+
+    <div class="card">
+        <h2>Väljakutsed</h2>
+        <?php if (empty($challenges)): ?>
+            <p class="empty">Väljakutseid pole veel.</p>
+        <?php else: ?>
+            <?php foreach ($challenges as $ch): ?>
+                <?php render_challenge_card($ch, get_challenge_progress($ch), true); ?>
+            <?php endforeach; ?>
+        <?php endif; ?>
+
+        <details class="chal-new">
+            <summary>+ Uus väljakutse</summary>
+            <form method="post">
+                <?= csrf_field() ?>
+                <input type="hidden" name="child" value="<?= $childId ?>">
+                <input type="hidden" name="action" value="challenge_new">
+                <label for="ch_title">Pealkiri</label>
+                <input type="text" id="ch_title" name="title" placeholder="nt. Suvine lugemismaraton" required>
+                <label>Eesmärk</label>
+                <div class="chal-goal-row">
+                    <input type="number" name="goal_value" min="1" placeholder="nt. 10" required>
+                    <select name="goal_type">
+                        <option value="books">raamatut</option>
+                        <option value="minutes">minutit</option>
+                    </select>
+                </div>
+                <div class="chal-goal-row">
+                    <div><label for="ch_start">Algus</label><input type="date" id="ch_start" name="start_date" required></div>
+                    <div><label for="ch_end">Lõpp</label><input type="date" id="ch_end" name="end_date" required></div>
+                </div>
+                <button type="submit" class="btn btn-add full-width">Loo väljakutse</button>
+            </form>
+        </details>
+    </div>
 
     <div class="actions">
         <a href="add_book.php?child=<?= $childId ?>" class="btn btn-add full-width"><?= icon("plus") ?> Lisa raamat</a>

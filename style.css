@@ -998,6 +998,108 @@ select:focus { outline: 2px solid var(--accent-purple); border-color: transparen
 }
 .heatmap-legend .hm-cell { width: 10px; height: 10px; margin-right: 4px; vertical-align: middle; }
 
+/* Reading challenges */
+.chal {
+  border-radius: 14px;
+  background: rgba(139, 92, 246, 0.06);
+  padding: 14px;
+}
+.chal + .chal { margin-top: 10px; }
+.chal-done { background: rgba(47, 190, 134, 0.12); }
+.chal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 10px;
+}
+.chal-title {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.chal-status {
+  flex: none;
+  white-space: nowrap;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.chal-active { color: var(--accent-purple); }
+.chal-upcoming, .chal-ended { color: var(--text-muted); }
+.chal-done .chal-status { color: #2FBE86; }
+.chal-dates {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin: 2px 0 8px;
+}
+.chal-bar {
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(57, 47, 77, 0.12);
+  overflow: hidden;
+}
+.chal-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--accent-purple);
+  transition: width 0.3s ease;
+}
+.chal-done .chal-bar-fill { background: #2FBE86; }
+.chal-prog {
+  margin-top: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+.chal-dots {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 8px;
+}
+.chal-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 4px;
+  background: rgba(57, 47, 77, 0.14);
+}
+.chal-dot.filled { background: var(--accent-purple); }
+.chal-done .chal-dot.filled { background: #2FBE86; }
+.chal-del { margin-top: 8px; }
+.chal-del-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 0;
+}
+.chal-new {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+.chal-new > summary {
+  cursor: pointer;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--accent-purple);
+  list-style: none;
+}
+.chal-new > summary::-webkit-details-marker { display: none; }
+.chal-goal-row {
+  display: flex;
+  gap: 10px;
+  align-items: flex-end;
+}
+.chal-goal-row > div { flex: 1; }
+.chal-goal-row > input[type="number"] { flex: 1; }
+.chal-goal-row > select { flex: 0 0 auto; width: auto; }
+
 /* Year summary card (Raamatud page) */
 .ys-head {
   display: flex;

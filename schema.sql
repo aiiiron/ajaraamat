@@ -53,6 +53,18 @@ CREATE TABLE IF NOT EXISTS entries (
     FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE SET NULL
 );
 
+CREATE TABLE IF NOT EXISTS challenges (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    child_id INT NOT NULL,
+    title VARCHAR(120) NOT NULL,
+    goal_type ENUM('books','minutes') NOT NULL DEFAULT 'books',
+    goal_value INT NOT NULL,
+    start_date DATE NOT NULL,
+    end_date DATE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (child_id) REFERENCES children(id) ON DELETE CASCADE
+);
+
 CREATE INDEX idx_entries_child_date ON entries(child_id, entry_date);
 CREATE INDEX idx_entries_book ON entries(book_id);
 CREATE INDEX idx_books_child ON books(child_id);

@@ -74,6 +74,19 @@ $yearSummary = get_year_summary($childId, $year);
         <div class="milestone-banner">🎉 Verstapost saavutatud: <?= $milestone ?> raamatut loetud!</div>
     <?php endif; ?>
 
+    <?php
+    $today = date('Y-m-d');
+    $challenges = array_filter(get_challenges($childId), fn($ch) => $today <= $ch['end_date']);
+    ?>
+    <?php if ($challenges): ?>
+    <div class="card">
+        <h2>Väljakutsed</h2>
+        <?php foreach ($challenges as $ch): ?>
+            <?php render_challenge_card($ch, get_challenge_progress($ch), false); ?>
+        <?php endforeach; ?>
+    </div>
+    <?php endif; ?>
+
     <div class="card">
         <h2>Kõik raamatud</h2>
         <?php render_books_table($books, false); ?>
