@@ -318,14 +318,19 @@ function find_valid_password_reset(string $rawToken): ?array {
     if ($rawToken === '') {
         return null;
     }
-    $pdo = get_db();
-    $stmt = $pdo->prepare(
-        "SELECT * FROM password_resets
-         WHERE token_hash = :h AND expires_at > NOW() LIMIT 1"
-    );
-    $stmt->execute([':h' => hash('sha256', $rawToken)]);
-    $row = $stmt->fetch();
-    return $row ?: null;
+    try {
+        $pdo = get_db();
+        $stmt = $pdo->prepare(
+            "SELECT * FROM password_resets
+             WHERE token_hash = :h AND expires_at > NOW() LIMIT 1"
+        );
+        $stmt->execute([':h' => hash('sha256', $rawToken)]);
+        $row = $stmt->fetch();
+        return $row ?: null;
+    } catch (PDOException $e) {
+        // Table not migrated yet — treat as no valid token.
+        return null;
+    }
 }
 
 /** Set the family's new bcrypt hash and burn the reset token. */
@@ -337,16 +342,25 @@ function complete_password_reset(int $resetId, int $familyId, string $newPasswor
         ->execute([':id' => $resetId]);
 }
 
-/** Active (unexpired) reset requests with the family e-mail — for admin.php. */
+/**
+ * Active (unexpired) reset requests with the family e-mail — for admin.php.
+ * Returns [] if the `password_resets` table hasn't been created yet
+ * (migrate_password_resets.php), so the admin panel never 500s on a
+ * deploy that landed before the migration ran.
+ */
 function get_active_password_resets(): array {
-    $pdo = get_db();
-    return $pdo->query(
-        "SELECT pr.*, f.email
-         FROM password_resets pr
-         JOIN families f ON f.id = pr.family_id
-         WHERE pr.expires_at > NOW()
-         ORDER BY pr.created_at DESC"
-    )->fetchAll();
+    try {
+        $pdo = get_db();
+        return $pdo->query(
+            "SELECT pr.*, f.email
+             FROM password_resets pr
+             JOIN families f ON f.id = pr.family_id
+             WHERE pr.expires_at > NOW()
+             ORDER BY pr.created_at DESC"
+        )->fetchAll();
+    } catch (PDOException $e) {
+        return [];
+    }
 }
 
 /**
