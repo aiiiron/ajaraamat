@@ -42,7 +42,14 @@ $resets = get_active_password_resets();
 <div class="wrap">
     <header class="topbar">
         <h1>🛠 Admin</h1>
-        <a href="admin_logout.php" class="link-muted">Logi välja</a>
+        <div class="header-actions">
+            <?php if (!empty($_SESSION['family_id'])): ?>
+                <a href="paren.php" class="link-muted">← Töölaud</a>
+                <a href="logout.php" class="link-muted">Logi välja</a>
+            <?php else: ?>
+                <a href="admin_logout.php" class="link-muted">Logi välja</a>
+            <?php endif; ?>
+        </div>
     </header>
 
     <section class="card">

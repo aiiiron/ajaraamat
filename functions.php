@@ -264,6 +264,30 @@ function get_family_by_email(string $email): ?array {
     return $row ?: null;
 }
 
+/**
+ * True for the site owner. Qualifies in either of two ways:
+ *  - a legacy `admin_login.php` session (`$_SESSION['is_admin']`), or
+ *  - being logged in as the family account whose e-mail matches
+ *    `ADMIN_EMAIL` in config.php (case-insensitive) — so the owner reaches
+ *    admin.php straight from their normal login, with no second password.
+ * If `ADMIN_EMAIL` is unset/empty, only the legacy path applies.
+ */
+function is_admin(): bool {
+    if (session_status() === PHP_SESSION_NONE) {
+        session_start();
+    }
+    if (!empty($_SESSION['is_admin'])) {
+        return true;
+    }
+    $adminEmail = defined('ADMIN_EMAIL') ? trim((string) ADMIN_EMAIL) : '';
+    if ($adminEmail === '' || empty($_SESSION['family_id'])) {
+        return false;
+    }
+    $family = get_family((int) $_SESSION['family_id']);
+    return $family !== null
+        && strcasecmp(trim((string) $family['email']), $adminEmail) === 0;
+}
+
 // =========================================================
 // Password reset (parent accounts)
 // =========================================================
