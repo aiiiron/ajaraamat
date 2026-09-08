@@ -30,6 +30,8 @@ CREATE TABLE IF NOT EXISTS books (
     started_date DATE DEFAULT NULL,
     finished_date DATE DEFAULT NULL,
     note VARCHAR(255) DEFAULT NULL,
+    total_pages INT DEFAULT NULL,
+    current_page INT DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (child_id) REFERENCES children(id) ON DELETE CASCADE
 );

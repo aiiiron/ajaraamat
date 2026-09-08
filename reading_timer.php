@@ -41,6 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save'
             ':note' => 'Lisatud taimeriga',
         ]);
         mark_book_started($bookId);
+        update_book_page($bookId, $childId, (int) ($_POST['current_page'] ?? 0));
     }
     header('Location: child.php?token=' . urlencode($token) . '&saved=1');
     exit;
@@ -139,6 +140,8 @@ $books = array_filter($books, fn($b) => $b['status'] !== 'loetud') ?: $books; //
             <input type="hidden" name="action" value="save">
             <input type="hidden" name="book_id" id="save-book-id">
             <input type="hidden" name="minutes" id="save-minutes">
+            <label for="save-page" style="text-align:left;">Praegu leheküljel (valikuline)</label>
+            <input type="number" id="save-page" name="current_page" min="0" inputmode="numeric" placeholder="nt. 84">
             <button type="submit" class="btn btn-add full-width" style="margin-top:12px;">Salvesta</button>
         </form>
         <button type="button" class="link-muted" style="margin-top:12px;background:none;border:none;cursor:pointer;font-size:14px;" onclick="discardFinish()">Ei, ära salvesta</button>

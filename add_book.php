@@ -22,12 +22,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $started = $_POST['started_date'] ?? '';
     $finished = $_POST['finished_date'] ?? '';
     $note = trim($_POST['note'] ?? '');
+    $totalPages = (int) ($_POST['total_pages'] ?? 0);
+    $currentPage = (int) ($_POST['current_page'] ?? 0);
 
     if ($title === '') {
         $error = 'Sisesta raamatu pealkiri.';
     } else {
         $pdo = get_db();
-        $stmt = $pdo->prepare("INSERT INTO books (child_id, title, author, status, started_date, finished_date, note) VALUES (:cid, :title, :author, :status, :started, :finished, :note)");
+        $stmt = $pdo->prepare("INSERT INTO books (child_id, title, author, status, started_date, finished_date, note, total_pages, current_page) VALUES (:cid, :title, :author, :status, :started, :finished, :note, :total_pages, :current_page)");
         $stmt->execute([
             ':cid' => $childId,
             ':title' => $title,
@@ -36,6 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':started' => $started !== '' ? $started : null,
             ':finished' => $status === 'loetud' && $finished !== '' ? $finished : ($status === 'loetud' ? date('Y-m-d') : null),
             ':note' => $note !== '' ? $note : null,
+            ':total_pages' => $totalPages > 0 ? $totalPages : null,
+            ':current_page' => $currentPage > 0 ? $currentPage : null,
         ]);
         header('Location: books.php?child=' . $childId);
         exit;
@@ -94,6 +98,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     Loetud
                 </label>
             </div>
+
+            <label for="total_pages">Lehekülgi kokku (valikuline)</label>
+            <input type="number" id="total_pages" name="total_pages" min="0" inputmode="numeric" placeholder="nt. 240" value="<?= htmlspecialchars($_POST['total_pages'] ?? '') ?>">
+
+            <label for="current_page">Praegu leheküljel (valikuline)</label>
+            <input type="number" id="current_page" name="current_page" min="0" inputmode="numeric" value="<?= htmlspecialchars($_POST['current_page'] ?? '') ?>">
 
             <label for="started_date">Alustatud (valikuline)</label>
             <input type="date" id="started_date" name="started_date">

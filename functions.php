@@ -359,6 +359,90 @@ function count_finished_books(int $childId): int {
     return (int) $stmt->fetchColumn();
 }
 
+/** Advance a book's current page (never rewind), e.g. from a logged reading session. */
+function update_book_page(int $bookId, int $childId, int $page): void {
+    if ($bookId <= 0 || $page <= 0) {
+        return;
+    }
+    $pdo = get_db();
+    $stmt = $pdo->prepare("UPDATE books SET current_page = :p
+        WHERE id = :id AND child_id = :cid AND (current_page IS NULL OR current_page < :p2)");
+    $stmt->execute([':p' => $page, ':id' => $bookId, ':cid' => $childId, ':p2' => $page]);
+}
+
+/** Books / pages / reading time / active days for one child in a calendar year. */
+function get_year_summary(int $childId, int $year): array {
+    $pdo = get_db();
+    $start = sprintf('%04d-01-01', $year);
+    $end   = sprintf('%04d-12-31', $year);
+
+    $e = $pdo->prepare("SELECT
+        COALESCE(SUM(raamat), 0) AS reading_minutes,
+        COALESCE(SUM(ekraan), 0) AS screen_minutes,
+        COUNT(DISTINCT CASE WHEN raamat > 0 THEN entry_date END) AS reading_days
+      FROM entries WHERE child_id = :cid AND entry_date BETWEEN :s AND :e");
+    $e->execute([':cid' => $childId, ':s' => $start, ':e' => $end]);
+    $row = $e->fetch() ?: [];
+
+    $b = $pdo->prepare("SELECT
+        COUNT(*) AS books_read,
+        COALESCE(SUM(total_pages), 0) AS pages_read
+      FROM books WHERE child_id = :cid AND status = 'loetud'
+        AND finished_date BETWEEN :s AND :e");
+    $b->execute([':cid' => $childId, ':s' => $start, ':e' => $end]);
+    $brow = $b->fetch() ?: [];
+
+    return [
+        'year'            => $year,
+        'books_read'      => (int) ($brow['books_read'] ?? 0),
+        'pages_read'      => (int) ($brow['pages_read'] ?? 0),
+        'reading_minutes' => (int) ($row['reading_minutes'] ?? 0),
+        'screen_minutes'  => (int) ($row['screen_minutes'] ?? 0),
+        'reading_days'    => (int) ($row['reading_days'] ?? 0),
+    ];
+}
+
+/** [minYear, maxYear] covering a child's data; always includes the current year. */
+function get_reading_year_range(int $childId): array {
+    $pdo = get_db();
+    $stmt = $pdo->prepare("SELECT MIN(YEAR(entry_date)) AS mn, MAX(YEAR(entry_date)) AS mx
+        FROM entries WHERE child_id = :cid");
+    $stmt->execute([':cid' => $childId]);
+    $r = $stmt->fetch() ?: [];
+    $cur = (int) date('Y');
+    $mn = !empty($r['mn']) ? (int) $r['mn'] : $cur;
+    $mx = !empty($r['mx']) ? max((int) $r['mx'], $cur) : $cur;
+    return [min($mn, $cur), $mx];
+}
+
+/** 2x2 grid of headline year numbers. */
+function render_year_summary(array $s): void {
+    $nf = fn($n) => number_format($n, 0, ',', "\u{202F}");
+    ?>
+    <div class="ys-grid">
+        <div class="ys-stat"><span class="ys-n"><?= $nf($s['books_read']) ?></span><span class="ys-l">Raamatut loetud</span></div>
+        <div class="ys-stat"><span class="ys-n"><?= $nf($s['pages_read']) ?></span><span class="ys-l">Lehekülge</span></div>
+        <div class="ys-stat"><span class="ys-n"><?= format_duration($s['reading_minutes']) ?></span><span class="ys-l">Loetud aega</span></div>
+        <div class="ys-stat"><span class="ys-n"><?= $nf($s['reading_days']) ?></span><span class="ys-l">Lugemispäeva</span></div>
+    </div>
+    <?php
+}
+
+/** Year navigation arrows for the year-summary card. $baseUrl already carries child/token. */
+function render_year_nav(int $year, int $minYear, int $maxYear, string $baseUrl): void {
+    ?>
+    <div class="ys-year">
+        <?php if ($year > $minYear): ?>
+            <a href="<?= htmlspecialchars($baseUrl) ?>&year=<?= $year - 1 ?>" aria-label="Eelmine aasta">‹</a>
+        <?php else: ?><span class="disabled">‹</span><?php endif; ?>
+        <span><?= $year ?></span>
+        <?php if ($year < $maxYear): ?>
+            <a href="<?= htmlspecialchars($baseUrl) ?>&year=<?= $year + 1 ?>" aria-label="Järgmine aasta">›</a>
+        <?php else: ?><span class="disabled">›</span><?php endif; ?>
+    </div>
+    <?php
+}
+
 /** Books with the most minutes actually logged against them (via linked entries). */
 function get_top_books(int $childId, int $limit = 5): array {
     $pdo = get_db();
@@ -397,7 +481,12 @@ function render_books_table(array $books, bool $editable = false): void {
                 <p class="bl-group-head <?= $cls ?>"><?= $heading ?><span class="bl-count"><?= count($groups[$status]) ?></span></p>
                 <?php foreach ($groups[$status] as $b):
                     $mins = isset($b['total_minutes']) ? (int) $b['total_minutes'] : 0;
-                    $hasMeta = $mins > 0 || !empty($b['finished_date']); ?>
+                    $totalPages = (int) ($b['total_pages'] ?? 0);
+                    $curPage = (int) ($b['current_page'] ?? 0);
+                    $showBar = $totalPages > 0 && $status === 'loeb';
+                    $pct = $showBar ? min(100, max(0, (int) round($curPage / $totalPages * 100))) : 0;
+                    $showPages = $totalPages > 0 && $status !== 'loeb';
+                    $hasMeta = $mins > 0 || !empty($b['finished_date']) || $showPages; ?>
                     <div class="bl-item <?= $cls ?>">
                         <div class="bl-main">
                             <span class="bl-title"><?= htmlspecialchars($b['title']) ?></span>
@@ -405,9 +494,16 @@ function render_books_table(array $books, bool $editable = false): void {
                                 <span class="bl-author"><?= htmlspecialchars($b['author']) ?></span>
                             <?php endif; ?>
                         </div>
+                        <?php if ($showBar): ?>
+                            <div class="bl-progress" role="progressbar" aria-valuenow="<?= $pct ?>" aria-valuemin="0" aria-valuemax="100">
+                                <div class="bl-progress-fill" style="width: <?= $pct ?>%"></div>
+                            </div>
+                            <div class="bl-progress-label">lk <?= number_format($curPage, 0, ',', "\u{202F}") ?> / <?= number_format($totalPages, 0, ',', "\u{202F}") ?> · <?= $pct ?>%</div>
+                        <?php endif; ?>
                         <?php if ($hasMeta): ?>
                             <div class="bl-meta">
                                 <?php if ($mins > 0): ?><span class="bl-mins">📖 <?= format_duration($mins) ?></span><?php endif; ?>
+                                <?php if ($showPages): ?><span class="bl-pages">📄 <?= number_format($totalPages, 0, ',', "\u{202F}") ?> lk</span><?php endif; ?>
                                 <?php if (!empty($b['finished_date'])): ?><span class="bl-date">✓ <?= htmlspecialchars(date('d.M.Y', strtotime($b['finished_date']))) ?></span><?php endif; ?>
                             </div>
                         <?php endif; ?>

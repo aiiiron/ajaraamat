@@ -25,6 +25,11 @@ $childId = (int) $child['id'];
 $books = get_books($childId);
 $finishedCount = count_finished_books($childId);
 $milestone = get_book_milestone($finishedCount);
+
+[$minYear, $maxYear] = get_reading_year_range($childId);
+$year = (int) ($_GET['year'] ?? date('Y'));
+$year = max($minYear, min($maxYear, $year));
+$yearSummary = get_year_summary($childId, $year);
 ?>
 <!DOCTYPE html>
 <html lang="et">
@@ -57,9 +62,12 @@ $milestone = get_book_milestone($finishedCount);
         <a href="child_books.php?token=<?= htmlspecialchars($token) ?>" class="tab active">Raamatud</a>
     </nav>
 
-    <div class="stat-card" style="margin-bottom:16px;">
-        <div class="stat-label">Loetud raamatuid kokku</div>
-        <div class="stat-value"><?= $finishedCount ?></div>
+    <div class="card">
+        <div class="ys-head">
+            <h2>Aasta kokkuvõte</h2>
+            <?php render_year_nav($year, $minYear, $maxYear, 'child_books.php?token=' . urlencode($token)); ?>
+        </div>
+        <?php render_year_summary($yearSummary); ?>
     </div>
 
     <?php if ($milestone): ?>

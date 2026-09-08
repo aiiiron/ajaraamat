@@ -709,7 +709,27 @@ select:focus { outline: 2px solid var(--accent-purple); border-color: transparen
   font-weight: 700;
 }
 .bl-mins { color: #C93E68; }
+.bl-pages { color: var(--text-muted); }
 .bl-date { color: var(--text-muted); }
+.bl-progress {
+  height: 7px;
+  margin-top: 8px;
+  border-radius: 999px;
+  background: rgba(57, 47, 77, 0.12);
+  overflow: hidden;
+}
+.bl-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: #F0578F;
+  transition: width 0.3s ease;
+}
+.bl-progress-label {
+  margin-top: 4px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
 .bl-edit {
   position: absolute;
   top: 8px;
@@ -829,6 +849,60 @@ select:focus { outline: 2px solid var(--accent-purple); border-color: transparen
   margin-top: 4px;
 }
 .heatmap-legend .hm-cell { width: 10px; height: 10px; margin-right: 4px; vertical-align: middle; }
+
+/* Year summary card (Raamatud page) */
+.ys-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.ys-head h2 { margin: 0; }
+.ys-year {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 15px;
+  flex: none;
+}
+.ys-year a {
+  color: var(--accent-purple);
+  text-decoration: none;
+  padding: 2px 8px;
+  font-size: 18px;
+  line-height: 1;
+}
+.ys-year .disabled { color: var(--border); padding: 2px 8px; font-size: 18px; line-height: 1; }
+.ys-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.ys-stat {
+  background: rgba(139, 92, 246, 0.06);
+  border-radius: 14px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ys-n {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 20px;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.ys-l {
+  font-size: 11px;
+  color: var(--text-muted);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
 
 /* "Enim aega" — same grouped tinted-card look as the book list */
 .top-block + .top-block { margin-top: 20px; }

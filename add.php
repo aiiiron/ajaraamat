@@ -60,6 +60,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':ekraan' => $ekraan,
             ':ekraan_comment' => $type === 'ekraan' && $ekraanComment !== '' ? $ekraanComment : null,
         ]);
+        if ($type === 'raamat' && $bookId) {
+            update_book_page($bookId, $childId, (int) ($_POST['current_page'] ?? 0));
+        }
         if ($fromDay !== '') {
             header('Location: edit_day.php?date=' . urlencode($fromDay) . '&child=' . $childId);
         } else {
@@ -135,6 +138,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <?php endforeach; ?>
                 </div>
                 <?php endif; ?>
+
+                <label for="current_page">Praegu leheküljel (valikuline)</label>
+                <input type="number" id="current_page" name="current_page" min="0" inputmode="numeric" placeholder="nt. 84" value="<?= htmlspecialchars($_POST['current_page'] ?? '') ?>">
 
                 <label for="raamat_comment">Märkus (valikuline)</label>
                 <input type="text" id="raamat_comment" name="raamat_comment" placeholder="nt. hea peatükk!" value="<?= htmlspecialchars($_POST['raamat_comment'] ?? '') ?>">
