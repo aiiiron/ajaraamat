@@ -88,12 +88,12 @@ $hasReading = $recap['raamat'] > 0 || $recap['ekraan'] > 0;
 
         <div class="wk-grid">
             <div class="wk-stat">
-                <div class="wk-l">📖 Loetud</div>
+                <div class="wk-l"><?= emoji_svg('books') ?> Loetud</div>
                 <div class="wk-n"><?= format_duration($recap['raamat']) ?></div>
                 <?= render_wk_delta($recap['raamat'], $prev['raamat']) ?>
             </div>
             <div class="wk-stat">
-                <div class="wk-l">📱 Ekraan</div>
+                <div class="wk-l"><?= emoji_svg('screen') ?> Ekraan</div>
                 <div class="wk-n"><?= format_duration($recap['ekraan']) ?></div>
                 <?= render_wk_delta($recap['ekraan'], $prev['ekraan'], true) ?>
             </div>

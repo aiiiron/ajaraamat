@@ -150,16 +150,16 @@ $dateLabel = date('d.m.Y', strtotime($date));
             <?php else: ?>
                 <div class="toggle-group">
                     <label class="toggle-btn <?= $eType === 'raamat' ? 'active' : '' ?>">
-                        <input type="radio" name="type" value="raamat" <?= $eType === 'raamat' ? 'checked' : '' ?> hidden> 📖 Raamat
+                        <input type="radio" name="type" value="raamat" <?= $eType === 'raamat' ? 'checked' : '' ?> hidden> <?= emoji_svg('books') ?> Raamat
                     </label>
                     <label class="toggle-btn <?= $eType === 'ekraan' ? 'active' : '' ?>">
-                        <input type="radio" name="type" value="ekraan" <?= $eType === 'ekraan' ? 'checked' : '' ?> hidden> 📱 Ekraan
+                        <input type="radio" name="type" value="ekraan" <?= $eType === 'ekraan' ? 'checked' : '' ?> hidden> <?= emoji_svg('screen') ?> Ekraan
                     </label>
                 </div>
             <?php endif; ?>
 
             <div class="type-fields" data-type="raamat" <?= ($eMixed || $eType === 'raamat') ? '' : 'hidden' ?>>
-                <label for="raamat_<?= $e['id'] ?>">📖 Raamat (min)</label>
+                <label for="raamat_<?= $e['id'] ?>"><?= emoji_svg('books') ?> Raamat (min)</label>
                 <input type="number" id="raamat_<?= $e['id'] ?>" name="raamat" min="0" value="<?= (int) $e['raamat'] ?>" inputmode="numeric">
 
                 <label for="book_id_<?= $e['id'] ?>">Milline raamat?</label>
@@ -177,7 +177,7 @@ $dateLabel = date('d.m.Y', strtotime($date));
             </div>
 
             <div class="type-fields" data-type="ekraan" <?= ($eMixed || $eType === 'ekraan') ? '' : 'hidden' ?>>
-                <label for="ekraan_<?= $e['id'] ?>">📱 Ekraan (min)</label>
+                <label for="ekraan_<?= $e['id'] ?>"><?= emoji_svg('screen') ?> Ekraan (min)</label>
                 <input type="number" id="ekraan_<?= $e['id'] ?>" name="ekraan" min="0" value="<?= (int) $e['ekraan'] ?>" inputmode="numeric">
 
                 <label for="ekraan_comment_<?= $e['id'] ?>">Ekraani kommentaar (valikuline)</label>

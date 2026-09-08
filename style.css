@@ -43,6 +43,19 @@
 /* icon that sits alone in a round button */
 .icon-btn .ic { width: 1em; height: 1em; vertical-align: 0; }
 
+/* värviline kategooria-emoji (lugemine / ekraan) — inline Fluent Emoji */
+.emo {
+  width: 1.2em;
+  height: 1.2em;
+  flex: none;
+  vertical-align: -0.22em;
+  display: inline-block;
+}
+/* emoji üksinda ümmarguses mullis — täida rohkem ruumi */
+.pt-k .emo { width: 17px; height: 17px; vertical-align: 0; }
+.reward-icon .emo { width: 26px; height: 26px; vertical-align: 0; }
+.wk-l .emo { width: 15px; height: 15px; }
+
 html {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;

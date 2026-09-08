@@ -111,15 +111,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label>Mille kohta on kanne?</label>
             <div class="toggle-group" id="type-toggle">
                 <label class="toggle-btn <?= $type === 'raamat' ? 'active' : '' ?>">
-                    <input type="radio" name="type" value="raamat" <?= $type === 'raamat' ? 'checked' : '' ?> hidden> 📖 Raamat
+                    <input type="radio" name="type" value="raamat" <?= $type === 'raamat' ? 'checked' : '' ?> hidden> <?= emoji_svg('books') ?> Raamat
                 </label>
                 <label class="toggle-btn <?= $type === 'ekraan' ? 'active' : '' ?>">
-                    <input type="radio" name="type" value="ekraan" <?= $type === 'ekraan' ? 'checked' : '' ?> hidden> 📱 Ekraan
+                    <input type="radio" name="type" value="ekraan" <?= $type === 'ekraan' ? 'checked' : '' ?> hidden> <?= emoji_svg('screen') ?> Ekraan
                 </label>
             </div>
 
             <div class="type-fields" data-type="raamat" <?= $type === 'raamat' ? '' : 'hidden' ?>>
-                <label for="raamat">📖 Raamat (min)</label>
+                <label for="raamat"><?= emoji_svg('books') ?> Raamat (min)</label>
                 <input type="number" id="raamat" name="raamat" min="0" placeholder="nt. 30" inputmode="numeric" value="<?= htmlspecialchars($_POST['raamat'] ?? '') ?>" <?= $type === 'raamat' ? 'autofocus' : '' ?>>
 
                 <label for="book_id">Milline raamat?</label>
@@ -134,7 +134,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php if (!empty($currentBooks)): ?>
                 <div class="quick-add-row">
                     <?php foreach (array_slice($currentBooks, 0, 4) as $b): ?>
-                        <button type="button" class="quick-add-btn" onclick="var s=document.getElementById('book_id');s.value='<?= $b['id'] ?>';document.getElementById('new_book_title').style.display='none';document.getElementById('raamat').focus();">📖 <?= htmlspecialchars($b['title']) ?></button>
+                        <button type="button" class="quick-add-btn" onclick="var s=document.getElementById('book_id');s.value='<?= $b['id'] ?>';document.getElementById('new_book_title').style.display='none';document.getElementById('raamat').focus();"><?= emoji_svg('books') ?> <?= htmlspecialchars($b['title']) ?></button>
                     <?php endforeach; ?>
                 </div>
                 <?php endif; ?>
@@ -147,7 +147,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
 
             <div class="type-fields" data-type="ekraan" <?= $type === 'ekraan' ? '' : 'hidden' ?>>
-                <label for="ekraan">📱 Ekraan (min)</label>
+                <label for="ekraan"><?= emoji_svg('screen') ?> Ekraan (min)</label>
                 <input type="number" id="ekraan" name="ekraan" min="0" placeholder="nt. 30" inputmode="numeric" value="<?= htmlspecialchars($_POST['ekraan'] ?? '') ?>" <?= $type === 'ekraan' ? 'autofocus' : '' ?>>
 
                 <label for="ekraan_comment">Ekraani kommentaar (valikuline)</label>
@@ -155,7 +155,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <?php if (!empty($recentEkraan)): ?>
                 <div class="quick-add-row">
                     <?php foreach ($recentEkraan as $c): ?>
-                        <button type="button" class="quick-add-btn" onclick="document.getElementById('ekraan_comment').value=<?= json_encode($c) ?>;document.getElementById('ekraan').focus();">📱 <?= htmlspecialchars($c) ?></button>
+                        <button type="button" class="quick-add-btn" onclick="document.getElementById('ekraan_comment').value=<?= json_encode($c) ?>;document.getElementById('ekraan').focus();"><?= emoji_svg('screen') ?> <?= htmlspecialchars($c) ?></button>
                     <?php endforeach; ?>
                 </div>
                 <?php endif; ?>

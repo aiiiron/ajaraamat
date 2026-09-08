@@ -48,6 +48,22 @@ function icon(string $name, string $class = 'ic'): string {
 }
 
 // =========================================================
+// Kategooria-ikoonid — inline Microsoft Fluent Emoji (flat),
+// MIT (https://github.com/microsoft/fluentui-emoji). Värvilised,
+// et "lugemine" / "ekraan" oleksid lapsesõbralikud ja näeksid
+// igas seadmes ühtemoodi välja. Mõõt tuleb .emo klassist (1em),
+// nii et kutse pärib ümbritseva teksti suuruse (.pt-k, .tag jne).
+// =========================================================
+
+function emoji_svg(string $name): string {
+    static $svg = [
+        'books'  => '<svg class="emo" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false"><path d="M17.0454 27.2857H30V13C30 11.8954 29.1045 11 28 11H17.0454V27.2857Z" fill="#00A6ED"/><path d="M15.6818 27.9642H30V29.3214H15.6818V27.9642Z" fill="#D3D3D3"/><path d="M16.0227 11C15.4579 11 15 11.4557 15 12.0179V28.6429H15.6818C15.6818 28.2681 15.9871 27.9643 16.3636 27.9643H17.0455V11H16.0227Z" fill="#0074BA"/><path d="M16.0227 27.2858C15.4579 27.2858 15 27.7415 15 28.3036V28.9822C15 29.5443 15.4579 30.0001 16.0227 30.0001H28.9773C29.4226 30.0001 29.8014 29.7168 29.9418 29.3215H16.3636C15.9871 29.3215 15.6818 29.0177 15.6818 28.6429C15.6818 28.2681 15.9871 27.9643 16.3636 27.9643H30V27.2858H16.0227Z" fill="#0074BA"/><path d="M10.0454 23.2857H23V9C23 7.89543 22.1045 7 21 7H10.0454V23.2857Z" fill="#CA0B4A"/><path d="M8.68182 23.9642H23V25.3214H8.68182V23.9642Z" fill="#D3D3D3"/><path d="M9.02273 7C8.45789 7 8 7.45571 8 8.01786V24.6429H8.68182C8.68182 24.2681 8.98708 23.9643 9.36364 23.9643H10.0455V7H9.02273Z" fill="#990838"/><path d="M9.02273 23.2858C8.45789 23.2858 8 23.7415 8 24.3036V24.9822C8 25.5443 8.45789 26.0001 9.02273 26.0001H21.9773C22.4226 26.0001 22.8014 25.7168 22.9418 25.3215H9.36364C8.98708 25.3215 8.68182 25.0177 8.68182 24.6429C8.68182 24.2681 8.98708 23.9643 9.36364 23.9643H23V23.2858H9.02273Z" fill="#990838"/><path d="M4.04541 20.2857H17V6C17 4.89543 16.1045 4 15 4H4.04541V20.2857Z" fill="#86D72F"/><path d="M2.68182 20.9642H17V22.3214H2.68182V20.9642Z" fill="#D3D3D3"/><path d="M3.02273 4C2.45789 4 2 4.45571 2 5.01786V21.6429H2.68182C2.68182 21.2681 2.98708 20.9643 3.36364 20.9643H4.04545V4H3.02273Z" fill="#44911B"/><path d="M3.02273 20.2858C2.45789 20.2858 2 20.7415 2 21.3036V21.9822C2 22.5443 2.45789 23.0001 3.02273 23.0001H15.9773C16.4226 23.0001 16.8014 22.7168 16.9418 22.3215H3.36364C2.98708 22.3215 2.68182 22.0177 2.68182 21.6429C2.68182 21.2681 2.98708 20.9643 3.36364 20.9643H17V20.2858H3.02273Z" fill="#008463"/></svg>',
+        'screen' => '<svg class="emo" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false"><path d="M10.3535 3.06063C10.1582 2.86537 10.1582 2.54879 10.3535 2.35352C10.5487 2.15826 10.8653 2.15826 11.0606 2.35352L14.9497 6.24261L14.2426 6.94972L10.3535 3.06063Z" fill="#636363"/><path d="M18.889 2.35348C19.0842 2.15822 19.4008 2.15822 19.5961 2.35348C19.7914 2.54874 19.7914 2.86532 19.5961 3.06058L15.707 6.94967L14.9999 6.24257L18.889 2.35348Z" fill="#636363"/><path d="M11.0002 23.5L8.00024 23L6.46544 28.7279C6.31248 29.2987 6.65125 29.8855 7.22209 30.0385C7.73725 30.1765 8.2754 29.9141 8.48393 29.4232L11.0002 23.5Z" fill="#636363"/><path d="M21.0002 23.5L24.0002 23L25.535 28.7279C25.688 29.2987 25.3492 29.8855 24.7784 30.0385C24.2632 30.1765 23.7251 29.9141 23.5165 29.4232L21.0002 23.5Z" fill="#636363"/><path d="M3 9C3 7.34315 4.34315 6 6 6H26C27.6569 6 29 7.34315 29 9V22C29 23.6569 27.6569 25 26 25H6C4.34315 25 3 23.6569 3 22V9Z" fill="#9B9B9B"/><circle cx="25.75" cy="13.25" r="1.25" fill="#CA0B4A"/><circle cx="25.75" cy="9.25" r="1.25" fill="#636363"/><path d="M6.5 11.5C6.5 10.3954 7.39543 9.5 8.5 9.5H20.5C21.6046 9.5 22.5 10.3954 22.5 11.5V19.5C22.5 20.6046 21.6046 21.5 20.5 21.5H8.5C7.39543 21.5 6.5 20.6046 6.5 19.5V11.5Z" fill="#83CBFF"/><path d="M21 10C21.5523 10 22 10.4477 22 11V20C22 20.5523 21.5523 21 21 21H8C7.44772 21 7 20.5523 7 20V11C7 10.4477 7.44772 10 8 10H21ZM8 9C6.89543 9 6 9.89543 6 11V20C6 21.1046 6.89543 22 8 22H21C22.1046 22 23 21.1046 23 20V11C23 9.89543 22.1046 9 21 9H8Z" fill="#321B41"/></svg>',
+    ];
+    return $svg[$name] ?? '';
+}
+
+// =========================================================
 // CSRF (session-authenticated forms)
 // =========================================================
 
@@ -148,7 +164,7 @@ function render_reward_card(int $owed, int $cap): void {
     $shown = min($earned, $cap);
     ?>
     <div class="reward-card">
-        <div class="reward-icon">📱</div>
+        <div class="reward-icon"><?= emoji_svg('screen') ?></div>
         <div class="reward-body">
             <div class="reward-label">Teenitud ekraaniaeg</div>
             <div class="reward-value"><?= format_duration($shown) ?></div>
@@ -478,8 +494,8 @@ function render_stats_tiles(array $s): void {
         <?php foreach ($tiles as [$label, $raamat, $ekraan, $isTotal]): ?>
             <div class="period-tile<?= $isTotal ? ' pt-total' : '' ?>">
                 <div class="pt-label"><?= htmlspecialchars($label) ?></div>
-                <div class="pt-row pt-reading"><span class="pt-k">📖</span><span class="pt-t">Raamat</span><span class="pt-v"><?= format_duration($raamat) ?></span></div>
-                <div class="pt-row pt-screen"><span class="pt-k">📱</span><span class="pt-t">Ekraan</span><span class="pt-v"><?= format_duration($ekraan) ?></span></div>
+                <div class="pt-row pt-reading"><span class="pt-k"><?= emoji_svg('books') ?></span><span class="pt-t">Raamat</span><span class="pt-v"><?= format_duration($raamat) ?></span></div>
+                <div class="pt-row pt-screen"><span class="pt-k"><?= emoji_svg('screen') ?></span><span class="pt-t">Ekraan</span><span class="pt-v"><?= format_duration($ekraan) ?></span></div>
             </div>
         <?php endforeach; ?>
     </div>
@@ -906,7 +922,7 @@ function render_books_table(array $books, bool $editable = false): void {
                         <?php endif; ?>
                         <?php if ($hasMeta): ?>
                             <div class="bl-meta">
-                                <?php if ($mins > 0): ?><span class="bl-mins">📖 <?= format_duration($mins) ?></span><?php endif; ?>
+                                <?php if ($mins > 0): ?><span class="bl-mins"><?= emoji_svg('books') ?> <?= format_duration($mins) ?></span><?php endif; ?>
                                 <?php if ($showPages): ?><span class="bl-pages">📄 <?= number_format($totalPages, 0, ',', "\u{202F}") ?> lk</span><?php endif; ?>
                                 <?php if (!empty($b['finished_date'])): ?><span class="bl-date">✓ <?= htmlspecialchars(date('d.M.Y', strtotime($b['finished_date']))) ?></span><?php endif; ?>
                             </div>
@@ -1114,9 +1130,9 @@ function render_entries_table(array $entries, bool $editable = false, int $child
                     <?php foreach ($rows as $a): ?>
                         <div class="entry-row">
                             <?php if ($a['type'] === 'raamat'): ?>
-                                <span class="tag tag-reading">📖 <?= $a['minutes'] ?> min</span>
+                                <span class="tag tag-reading"><?= emoji_svg('books') ?> <?= $a['minutes'] ?> min</span>
                             <?php else: ?>
-                                <span class="tag tag-screen">📱 <?= $a['minutes'] ?> min</span>
+                                <span class="tag tag-screen"><?= emoji_svg('screen') ?> <?= $a['minutes'] ?> min</span>
                             <?php endif; ?>
                             <div class="entry-label">
                                 <?= $a['label'] ? htmlspecialchars($a['label']) : '–' ?>

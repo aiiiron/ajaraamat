@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/functions.php'; // emoji_svg() turunduslehe mock-ridade jaoks
 configure_session();
 // If a parent is already logged in (e.g. reopening a home-screen shortcut
 // that points here), skip the marketing page and go straight to the dashboard.
@@ -106,9 +107,10 @@ if (!empty($_SESSION['family_id'])) {
   .mock-stat .v { font-family: 'Baloo 2', sans-serif; font-size: 15px; font-weight: 700; }
   .mock-rows { display: flex; flex-direction: column; gap: 6px; }
   .mock-row { display: flex; align-items: center; gap: 8px; font-size: 12px; background: #F7F4FC; border-radius: 10px; padding: 8px 10px; }
-  .mock-pill { font-family: 'Baloo 2', sans-serif; font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 99px; }
+  .mock-pill { font-family: 'Baloo 2', sans-serif; font-size: 11px; font-weight: 700; padding: 3px 9px 3px 7px; border-radius: 99px; white-space: nowrap; }
   .mock-pill.em { background: var(--reading-tint); color: #C93E68; }
   .mock-pill.in { background: var(--screen-tint); color: #4A5FB5; }
+  .mock-pill .emo { width: 1.25em; height: 1.25em; vertical-align: -0.25em; display: inline-block; }
   .streak-chip { position: absolute; top: -14px; right: 18px; background: linear-gradient(90deg, #FFC98A, #FFA8CB); color: #93450A; font-family: 'Baloo 2', sans-serif; font-size: 13px; font-weight: 700; padding: 8px 14px; border-radius: 99px; box-shadow: 0 8px 20px -8px rgba(147,69,10,0.3); transform: rotate(3deg); }
 
   section { padding: 70px 0; }
@@ -191,9 +193,9 @@ if (!empty($_SESSION['family_id'])) {
         <div class="mock-stat"><div class="l">Ekraan kokku</div><div class="v">298 min</div></div>
       </div>
       <div class="mock-rows">
-        <div class="mock-row"><span class="mock-pill em">📖 30 min</span> Karlsson katuselt</div>
-        <div class="mock-row"><span class="mock-pill in">📱 20 min</span> Youtube</div>
-        <div class="mock-row"><span class="mock-pill em">📖 25 min</span> Pipi Pikksukk</div>
+        <div class="mock-row"><span class="mock-pill em"><?= emoji_svg('books') ?> 30 min</span> Karlsson katuselt</div>
+        <div class="mock-row"><span class="mock-pill in"><?= emoji_svg('screen') ?> 20 min</span> Youtube</div>
+        <div class="mock-row"><span class="mock-pill em"><?= emoji_svg('books') ?> 25 min</span> Pipi Pikksukk</div>
       </div>
     </div>
   </div>
@@ -245,8 +247,8 @@ if (!empty($_SESSION['family_id'])) {
             <div class="v">7 min lugemist võlgu</div>
           </div>
           <div class="mock-rows">
-            <div class="mock-row"><span class="mock-pill em">📖 60 min</span> Meister</div>
-            <div class="mock-row"><span class="mock-pill in">📱 77 min</span> Youtube</div>
+            <div class="mock-row"><span class="mock-pill em"><?= emoji_svg('books') ?> 60 min</span> Meister</div>
+            <div class="mock-row"><span class="mock-pill in"><?= emoji_svg('screen') ?> 77 min</span> Youtube</div>
           </div>
         </div>
       </div>
@@ -258,8 +260,8 @@ if (!empty($_SESSION['family_id'])) {
             <div class="v">Tasakaalus!</div>
           </div>
           <div class="mock-rows">
-            <div class="mock-row"><span class="mock-pill em">📖 45 min</span> Sipsik</div>
-            <div class="mock-row"><span class="mock-pill in">📱 45 min</span> Operatsioon AI</div>
+            <div class="mock-row"><span class="mock-pill em"><?= emoji_svg('books') ?> 45 min</span> Sipsik</div>
+            <div class="mock-row"><span class="mock-pill in"><?= emoji_svg('screen') ?> 45 min</span> Operatsioon AI</div>
           </div>
         </div>
       </div>

@@ -76,8 +76,8 @@ $totals = get_totals($childId);
     ?>
     <div class="period-tile pt-total hist-total">
         <div class="pt-label">Kokku</div>
-        <div class="pt-row pt-reading"><span class="pt-k">📖</span><span class="pt-t">Raamat</span><span class="pt-v"><?= format_duration((int) $totals['raamat']) ?></span></div>
-        <div class="pt-row pt-screen"><span class="pt-k">📱</span><span class="pt-t">Ekraan</span><span class="pt-v"><?= format_duration((int) $totals['ekraan']) ?></span></div>
+        <div class="pt-row pt-reading"><span class="pt-k"><?= emoji_svg('books') ?></span><span class="pt-t">Raamat</span><span class="pt-v"><?= format_duration((int) $totals['raamat']) ?></span></div>
+        <div class="pt-row pt-screen"><span class="pt-k"><?= emoji_svg('screen') ?></span><span class="pt-t">Ekraan</span><span class="pt-v"><?= format_duration((int) $totals['ekraan']) ?></span></div>
         <div class="pt-row pt-balance <?= $balClass ?>"><span class="pt-k">⚖️</span><span class="pt-t">Tasakaal</span><span class="pt-v"><?= htmlspecialchars($balText) ?></span></div>
     </div>
 
