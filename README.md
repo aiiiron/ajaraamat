@@ -60,6 +60,9 @@ GitHub repo "Actions" vahekaardilt.
    - `DB_HOST`, `DB_NAME`, `DB_USER`, `DB_PASS` — andmebaasi ühendus.
    - `ADMIN_PASSWORD` — SINU parool uute perede kinnitamiseks
      (`admin_login.php` kaudu). See ei ole ühegi pere parool.
+   - `ADMIN_EMAIL` — valikuline; sinu enda pere konto e-post. Kui täidad
+     selle, pääsed admin paneeli otse oma tavalisest sisselogimisest,
+     ilma eraldi `ADMIN_PASSWORD`-ita. Jäta tühjaks, kui ei soovi seda.
    - `READING_RATIO` — jäta `1.0`, kui reegel on 1:1.
 4. **Lae kõik failid FTP kaudu üles.**
 5. Ava sait brauseris — see näitab tutvustuslehte. Perekonnad saavad end
@@ -128,14 +131,24 @@ saavad selle automaatselt). Kui andmebaas on juba püsti:
 
 ## Admin paneel
 
-`admin_login.php` — sisesta `config.php`-s määratud `ADMIN_PASSWORD`.
+Kaks võimalust admin paneeli (`admin.php`) pääseda:
+
+1. **Oma konto kaudu** (mugavam): pane `config.php`-sse
+   `ADMIN_EMAIL` = sinu pere konto e-post. Kui oled `login.php` kaudu
+   sisse logitud, ilmub töölaua ülariba paremasse serva link **"Admin"**.
+   Eraldi parooli pole vaja.
+2. **Eraldi parooliga**: `admin_login.php` — sisesta `config.php`-s
+   määratud `ADMIN_PASSWORD`. Töötab endiselt, `ADMIN_EMAIL`-ist sõltumata
+   (nt kui pere kontost välja logid).
+
 Sealt näed:
 - Ootel registreerimisi — Kinnita/Lükka tagasi.
 - Kõiki peresid ja nende laste arvu.
 - Aktiivseid parooli lähtestamise päringuid — iga juures valmis link,
   mille saad vanemale käsitsi anda, kui automaatne e-kiri kohale ei jõua.
 
-Ainult sina näed admin paneeli. Vanemad ei näe ega puutu sellega kokku.
+Ainult sina näed admin paneeli. Tavalised vanemad ei näe "Admin" linki
+ega pääse `admin.php`-le — kui mõni proovib, suunatakse ta oma töölauale.
 
 ## Perede ja laste haldamine
 
