@@ -4,6 +4,10 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+header('Cache-Control: no-store, must-revalidate');
+header('Pragma: no-cache');
+header('Expires: 0');
+
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $now = time();

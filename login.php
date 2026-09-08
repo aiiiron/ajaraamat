@@ -3,6 +3,12 @@ require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/db.php';
 configure_session();
 
+// Don't let Safari cache the login page (see functions.php — iOS with a Screen
+// Time passcode can't clear its cache).
+header('Cache-Control: no-store, must-revalidate');
+header('Pragma: no-cache');
+header('Expires: 0');
+
 // Already logged in? Skip straight to the dashboard instead of showing the form again.
 if (!empty($_SESSION['family_id'])) {
     header('Location: paren.php');

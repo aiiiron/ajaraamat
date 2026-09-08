@@ -3,6 +3,20 @@ require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/config.php';
 
 // =========================================================
+// Never cache the HTML documents themselves
+// =========================================================
+// The CSS, JS and icons are versioned with ?v= and cache fine. But a stale
+// cached *page* is a real problem on iOS: when a Screen Time passcode is set,
+// Safari's cache can't be cleared at all, so an old child.php / paren.php would
+// stick forever. no-store tells every cache (Safari and the Hostinger CDN) to
+// re-fetch the markup each time; the versioned assets it references still cache.
+if (PHP_SAPI !== 'cli' && !headers_sent()) {
+    header('Cache-Control: no-store, must-revalidate');
+    header('Pragma: no-cache');
+    header('Expires: 0');
+}
+
+// =========================================================
 // Formatting
 // =========================================================
 
