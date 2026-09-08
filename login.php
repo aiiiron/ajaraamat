@@ -80,6 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <button type="submit">Logi sisse</button>
     </form>
+    <a href="forgot.php" class="link-muted login-home-link">Unustasid parooli?</a><br>
     <a href="register.php" class="link-muted login-home-link">Pole veel kontot? Registreeru</a><br>
     <a href="index.php" class="link-muted login-home-link">← Avaleht</a>
 </div>

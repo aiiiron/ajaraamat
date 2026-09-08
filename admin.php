@@ -5,10 +5,18 @@ require_once __DIR__ . '/functions.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     require_csrf();
-    $id = (int) ($_POST['family_id'] ?? 0);
     $action = $_POST['action'] ?? '';
-    if ($id > 0 && in_array($action, ['approved', 'rejected', 'pending'], true)) {
-        set_family_status($id, $action);
+
+    if ($action === 'reset_cancel') {
+        $resetId = (int) ($_POST['reset_id'] ?? 0);
+        if ($resetId > 0) {
+            get_db()->prepare("DELETE FROM password_resets WHERE id = :id")->execute([':id' => $resetId]);
+        }
+    } else {
+        $id = (int) ($_POST['family_id'] ?? 0);
+        if ($id > 0 && in_array($action, ['approved', 'rejected', 'pending'], true)) {
+            set_family_status($id, $action);
+        }
     }
     header('Location: admin.php');
     exit;
@@ -16,6 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $pending = get_families_by_status('pending');
 $all = get_all_families();
+$resets = get_active_password_resets();
 ?>
 <!DOCTYPE html>
 <html lang="et">
@@ -59,6 +68,37 @@ $all = get_all_families();
                             <button type="submit" class="btn-delete-full">Lükka tagasi</button>
                         </form>
                     </div>
+                </div>
+            <?php endforeach; ?>
+        <?php endif; ?>
+    </section>
+
+    <section class="card">
+        <h2>Parooli lähtestamise päringud (<?= count($resets) ?>)</h2>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">
+            Link saadetakse vanemale automaatselt e-postiga, aga jagatud hostingu kiri
+            ei pruugi kohale jõuda. Kui vanem ütleb, et kirja ei tulnud, kopeeri talle
+            see link käsitsi. Iga link kehtib 24 tundi ja toimib ainult ühe korra.
+        </p>
+        <?php if (empty($resets)): ?>
+            <p class="empty">Aktiivseid päringuid pole.</p>
+        <?php else: ?>
+            <?php foreach ($resets as $r): ?>
+                <?php $link = base_url() . '/reset.php?token=' . $r['token']; ?>
+                <div class="day-entry-card" style="margin-bottom:12px;">
+                    <p style="margin-bottom:4px;"><strong><?= htmlspecialchars($r['email']) ?></strong></p>
+                    <p style="font-size:13px;color:var(--text-muted);margin-bottom:8px;">
+                        Küsitud: <?= htmlspecialchars(date('d.m.Y H:i', strtotime($r['created_at']))) ?>
+                        · aegub: <?= htmlspecialchars(date('d.m.Y H:i', strtotime($r['expires_at']))) ?>
+                    </p>
+                    <input type="text" readonly value="<?= htmlspecialchars($link, ENT_QUOTES) ?>"
+                           onclick="this.select()" style="width:100%;margin-bottom:8px;font-size:13px;">
+                    <form method="post">
+                        <?= csrf_field() ?>
+                        <input type="hidden" name="action" value="reset_cancel">
+                        <input type="hidden" name="reset_id" value="<?= (int) $r['id'] ?>">
+                        <button type="submit" class="btn-delete-full">Tühista see päring</button>
+                    </form>
                 </div>
             <?php endforeach; ?>
         <?php endif; ?>

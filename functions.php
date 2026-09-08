@@ -248,6 +248,135 @@ function set_family_status(int $familyId, string $status): void {
     $stmt->execute([':s' => $status, ':id' => $familyId]);
 }
 
+function get_family(int $familyId): ?array {
+    $pdo = get_db();
+    $stmt = $pdo->prepare("SELECT * FROM families WHERE id = :id");
+    $stmt->execute([':id' => $familyId]);
+    $row = $stmt->fetch();
+    return $row ?: null;
+}
+
+function get_family_by_email(string $email): ?array {
+    $pdo = get_db();
+    $stmt = $pdo->prepare("SELECT * FROM families WHERE email = :e");
+    $stmt->execute([':e' => $email]);
+    $row = $stmt->fetch();
+    return $row ?: null;
+}
+
+// =========================================================
+// Password reset (parent accounts)
+// =========================================================
+//
+// Flow: forgot.php creates a token for an *approved* family, tries to email
+// the reset link via mail(), and — because shared-hosting mail() is
+// unreliable — the same link is always shown to the site owner in admin.php
+// to hand over manually. reset.php verifies the token and sets a new hash.
+//
+// The `password_resets` row keeps both `token_hash` (the value reset.php
+// looks up) and the raw `token` (only so admin.php can rebuild a working
+// link for the manual fallback). The row is deleted the moment the token is
+// used, and a family can only ever have one active reset row (UNIQUE key).
+
+// How long a reset link stays valid.
+define('PASSWORD_RESET_TTL', 60 * 60 * 24); // 24 tundi
+
+/** Absolute site origin for the current request, e.g. "https://ajaraamat.ee". */
+function base_url(): string {
+    $https = !empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off';
+    $host  = $_SERVER['HTTP_HOST'] ?? 'ajaraamat.ee';
+    return ($https ? 'https' : 'http') . '://' . $host;
+}
+
+/**
+ * Issue a fresh single-use reset token for a family, replacing any earlier
+ * one. Returns the RAW token (never stored anywhere it can be read back for
+ * verification) to drop into the reset link.
+ */
+function create_password_reset(int $familyId): string {
+    $pdo = get_db();
+    // Drop this family's previous token and sweep anything already expired.
+    $pdo->prepare("DELETE FROM password_resets WHERE family_id = :fid OR expires_at < NOW()")
+        ->execute([':fid' => $familyId]);
+
+    $raw = bin2hex(random_bytes(32));
+    $stmt = $pdo->prepare(
+        "INSERT INTO password_resets (family_id, token_hash, token, expires_at)
+         VALUES (:fid, :h, :t, :exp)"
+    );
+    $stmt->execute([
+        ':fid' => $familyId,
+        ':h'   => hash('sha256', $raw),
+        ':t'   => $raw,
+        ':exp' => date('Y-m-d H:i:s', time() + PASSWORD_RESET_TTL),
+    ]);
+    return $raw;
+}
+
+/** The reset row for a still-valid raw token, or null. Does not consume it. */
+function find_valid_password_reset(string $rawToken): ?array {
+    if ($rawToken === '') {
+        return null;
+    }
+    $pdo = get_db();
+    $stmt = $pdo->prepare(
+        "SELECT * FROM password_resets
+         WHERE token_hash = :h AND expires_at > NOW() LIMIT 1"
+    );
+    $stmt->execute([':h' => hash('sha256', $rawToken)]);
+    $row = $stmt->fetch();
+    return $row ?: null;
+}
+
+/** Set the family's new bcrypt hash and burn the reset token. */
+function complete_password_reset(int $resetId, int $familyId, string $newPassword): void {
+    $pdo = get_db();
+    $pdo->prepare("UPDATE families SET password_hash = :h WHERE id = :id")
+        ->execute([':h' => password_hash($newPassword, PASSWORD_DEFAULT), ':id' => $familyId]);
+    $pdo->prepare("DELETE FROM password_resets WHERE id = :id")
+        ->execute([':id' => $resetId]);
+}
+
+/** Active (unexpired) reset requests with the family e-mail — for admin.php. */
+function get_active_password_resets(): array {
+    $pdo = get_db();
+    return $pdo->query(
+        "SELECT pr.*, f.email
+         FROM password_resets pr
+         JOIN families f ON f.id = pr.family_id
+         WHERE pr.expires_at > NOW()
+         ORDER BY pr.created_at DESC"
+    )->fetchAll();
+}
+
+/**
+ * Best-effort: e-mail the reset link. Shared-hosting mail() often silently
+ * fails or lands in spam, so callers must ALSO surface the link in admin.php.
+ * Returns mail()'s own boolean result.
+ */
+function send_password_reset_email(string $toEmail, string $link): bool {
+    $host = $_SERVER['HTTP_HOST'] ?? 'ajaraamat.ee';
+    $subject = 'Ajaraamat — parooli lähtestamine';
+    $body =
+        "Keegi (loodetavasti sina) palus Ajaraamatus parooli lähtestamist.\n\n" .
+        "Ava see link 24 tunni jooksul ja vali uus parool:\n" .
+        $link . "\n\n" .
+        "Kui sa ei palunud parooli lähtestamist, jäta see kiri tähelepanuta — " .
+        "sinu parool ei muutu.\n";
+    $headers = implode("\r\n", [
+        'From: Ajaraamat <no-reply@' . $host . '>',
+        'MIME-Version: 1.0',
+        'Content-Type: text/plain; charset=UTF-8',
+        'X-Mailer: PHP/' . phpversion(),
+    ]);
+    return @mail(
+        $toEmail,
+        '=?UTF-8?B?' . base64_encode($subject) . '?=',
+        $body,
+        $headers
+    );
+}
+
 // =========================================================
 // Reading / screen entries (per child)
 // =========================================================

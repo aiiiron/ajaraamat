@@ -116,12 +116,24 @@ Kui sul on juba andmeid vanast (sidumata) versioonist:
    käsitsi raamatuga siduda, kui soovid.
 3. **Kustuta `migrate_link_books.php` server pealt ära** pärast kasutamist.
 
+## Parooli lähtestamise tabel (olemasolev paigaldus)
+
+Uus `password_resets` tabel on `schema.sql`-is olemas (uued paigaldused
+saavad selle automaatselt). Kui andmebaas on juba püsti:
+
+1. Lae üles `migrate_password_resets.php` (tuleb pushiga kaasa).
+2. Ava see brauseris — küsib admini parooli, siis loob tabeli.
+   Korduval avamisel ei tee midagi.
+3. **Kustuta `migrate_password_resets.php` server pealt ära** pärast kasutamist.
+
 ## Admin paneel
 
 `admin_login.php` — sisesta `config.php`-s määratud `ADMIN_PASSWORD`.
 Sealt näed:
 - Ootel registreerimisi — Kinnita/Lükka tagasi.
 - Kõiki peresid ja nende laste arvu.
+- Aktiivseid parooli lähtestamise päringuid — iga juures valmis link,
+  mille saad vanemale käsitsi anda, kui automaatne e-kiri kohale ei jõua.
 
 Ainult sina näed admin paneeli. Vanemad ei näe ega puutu sellega kokku.
 
@@ -173,10 +185,18 @@ seadmesse — igaühel on erinev, äraarvamatu token, nii et pered ei näe
   ära jaga neid avalikult väljaspool oma peret.
 - Uued kontod nõuavad käsitsi kinnitust (`ADMIN_PASSWORD`), et vältida
   suvaliste kontode teket.
-- Parooli taastamist praegu ei ole (nõuaks e-kirjade saatmise
-  seadistust serveris) — kui vanem unustab parooli, pead sa selle
-  andmebaasis käsitsi lähtestama või konto kustutama ja uuesti
-  registreerima laskma.
+- **Parooli lähtestamine** (unustatud parool): vanem avab `forgot.php`,
+  sisestab oma e-posti ja saab lingi `reset.php?token=...`, millega valib
+  uue parooli. Token on ühekordne, kehtib 24 tundi ja on andmebaasis
+  hoitud räsina (`password_resets` tabel). `forgot.php` annab alati sama
+  vastuse, olenemata sellest, kas e-post on registreeritud, ja on
+  sessioonipõhiselt piiratud (5 päringut, siis 5 min paus) — sama moodi
+  nagu `login.php`. Reset-vormidel on CSRF kaitse.
+- E-kiri saadetakse PHP `mail()`-iga. Jagatud hostingus võib see kohale
+  jõudmata jääda või rämpsposti sattuda, seega **sama link on alati
+  nähtav ka admin paneelis** (`admin.php` → "Parooli lähtestamise
+  päringud") — kui vanem kirja ei saa, kopeerid selle talle käsitsi.
+  Sealtsamast saad kahtlase päringu ka tühistada.
 
 ## Failid
 - `config.php` — andmebaasi andmed, admini parool
@@ -186,6 +206,8 @@ seadmesse — igaühel on erinev, äraarvamatu token, nii et pered ei näe
 - `db.php`, `auth.php`, `admin_auth.php`, `functions.php` — abifailid
 - `index.php` — avalik tutvustusleht
 - `register.php`, `login.php`, `logout.php` — pere konto
+- `forgot.php`, `reset.php` — unustatud parooli lähtestamine
+- `migrate_password_resets.php` — lisab `password_resets` tabeli olemasolevasse andmebaasi
 - `admin_login.php`, `admin_logout.php`, `admin.php` — saidi omaniku paneel
 - `paren.php` — vanema töölaud (valitud laps)
 - `children.php` — laste haldamine, avalike linkide vaatamine
