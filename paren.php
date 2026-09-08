@@ -92,6 +92,8 @@ $chartEkraan = array_map(fn($d) => $d['ekraan'], $daily);
         <?php render_balance_bar($totals['raamat'], $totals['ekraan']); ?>
     </div>
 
+    <?php render_goal_card((int) $stats['today_raamat'], (int) $stats['week_raamat'], (int) ($child['daily_goal_min'] ?? 0), (int) ($child['weekly_goal_min'] ?? 0)); ?>
+
     <?php render_stats_tiles($stats); ?>
     <?php if ($stats['today_raamat'] === 0 && $stats['today_ekraan'] === 0): ?>
         <p class="child-link-note" style="margin-top:-8px;margin-bottom:16px;">Täna pole veel midagi lisatud.</p>

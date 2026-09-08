@@ -128,6 +128,44 @@ function rename_child(int $childId, string $name): void {
     $stmt->execute([':name' => $name, ':id' => $childId]);
 }
 
+/** Sets a child's reading goals; pass null for "no goal". */
+function set_child_goal(int $childId, ?int $daily, ?int $weekly): void {
+    $pdo = get_db();
+    $stmt = $pdo->prepare("UPDATE children SET daily_goal_min = :d, weekly_goal_min = :w WHERE id = :id");
+    $stmt->execute([':d' => $daily, ':w' => $weekly, ':id' => $childId]);
+}
+
+/** Reading-goal progress card with a conic-gradient ring. Renders nothing if no goal is set. */
+function render_goal_card(int $todayMin, int $weekMin, int $dailyGoal, int $weeklyGoal): void {
+    $hasDaily = $dailyGoal > 0;
+    $hasWeekly = $weeklyGoal > 0;
+    if (!$hasDaily && !$hasWeekly) {
+        return;
+    }
+
+    if ($hasDaily) {
+        $cur = $todayMin; $goal = $dailyGoal; $label = 'Tänane lugemiseesmärk';
+    } else {
+        $cur = $weekMin; $goal = $weeklyGoal; $label = 'Selle nädala lugemiseesmärk';
+    }
+    $pct = $goal > 0 ? min(100, (int) round($cur / $goal * 100)) : 0;
+    $done = $cur >= $goal;
+    ?>
+    <div class="goal-card<?= $done ? ' done' : '' ?>">
+        <div class="goal-ring" style="--pct: <?= $pct ?>">
+            <span class="goal-ring-num"><?= $done ? icon('check') : $pct . '%' ?></span>
+        </div>
+        <div class="goal-body">
+            <div class="goal-label"><?= $done ? 'Eesmärk täidetud! 🎉' : htmlspecialchars($label) ?></div>
+            <div class="goal-value"><?= format_duration($cur) ?> / <?= format_duration($goal) ?></div>
+            <?php if ($hasDaily && $hasWeekly): ?>
+                <div class="goal-sub">Sel nädalal <?= format_duration($weekMin) ?> / <?= format_duration($weeklyGoal) ?></div>
+            <?php endif; ?>
+        </div>
+    </div>
+    <?php
+}
+
 function delete_child(int $childId): void {
     $pdo = get_db();
     $stmt = $pdo->prepare("DELETE FROM children WHERE id = :id");

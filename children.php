@@ -16,6 +16,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header('Location: children.php');
         exit;
     }
+    if (($_POST['action'] ?? '') === 'goal') {
+        $cid = (int) ($_POST['child_id'] ?? 0);
+        if (child_belongs_to_family($cid, $familyId)) {
+            $d = (int) ($_POST['daily_goal_min'] ?? 0);
+            $w = (int) ($_POST['weekly_goal_min'] ?? 0);
+            set_child_goal($cid, $d > 0 ? $d : null, $w > 0 ? $w : null);
+        }
+        header('Location: children.php');
+        exit;
+    }
     $name = trim($_POST['name'] ?? '');
     if ($name === '') {
         $error = 'Sisesta lapse nimi.';
@@ -88,6 +98,24 @@ $baseUrl = $scheme . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['SCRIPT_NAME
                 <button type="submit" class="btn-delete-full">Kustuta laps</button>
             </form>
         </div>
+
+        <form method="post" class="goal-form">
+            <?= csrf_field() ?>
+            <input type="hidden" name="action" value="goal">
+            <input type="hidden" name="child_id" value="<?= $c['id'] ?>">
+            <p class="goal-form-head">Lugemiseesmärk</p>
+            <div class="goal-form-row">
+                <div>
+                    <label for="dg<?= $c['id'] ?>">Päevas (min)</label>
+                    <input type="number" id="dg<?= $c['id'] ?>" name="daily_goal_min" min="0" inputmode="numeric" placeholder="nt. 30" value="<?= (int) ($c['daily_goal_min'] ?? 0) ?: '' ?>">
+                </div>
+                <div>
+                    <label for="wg<?= $c['id'] ?>">Nädalas (min)</label>
+                    <input type="number" id="wg<?= $c['id'] ?>" name="weekly_goal_min" min="0" inputmode="numeric" placeholder="nt. 210" value="<?= (int) ($c['weekly_goal_min'] ?? 0) ?: '' ?>">
+                </div>
+            </div>
+            <button type="submit" class="quick-add-btn">Salvesta eesmärk</button>
+        </form>
     </div>
     <?php endforeach; ?>
 
