@@ -447,12 +447,15 @@ function get_year_summary(int $childId, int $year): array {
     $e->execute([':cid' => $childId, ':s' => $start, ':e' => $end]);
     $row = $e->fetch() ?: [];
 
+    // Pages read = whole books finished this year + progress in books still being
+    // read (only counted for the current year, where "in progress" is meaningful).
+    $curYear = $year === (int) date('Y') ? 1 : 0;
     $b = $pdo->prepare("SELECT
-        COUNT(*) AS books_read,
-        COALESCE(SUM(total_pages), 0) AS pages_read
-      FROM books WHERE child_id = :cid AND status = 'loetud'
-        AND finished_date BETWEEN :s AND :e");
-    $b->execute([':cid' => $childId, ':s' => $start, ':e' => $end]);
+        COUNT(CASE WHEN status = 'loetud' AND finished_date BETWEEN :s AND :e THEN 1 END) AS books_read,
+        COALESCE(SUM(CASE WHEN status = 'loetud' AND finished_date BETWEEN :s2 AND :e2 THEN total_pages END), 0)
+          + COALESCE(SUM(CASE WHEN :cur = 1 AND status = 'loeb' THEN current_page END), 0) AS pages_read
+      FROM books WHERE child_id = :cid");
+    $b->execute([':cid' => $childId, ':s' => $start, ':e' => $end, ':s2' => $start, ':e2' => $end, ':cur' => $curYear]);
     $brow = $b->fetch() ?: [];
 
     return [
@@ -717,13 +720,13 @@ function render_books_table(array $books, bool $editable = false): void {
                     $mins = isset($b['total_minutes']) ? (int) $b['total_minutes'] : 0;
                     $totalPages = (int) ($b['total_pages'] ?? 0);
                     $curPage = (int) ($b['current_page'] ?? 0);
-                    $showBar = $totalPages > 0 && $status === 'loeb';
+                    $showBar = $totalPages > 0 && $status !== 'loetud';
                     $pct = $showBar ? min(100, max(0, (int) round($curPage / $totalPages * 100))) : 0;
-                    $showPages = $totalPages > 0 && $status !== 'loeb';
+                    $showPages = $totalPages > 0 && $status === 'loetud';
                     $hasMeta = $mins > 0 || !empty($b['finished_date']) || $showPages; ?>
                     <div class="bl-item <?= $cls ?>">
                         <div class="bl-main">
-                            <span class="bl-title"><?= htmlspecialchars($b['title']) ?></span>
+                            <span class="bl-title"><?= htmlspecialchars($b['title']) ?><?php if ($showBar): ?> <span class="bl-pct"><?= $pct ?>%</span><?php endif; ?></span>
                             <?php if (!empty($b['author'])): ?>
                                 <span class="bl-author"><?= htmlspecialchars($b['author']) ?></span>
                             <?php endif; ?>
@@ -732,7 +735,7 @@ function render_books_table(array $books, bool $editable = false): void {
                             <div class="bl-progress" role="progressbar" aria-valuenow="<?= $pct ?>" aria-valuemin="0" aria-valuemax="100">
                                 <div class="bl-progress-fill" style="width: <?= $pct ?>%"></div>
                             </div>
-                            <div class="bl-progress-label">lk <?= number_format($curPage, 0, ',', "\u{202F}") ?> / <?= number_format($totalPages, 0, ',', "\u{202F}") ?> · <?= $pct ?>%</div>
+                            <div class="bl-progress-label">lk <?= number_format($curPage, 0, ',', "\u{202F}") ?> / <?= number_format($totalPages, 0, ',', "\u{202F}") ?></div>
                         <?php endif; ?>
                         <?php if ($hasMeta): ?>
                             <div class="bl-meta">

@@ -858,6 +858,12 @@ select:focus { outline: 2px solid var(--accent-purple); border-color: transparen
 }
 .bl-mins { color: #C93E68; }
 .bl-pages { color: var(--text-muted); }
+.bl-pct {
+  font-family: var(--font-body);
+  font-size: 12px;
+  font-weight: 700;
+  color: #C93E68;
+}
 .bl-date { color: var(--text-muted); }
 .bl-progress {
   height: 7px;
