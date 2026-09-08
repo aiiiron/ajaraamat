@@ -21,7 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if (child_belongs_to_family($cid, $familyId)) {
             $d = (int) ($_POST['daily_goal_min'] ?? 0);
             $w = (int) ($_POST['weekly_goal_min'] ?? 0);
-            set_child_goal($cid, $d > 0 ? $d : null, $w > 0 ? $w : null);
+            $r = (int) ($_POST['screen_reward_cap_min'] ?? 0);
+            set_child_goal($cid, $d > 0 ? $d : null, $w > 0 ? $w : null, $r > 0 ? $r : null);
         }
         header('Location: children.php');
         exit;
@@ -103,18 +104,25 @@ $baseUrl = $scheme . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['SCRIPT_NAME
             <?= csrf_field() ?>
             <input type="hidden" name="action" value="goal">
             <input type="hidden" name="child_id" value="<?= $c['id'] ?>">
-            <p class="goal-form-head">Lugemiseesmärk</p>
+            <p class="goal-form-head">Eesmärgid ja ekraanitasu</p>
             <div class="goal-form-row">
                 <div>
-                    <label for="dg<?= $c['id'] ?>">Päevas (min)</label>
+                    <label for="dg<?= $c['id'] ?>">Eesmärk päevas (min)</label>
                     <input type="number" id="dg<?= $c['id'] ?>" name="daily_goal_min" min="0" inputmode="numeric" placeholder="nt. 30" value="<?= (int) ($c['daily_goal_min'] ?? 0) ?: '' ?>">
                 </div>
                 <div>
-                    <label for="wg<?= $c['id'] ?>">Nädalas (min)</label>
+                    <label for="wg<?= $c['id'] ?>">Eesmärk nädalas (min)</label>
                     <input type="number" id="wg<?= $c['id'] ?>" name="weekly_goal_min" min="0" inputmode="numeric" placeholder="nt. 210" value="<?= (int) ($c['weekly_goal_min'] ?? 0) ?: '' ?>">
+                </div>
+            </div>
+            <div class="goal-form-row">
+                <div>
+                    <label for="rc<?= $c['id'] ?>">Ekraaniaja tasu ülempiir (min/p)</label>
+                    <input type="number" id="rc<?= $c['id'] ?>" name="screen_reward_cap_min" min="0" inputmode="numeric" placeholder="nt. 60" value="<?= (int) ($c['screen_reward_cap_min'] ?? 0) ?: '' ?>">
                 </div>
                 <button type="submit" class="btn btn-add">Salvesta</button>
             </div>
+            <p class="goal-form-note">Ekraaniaja tasu: kui laps loeb rohkem kui vaatab, näeb ta „teenitud" ekraaniaega (kuni ülempiirini). Tühi = väljas.</p>
         </form>
     </div>
     <?php endforeach; ?>

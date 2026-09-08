@@ -19,6 +19,7 @@ CREATE TABLE IF NOT EXISTS children (
     public_token VARCHAR(40) NOT NULL UNIQUE,
     daily_goal_min INT DEFAULT NULL,
     weekly_goal_min INT DEFAULT NULL,
+    screen_reward_cap_min INT DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (family_id) REFERENCES families(id) ON DELETE CASCADE
 );

@@ -207,6 +207,55 @@ h2 { font-size: 18px; margin: 0 0 16px; }
 .stat-label { font-size: 11px; color: var(--text-muted); margin-bottom: 2px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.03em; }
 .stat-value { font-family: var(--font-heading); font-size: 19px; font-weight: 700; color: var(--ink); }
 
+/* Earned screen-time (reward conversion) */
+.reward-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: var(--screen-bg);
+  border-radius: 18px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+.reward-icon {
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+  flex: none;
+}
+.reward-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #5069C9;
+  margin-bottom: 2px;
+}
+.reward-value {
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 22px;
+  color: #3A4FA0;
+  font-variant-numeric: tabular-nums;
+}
+.reward-sub {
+  font-size: 12px;
+  color: #5069C9;
+  font-weight: 700;
+  margin-top: 2px;
+}
+
+.goal-form-note {
+  margin: 10px 0 0;
+  font-size: 12px;
+  color: var(--text-muted);
+  line-height: 1.5;
+}
+
 /* Reading goal — ring + progress */
 .goal-card {
   display: flex;
@@ -293,15 +342,15 @@ h2 { font-size: 18px; margin: 0 0 16px; }
 }
 .goal-form-row {
   display: flex;
-  flex-wrap: wrap;
   align-items: flex-end;
   gap: 10px;
+  margin-top: 10px;
 }
-.goal-form-row > div { flex: 1 1 90px; }
+.goal-form-row > div { flex: 1; min-width: 0; }
 .goal-form-row .btn {
   flex: none;
   margin-top: 0;
-  padding: 11px 20px;
+  padding: 11px 22px;
   font-size: 14px;
   min-height: 46px;
 }

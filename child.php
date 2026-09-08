@@ -102,6 +102,8 @@ if ($owed > 0) {
         <?php render_balance_bar($totals['raamat'], $totals['ekraan']); ?>
     </div>
 
+    <?php render_reward_card((int) $owed, (int) ($child['screen_reward_cap_min'] ?? 0)); ?>
+
     <?php render_goal_card((int) $stats['today_raamat'], (int) $stats['week_raamat'], (int) ($child['daily_goal_min'] ?? 0), (int) ($child['weekly_goal_min'] ?? 0)); ?>
 
     <?php render_stats_tiles($stats); ?>

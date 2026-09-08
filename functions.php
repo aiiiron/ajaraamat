@@ -128,11 +128,36 @@ function rename_child(int $childId, string $name): void {
     $stmt->execute([':name' => $name, ':id' => $childId]);
 }
 
-/** Sets a child's reading goals; pass null for "no goal". */
-function set_child_goal(int $childId, ?int $daily, ?int $weekly): void {
+/** Sets a child's reading goals + earned-screen-time cap; pass null to clear one. */
+function set_child_goal(int $childId, ?int $daily, ?int $weekly, ?int $rewardCap): void {
     $pdo = get_db();
-    $stmt = $pdo->prepare("UPDATE children SET daily_goal_min = :d, weekly_goal_min = :w WHERE id = :id");
-    $stmt->execute([':d' => $daily, ':w' => $weekly, ':id' => $childId]);
+    $stmt = $pdo->prepare("UPDATE children SET daily_goal_min = :d, weekly_goal_min = :w, screen_reward_cap_min = :r WHERE id = :id");
+    $stmt->execute([':d' => $daily, ':w' => $weekly, ':r' => $rewardCap, ':id' => $childId]);
+}
+
+/** "Earned screen time" card. Opt-in: only renders when a cap is set and the
+ *  child is actually in credit (owed < 0 = read more than watched). */
+function render_reward_card(int $owed, int $cap): void {
+    if ($cap <= 0) {
+        return;
+    }
+    $earned = max(0, -$owed);
+    if ($earned <= 0) {
+        return;
+    }
+    $shown = min($earned, $cap);
+    ?>
+    <div class="reward-card">
+        <div class="reward-icon">📱</div>
+        <div class="reward-body">
+            <div class="reward-label">Teenitud ekraaniaeg</div>
+            <div class="reward-value"><?= format_duration($shown) ?></div>
+            <?php if ($earned > $cap): ?>
+                <div class="reward-sub">Rohkem on veel varuks 👍</div>
+            <?php endif; ?>
+        </div>
+    </div>
+    <?php
 }
 
 /** Reading-goal progress card with a conic-gradient ring. Renders nothing if no goal is set. */
