@@ -65,6 +65,23 @@ CREATE TABLE IF NOT EXISTS challenges (
     FOREIGN KEY (child_id) REFERENCES children(id) ON DELETE CASCADE
 );
 
+-- Parooli lähtestamise ühekordsed tokenid (vanema kontod).
+-- `token_hash` on väärtus, mida reset.php päringus otsib; `token` (toores)
+-- on ainult selleks, et admin.php saaks käsitsi jagatava lingi taastada,
+-- kui e-kiri kohale ei jõua. Rida kustutatakse kohe, kui tokenit kasutati;
+-- igal perel saab korraga olla ainult üks aktiivne rida (UNIQUE võti).
+CREATE TABLE IF NOT EXISTS password_resets (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    family_id INT NOT NULL,
+    token_hash CHAR(64) NOT NULL,
+    token CHAR(64) NOT NULL,
+    expires_at DATETIME NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_password_resets_family (family_id),
+    KEY idx_password_resets_token_hash (token_hash),
+    FOREIGN KEY (family_id) REFERENCES families(id) ON DELETE CASCADE
+);
+
 CREATE INDEX idx_entries_child_date ON entries(child_id, entry_date);
 CREATE INDEX idx_entries_book ON entries(book_id);
 CREATE INDEX idx_books_child ON books(child_id);
