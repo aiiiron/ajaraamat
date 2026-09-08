@@ -139,8 +139,25 @@ h2 { font-size: 18px; margin: 0 0 16px; }
 .header-actions {
   display: flex;
   align-items: center;
-  gap: 14px;
+  gap: 10px;
 }
+/* Text actions in the topbar (Admin / Logi välja) match the round icon button */
+.header-actions .link-muted {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 14px;
+  border-radius: var(--radius-pill);
+  background: var(--card-bg);
+  color: var(--accent-purple);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  box-shadow: 0 4px 12px -6px rgba(57, 47, 77, 0.2);
+  transition: transform 0.1s ease;
+}
+.header-actions .link-muted:hover { color: var(--accent-pink); }
+.header-actions .link-muted:active { transform: scale(0.96); }
 
 .icon-btn {
   display: inline-flex;
