@@ -291,14 +291,19 @@ h2 { font-size: 18px; margin: 0 0 16px; }
   letter-spacing: 0.03em;
   color: var(--text-muted);
 }
-.goal-form-row { display: flex; gap: 10px; }
-.goal-form-row > div { flex: 1; }
-.goal-form .btn {
+.goal-form-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 10px;
+}
+.goal-form-row > div { flex: 1 1 90px; }
+.goal-form-row .btn {
   flex: none;
-  align-self: flex-start;
-  margin-top: 12px;
+  margin-top: 0;
   padding: 11px 20px;
   font-size: 14px;
+  min-height: 46px;
 }
 
 /* Statistika — one tile per period (Täna / See nädal / See kuu / Kokku) */
