@@ -82,6 +82,10 @@ $chartEkraan = array_map(fn($d) => $d['ekraan'], $daily);
         <div class="milestone-banner"><?= icon("check") ?> Kanne salvestatud!</div>
     <?php endif; ?>
 
+    <?php if ((int) date('N') <= 2): ?>
+        <a class="wk-banner" href="week.php?child=<?= $childId ?>">📊 Eelmise nädala kokkuvõte →</a>
+    <?php endif; ?>
+
     <?php if ($streak > 0): ?>
         <div class="streak-badge"><?= icon("flame") ?> <?= $streak ?> päeva järjest tasakaalus</div>
     <?php endif; ?>
@@ -166,6 +170,8 @@ $chartEkraan = array_map(fn($d) => $d['ekraan'], $daily);
     </section>
 
     <p class="child-link-note">
+        <a href="week.php?child=<?= $childId ?>">Eelmine nädal →</a>
+        &nbsp;·&nbsp;
         <a href="children.php"><?= htmlspecialchars($child['name']) ?> enda link →</a>
         &nbsp;·&nbsp;
         <a href="export.php?child=<?= $childId ?>">Laadi CSV alla</a>

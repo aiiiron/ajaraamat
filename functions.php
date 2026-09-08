@@ -566,6 +566,76 @@ function render_challenge_card(array $ch, int $progress, bool $editable): void {
     <?php
 }
 
+// =========================================================
+// Weekly recap
+// =========================================================
+
+/** [mondayDate, sundayDate] for a week; 0 = current week, 1 = last week, ... */
+function get_week_bounds(int $weeksAgo): array {
+    $weeksAgo = max(0, $weeksAgo);
+    $monday = date('Y-m-d', strtotime("monday this week -{$weeksAgo} week"));
+    $sunday = date('Y-m-d', strtotime("{$monday} +6 days"));
+    return [$monday, $sunday];
+}
+
+function et_weekday(string $date): string {
+    $names = [1 => 'esmaspäev', 2 => 'teisipäev', 3 => 'kolmapäev', 4 => 'neljapäev',
+              5 => 'reede', 6 => 'laupäev', 7 => 'pühapäev'];
+    return $names[(int) date('N', strtotime($date))] ?? '';
+}
+
+/** Reading/screen totals, active days, best day, top book and per-day reading
+ *  for one child across a date range. */
+function get_week_recap(int $childId, string $start, string $end): array {
+    $pdo = get_db();
+    $p = [':c' => $childId, ':s' => $start, ':e' => $end];
+
+    $t = $pdo->prepare("SELECT COALESCE(SUM(raamat),0) AS raamat, COALESCE(SUM(ekraan),0) AS ekraan,
+        COUNT(DISTINCT CASE WHEN raamat > 0 THEN entry_date END) AS reading_days
+      FROM entries WHERE child_id = :c AND entry_date BETWEEN :s AND :e");
+    $t->execute($p);
+    $row = $t->fetch() ?: [];
+
+    $bd = $pdo->prepare("SELECT entry_date, SUM(raamat) AS m FROM entries
+      WHERE child_id = :c AND entry_date BETWEEN :s AND :e AND raamat > 0
+      GROUP BY entry_date ORDER BY m DESC, entry_date DESC LIMIT 1");
+    $bd->execute($p);
+    $best = $bd->fetch() ?: null;
+
+    $tb = $pdo->prepare("SELECT bk.title, SUM(en.raamat) AS m
+      FROM entries en JOIN books bk ON bk.id = en.book_id
+      WHERE en.child_id = :c AND en.entry_date BETWEEN :s AND :e AND en.raamat > 0
+      GROUP BY bk.id, bk.title ORDER BY m DESC LIMIT 1");
+    $tb->execute($p);
+    $topBook = $tb->fetch() ?: null;
+
+    $pd = $pdo->prepare("SELECT entry_date, SUM(raamat) AS m FROM entries
+      WHERE child_id = :c AND entry_date BETWEEN :s AND :e GROUP BY entry_date");
+    $pd->execute($p);
+    $perDay = array_map('intval', $pd->fetchAll(PDO::FETCH_KEY_PAIR));
+
+    return [
+        'raamat'       => (int) ($row['raamat'] ?? 0),
+        'ekraan'       => (int) ($row['ekraan'] ?? 0),
+        'reading_days' => (int) ($row['reading_days'] ?? 0),
+        'best_day'     => $best ? ['date' => $best['entry_date'], 'min' => (int) $best['m']] : null,
+        'top_book'     => $topBook ? ['title' => $topBook['title'], 'min' => (int) $topBook['m']] : null,
+        'per_day'      => $perDay,
+    ];
+}
+
+/** Small "▲ 20 min rohkem" delta line. $inverse: for screen time, less is better. */
+function render_wk_delta(int $now, int $prev, bool $inverse = false): string {
+    $d = $now - $prev;
+    if ($d === 0) {
+        return '<div class="wk-d wk-flat">sama kui eelmisel nädalal</div>';
+    }
+    $up = $d > 0;
+    $good = $inverse ? !$up : $up;
+    return '<div class="wk-d ' . ($good ? 'wk-good' : 'wk-bad') . '">'
+        . ($up ? '▲' : '▼') . ' ' . format_duration(abs($d)) . ($up ? ' rohkem' : ' vähem') . '</div>';
+}
+
 /** [minYear, maxYear] covering a child's data; always includes the current year. */
 function get_reading_year_range(int $childId): array {
     $pdo = get_db();
