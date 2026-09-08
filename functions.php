@@ -16,6 +16,13 @@ if (PHP_SAPI !== 'cli' && !headers_sent()) {
     header('Expires: 0');
 }
 
+// Poem-memorisation entries (entries.kind = 'luuletus') count as normal reading
+// minutes everywhere, but give this multiplier's worth of credit against the
+// screen-time debt. 2.0 => 15 min learnt by heart erases 30 min of screen debt.
+if (!defined('POEM_BONUS_MULT')) {
+    define('POEM_BONUS_MULT', 2.0);
+}
+
 // =========================================================
 // Formatting
 // =========================================================
@@ -451,13 +458,18 @@ function send_password_reset_email(string $toEmail, string $link): bool {
 
 function get_totals(int $childId): array {
     $pdo = get_db();
-    $stmt = $pdo->prepare("SELECT COALESCE(SUM(raamat),0) as raamat, COALESCE(SUM(ekraan),0) as ekraan FROM entries WHERE child_id = :cid");
+    $stmt = $pdo->prepare("SELECT
+        COALESCE(SUM(raamat),0) as raamat,
+        COALESCE(SUM(ekraan),0) as ekraan,
+        COALESCE(SUM(CASE WHEN kind = 'luuletus' THEN raamat ELSE 0 END),0) as poem
+      FROM entries WHERE child_id = :cid");
     $stmt->execute([':cid' => $childId]);
     $row = $stmt->fetch();
     $raamat = (int) $row['raamat'];
     $ekraan = (int) $row['ekraan'];
-    $owed = round($ekraan * READING_RATIO) - $raamat; // positive = lugemist võlgu (reading owed)
-    return ['raamat' => $raamat, 'ekraan' => $ekraan, 'owed' => $owed];
+    $bonus  = (int) round($row['poem'] * (POEM_BONUS_MULT - 1)); // luuletuse lisakrediit
+    $owed = round($ekraan * READING_RATIO) - $raamat - $bonus; // positive = lugemist võlgu (reading owed)
+    return ['raamat' => $raamat, 'ekraan' => $ekraan, 'owed' => $owed, 'poem' => (int) $row['poem']];
 }
 
 function get_today_totals(int $childId): array {
@@ -976,11 +988,15 @@ function get_book_milestone(int $count): ?int {
 function get_daily_totals_range(int $childId, int $days = 30): array {
     $pdo = get_db();
     $start = date('Y-m-d', strtotime("-" . ($days - 1) . " days"));
-    $stmt = $pdo->prepare("SELECT entry_date, SUM(raamat) as raamat, SUM(ekraan) as ekraan FROM entries WHERE child_id = :cid AND entry_date >= :start GROUP BY entry_date");
+    $stmt = $pdo->prepare("SELECT entry_date,
+        SUM(raamat) as raamat,
+        SUM(ekraan) as ekraan,
+        SUM(CASE WHEN kind = 'luuletus' THEN raamat ELSE 0 END) as poem
+      FROM entries WHERE child_id = :cid AND entry_date >= :start GROUP BY entry_date");
     $stmt->execute([':cid' => $childId, ':start' => $start]);
     $byDate = [];
     foreach ($stmt as $row) {
-        $byDate[$row['entry_date']] = ['raamat' => (int) $row['raamat'], 'ekraan' => (int) $row['ekraan']];
+        $byDate[$row['entry_date']] = ['raamat' => (int) $row['raamat'], 'ekraan' => (int) $row['ekraan'], 'poem' => (int) $row['poem']];
     }
     $result = [];
     for ($i = $days - 1; $i >= 0; $i--) {
@@ -989,6 +1005,7 @@ function get_daily_totals_range(int $childId, int $days = 30): array {
             'date' => $d,
             'raamat' => $byDate[$d]['raamat'] ?? 0,
             'ekraan' => $byDate[$d]['ekraan'] ?? 0,
+            'poem' => $byDate[$d]['poem'] ?? 0,
         ];
     }
     return $result;
@@ -996,14 +1013,19 @@ function get_daily_totals_range(int $childId, int $days = 30): array {
 
 function get_current_streak(int $childId): int {
     $pdo = get_db();
-    $stmt = $pdo->prepare("SELECT entry_date, SUM(raamat) as raamat, SUM(ekraan) as ekraan FROM entries WHERE child_id = :cid GROUP BY entry_date ORDER BY entry_date DESC");
+    $stmt = $pdo->prepare("SELECT entry_date,
+        SUM(raamat) as raamat,
+        SUM(ekraan) as ekraan,
+        SUM(CASE WHEN kind = 'luuletus' THEN raamat ELSE 0 END) as poem
+      FROM entries WHERE child_id = :cid GROUP BY entry_date ORDER BY entry_date DESC");
     $stmt->execute([':cid' => $childId]);
     $rows = $stmt->fetchAll();
     $streak = 0;
     foreach ($rows as $row) {
         $raamat = (int) $row['raamat'];
         $ekraan = (int) $row['ekraan'];
-        if (round($ekraan * READING_RATIO) - $raamat <= 0) {
+        $bonus  = (int) round($row['poem'] * (POEM_BONUS_MULT - 1));
+        if (round($ekraan * READING_RATIO) - $raamat - $bonus <= 0) {
             $streak++;
         } else {
             break;
@@ -1061,7 +1083,8 @@ function render_heatmap(array $dailyTotals): void {
     <div class="heatmap">
         <?php foreach ($dailyTotals as $d):
             $hasData = $d['raamat'] > 0 || $d['ekraan'] > 0;
-            $owed = round($d['ekraan'] * READING_RATIO) - $d['raamat'];
+            $bonus = (int) round(($d['poem'] ?? 0) * (POEM_BONUS_MULT - 1));
+            $owed = round($d['ekraan'] * READING_RATIO) - $d['raamat'] - $bonus;
             if (!$hasData) {
                 $class = 'hm-empty';
                 $state = 'Kandeid pole';
@@ -1106,14 +1129,15 @@ function render_entries_table(array $entries, bool $editable = false, int $child
     $activities = [];
     foreach ($entries as $e) {
         if ((int) $e['raamat'] > 0) {
+            $isPoem = ($e['kind'] ?? '') === 'luuletus';
             $bookTitle = $e['book_title'] ?? null;
             $note = $e['raamat_comment'] ?? null;
             // Legacy entries (from before books were linked) stored the book
             // name itself in raamat_comment — show it as the label if there's
             // no linked book.
-            $label = $bookTitle ?: $note;
+            $label = $bookTitle ?: $note ?: ($isPoem ? 'Luuletus' : null);
             $subNote = ($bookTitle && $note) ? $note : null;
-            $activities[] = ['date' => $e['entry_date'], 'type' => 'raamat', 'minutes' => (int) $e['raamat'], 'label' => $label, 'sub' => $subNote, 'id' => $e['id']];
+            $activities[] = ['date' => $e['entry_date'], 'type' => $isPoem ? 'luuletus' : 'raamat', 'minutes' => (int) $e['raamat'], 'label' => $label, 'sub' => $subNote, 'id' => $e['id']];
         }
         if ((int) $e['ekraan'] > 0) {
             $activities[] = ['date' => $e['entry_date'], 'type' => 'ekraan', 'minutes' => (int) $e['ekraan'], 'label' => $e['ekraan_comment'], 'sub' => null, 'id' => $e['id']];
@@ -1145,6 +1169,8 @@ function render_entries_table(array $entries, bool $editable = false, int $child
                         <div class="entry-row">
                             <?php if ($a['type'] === 'raamat'): ?>
                                 <span class="tag tag-reading"><?= emoji_svg('books') ?> <?= $a['minutes'] ?> min</span>
+                            <?php elseif ($a['type'] === 'luuletus'): ?>
+                                <span class="tag tag-reading"><?= emoji_svg('books') ?> <?= $a['minutes'] ?> min · 2×</span>
                             <?php else: ?>
                                 <span class="tag tag-screen"><?= emoji_svg('screen') ?> <?= $a['minutes'] ?> min</span>
                             <?php endif; ?>

@@ -613,6 +613,29 @@ label {
   color: var(--text-muted);
   margin-top: 8px;
 }
+label.check-row {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 12px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text);
+  cursor: pointer;
+}
+label.check-row input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  min-height: 0;
+  flex: none;
+  accent-color: var(--brand, #8B5CF6);
+  cursor: pointer;
+}
+.check-hint {
+  font-weight: 600;
+  font-size: 12px;
+  color: var(--text-muted);
+}
 input[type="text"], input[type="number"], input[type="date"], input[type="password"], input[type="email"] {
   padding: 11px 14px;
   border: 1.5px solid var(--border);

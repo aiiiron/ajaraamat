@@ -24,6 +24,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $date = $_POST['entry_date'] ?? date('Y-m-d');
     $raamat = $type === 'raamat' ? (int) ($_POST['raamat'] ?? 0) : 0;
     $ekraan = $type === 'ekraan' ? (int) ($_POST['ekraan'] ?? 0) : 0;
+    $isPoem = $type === 'raamat' && !empty($_POST['is_poem']);
     $bookChoice = $_POST['book_id'] ?? '';
     $newBookTitle = trim($_POST['new_book_title'] ?? '');
     $raamatComment = trim($_POST['raamat_comment'] ?? '');
@@ -50,11 +51,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         $pdo = get_db();
-        $stmt = $pdo->prepare("INSERT INTO entries (child_id, entry_date, raamat, book_id, raamat_comment, ekraan, ekraan_comment) VALUES (:cid, :date, :raamat, :book_id, :raamat_comment, :ekraan, :ekraan_comment)");
+        $stmt = $pdo->prepare("INSERT INTO entries (child_id, entry_date, raamat, kind, book_id, raamat_comment, ekraan, ekraan_comment) VALUES (:cid, :date, :raamat, :kind, :book_id, :raamat_comment, :ekraan, :ekraan_comment)");
         $stmt->execute([
             ':cid' => $childId,
             ':date' => $date,
             ':raamat' => $raamat,
+            ':kind' => $isPoem ? 'luuletus' : null,
             ':book_id' => $bookId,
             ':raamat_comment' => $type === 'raamat' && $raamatComment !== '' ? $raamatComment : null,
             ':ekraan' => $ekraan,
@@ -121,6 +123,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="type-fields" data-type="raamat" <?= $type === 'raamat' ? '' : 'hidden' ?>>
                 <label for="raamat"><?= emoji_svg('books') ?> Raamat (min)</label>
                 <input type="number" id="raamat" name="raamat" min="0" placeholder="nt. 30" inputmode="numeric" value="<?= htmlspecialchars($_POST['raamat'] ?? '') ?>" <?= $type === 'raamat' ? 'autofocus' : '' ?>>
+
+                <label class="check-row">
+                    <input type="checkbox" name="is_poem" value="1" <?= !empty($_POST['is_poem']) ? 'checked' : '' ?>>
+                    Luuletuse pähe õppimine <span class="check-hint">annab 2× tasakaalu-boonust</span>
+                </label>
 
                 <label for="book_id">Milline raamat?</label>
                 <select id="book_id" name="book_id" onchange="document.getElementById('new_book_title').style.display = this.value === 'new' ? 'block' : 'none';">

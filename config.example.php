@@ -23,3 +23,9 @@ define('ADMIN_EMAIL', '');
 // Reegel: mitu minutit lugemist ("Raamat") on vaja iga ekraaniminuti kohta.
 // 1.0 = 1:1 reegel. Kehtib kõigile peredele ühtemoodi.
 define('READING_RATIO', 1.0);
+
+// Luuletuse pähe õppimine (kanne kind = 'luuletus'): loeb tavalise
+// lugemisajana kõikjal, aga annab selle kordaja jagu krediiti ekraanivõla
+// vastu. 2.0 => 15 min pähe õpitut kustutab 30 min ekraanivõlga.
+// (Kui siin defineerimata, kasutab functions.php vaikeväärtust 2.0.)
+define('POEM_BONUS_MULT', 2.0);

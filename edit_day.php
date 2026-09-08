@@ -45,6 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $newBookTitle = trim($_POST['new_book_title'] ?? '');
         $raamatComment = trim($_POST['raamat_comment'] ?? '');
         $ekraanComment = trim($_POST['ekraan_comment'] ?? '');
+        $isPoem = !empty($_POST['is_poem']);
 
         // A single-type entry only keeps its own side.
         if ($type === 'raamat') {
@@ -54,6 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $raamat = 0;
             $raamatComment = '';
             $bookChoice = '';
+            $isPoem = false;
         }
 
         if ($raamat <= 0 && $ekraan <= 0) {
@@ -74,9 +76,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
-            $stmt = $pdo->prepare("UPDATE entries SET raamat = :raamat, book_id = :book_id, raamat_comment = :raamat_comment, ekraan = :ekraan, ekraan_comment = :ekraan_comment WHERE id = :id");
+            $stmt = $pdo->prepare("UPDATE entries SET raamat = :raamat, kind = :kind, book_id = :book_id, raamat_comment = :raamat_comment, ekraan = :ekraan, ekraan_comment = :ekraan_comment WHERE id = :id");
             $stmt->execute([
                 ':raamat' => $raamat,
+                ':kind' => ($raamat > 0 && $isPoem) ? 'luuletus' : null,
                 ':book_id' => $bookId,
                 ':raamat_comment' => $raamat > 0 && $raamatComment !== '' ? $raamatComment : null,
                 ':ekraan' => $ekraan,
@@ -161,6 +164,13 @@ $dateLabel = date('d.m.Y', strtotime($date));
             <div class="type-fields" data-type="raamat" <?= ($eMixed || $eType === 'raamat') ? '' : 'hidden' ?>>
                 <label for="raamat_<?= $e['id'] ?>"><?= emoji_svg('books') ?> Raamat (min)</label>
                 <input type="number" id="raamat_<?= $e['id'] ?>" name="raamat" min="0" value="<?= (int) $e['raamat'] ?>" inputmode="numeric">
+
+                <?php if (!$eMixed): ?>
+                <label class="check-row">
+                    <input type="checkbox" name="is_poem" value="1" <?= ($e['kind'] ?? '') === 'luuletus' ? 'checked' : '' ?>>
+                    Luuletuse pähe õppimine <span class="check-hint">annab 2× tasakaalu-boonust</span>
+                </label>
+                <?php endif; ?>
 
                 <label for="book_id_<?= $e['id'] ?>">Milline raamat?</label>
                 <select id="book_id_<?= $e['id'] ?>" name="book_id" onchange="document.getElementById('new_book_title_<?= $e['id'] ?>').style.display = this.value === 'new' ? 'block' : 'none';">
