@@ -737,6 +737,20 @@ function get_challenge_progress(array $ch): int {
     return (int) $stmt->fetchColumn();
 }
 
+/** Pages read towards a challenge: finished books' pages inside the window, plus
+ *  the current page of books still being read (while the window is live). */
+function get_challenge_pages(array $ch): int {
+    $pdo = get_db();
+    $today = date('Y-m-d');
+    $live = ($today >= $ch['start_date'] && $today <= $ch['end_date']) ? 1 : 0;
+    $stmt = $pdo->prepare("SELECT
+        COALESCE(SUM(CASE WHEN status = 'loetud' AND finished_date BETWEEN :s AND :e THEN total_pages END), 0)
+        + COALESCE(SUM(CASE WHEN :live = 1 AND status = 'loeb' THEN current_page END), 0) AS pages
+      FROM books WHERE child_id = :cid");
+    $stmt->execute([':cid' => (int) $ch['child_id'], ':s' => $ch['start_date'], ':e' => $ch['end_date'], ':live' => $live]);
+    return (int) $stmt->fetchColumn();
+}
+
 /** One challenge with a progress bar (and a dot row for small book goals). */
 function render_challenge_card(array $ch, int $progress, bool $editable): void {
     $goal = max(1, (int) $ch['goal_value']);
@@ -769,6 +783,10 @@ function render_challenge_card(array $ch, int $progress, bool $editable): void {
         <div class="chal-dates"><?= date('d.m', strtotime($ch['start_date'])) ?> – <?= date('d.m.Y', strtotime($ch['end_date'])) ?></div>
         <div class="chal-bar"><div class="chal-bar-fill" style="width: <?= $pct ?>%"></div></div>
         <div class="chal-prog"><?= htmlspecialchars($progText) ?> · <?= $pct ?>%</div>
+        <?php $chalPages = get_challenge_pages($ch); ?>
+        <?php if ($chalPages > 0): ?>
+            <div class="chal-pages"><?= emoji_svg('books') ?> <?= $chalPages ?> lk loetud</div>
+        <?php endif; ?>
         <?php if ($type === 'books' && $goal <= 24): ?>
             <div class="chal-dots">
                 <?php for ($i = 0; $i < $goal; $i++): ?>

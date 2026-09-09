@@ -1180,6 +1180,16 @@ select:focus { outline: 2px solid var(--accent-purple); border-color: transparen
   font-weight: 700;
   color: var(--text-muted);
 }
+.chal-pages {
+  margin-top: 3px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.chal-pages .emo { width: 15px; height: 15px; }
 .chal-dots {
   display: flex;
   flex-wrap: wrap;
