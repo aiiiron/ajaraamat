@@ -1099,6 +1099,29 @@ select:focus { outline: 2px solid var(--accent-purple); border-color: transparen
   flex: none;
   text-align: center;
 }
+.mc-group { margin-top: 6px; }
+.mc-group + .mc-group { margin-top: 18px; }
+.mc-title {
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-muted);
+  margin: 0 0 2px;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+.mc-now {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--accent-purple);
+  letter-spacing: 0;
+  text-transform: none;
+}
+.ms-row.mc-locked { opacity: 0.5; }
+.ms-row.mc-locked .ms-date { color: var(--accent-purple); }
 
 /* Heatmap */
 .heatmap {

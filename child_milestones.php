@@ -66,6 +66,12 @@ record_milestones($childId);
         <p class="child-link-note" style="text-align:left;margin:4px 0 14px;">Kõik, mille oled seni saavutanud.</p>
         <?php render_milestones_list($childId); ?>
     </div>
+
+    <div class="card">
+        <h2>Mida on veel võita</h2>
+        <p class="child-link-note" style="text-align:left;margin:4px 0 14px;">Kõik automaatsed verstapostid. Number pealkirja kõrval näitab, kus sa praegu oled.</p>
+        <?php render_milestone_catalog($childId); ?>
+    </div>
 </div>
 </body>
 </html>

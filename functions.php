@@ -1021,20 +1021,44 @@ function book_status_suffix(string $status): string {
 // Milestones / achievements (persisted, per child)
 // =========================================================
 
-/** Threshold ladders per milestone kind. */
+/** Threshold ladders per automatic milestone kind. These are the "predefined
+ *  variables" — every value here becomes a milestone the moment the child
+ *  reaches it. Edit a list to add / remove / retune tiers. */
 function milestone_ladders(): array {
     return [
-        'books'  => [1, 5, 10, 20, 30, 50, 75, 100, 150, 200],
-        'pages'  => [500, 1000, 2500, 5000, 10000, 25000, 50000, 100000],
-        'hours'  => [10, 25, 50, 100, 250, 500, 1000],
-        'days'   => [10, 25, 50, 100, 200, 365, 500],
-        'streak' => [7, 14, 30, 60, 100, 200],
+        'books'  => [1, 5, 10, 20, 30, 50, 75, 100, 150, 200],           // finished books
+        'pages'  => [500, 1000, 2500, 5000, 10000, 25000, 50000, 100000], // pages read
+        'hours'  => [10, 25, 50, 100, 250, 500, 1000],                    // hours read
+        'days'   => [10, 25, 50, 100, 200, 365, 500],                     // days with reading logged
+        'streak' => [7, 14, 30, 60, 100, 200],                            // consecutive balanced days
     ];
 }
 
-/** Detect any newly-reached milestones for a child and store them (first hit
- *  keeps the date). Cheap enough for dashboard / books / milestones page loads. */
-function record_milestones(int $childId): void {
+/** Human heading per automatic milestone kind. */
+function milestone_kind_names(): array {
+    return [
+        'books'  => 'Loetud raamatud',
+        'pages'  => 'Loetud leheküljed',
+        'hours'  => 'Loetud tunnid',
+        'days'   => 'Lugemispäevad',
+        'streak' => 'Tasakaalu seeria',
+    ];
+}
+
+/** [emoji, Estonian phrase] for an automatic milestone tier (no stored row). */
+function milestone_phrase(string $kind, int $n): array {
+    switch ($kind) {
+        case 'books':  return ['📚', $n . ($n === 1 ? ' raamat loetud' : ' raamatut loetud')];
+        case 'pages':  return ['📖', number_format($n, 0, '', ' ') . ($n === 1 ? ' lehekülg loetud' : ' lehekülge loetud')];
+        case 'hours':  return ['⏱️', $n . ($n === 1 ? ' tund loetud' : ' tundi loetud')];
+        case 'days':   return ['📅', $n . ($n === 1 ? ' lugemispäev' : ' lugemispäeva')];
+        case 'streak': return ['🔥', $n . ($n === 1 ? ' päev järjest tasakaalus' : ' päeva järjest tasakaalus')];
+    }
+    return ['⭐', 'Verstapost'];
+}
+
+/** Current running totals a child is measured against for automatic milestones. */
+function milestone_standings(int $childId): array {
     $pdo = get_db();
 
     $bp = $pdo->prepare("SELECT
@@ -1050,13 +1074,20 @@ function record_milestones(int $childId): void {
     $en->execute([':cid' => $childId]);
     $enr = $en->fetch() ?: ['mins' => 0, 'days' => 0];
 
-    $standings = [
+    return [
         'books'  => count_finished_books($childId),
         'pages'  => $pages,
         'hours'  => intdiv((int) $enr['mins'], 60),
         'days'   => (int) $enr['days'],
         'streak' => get_current_streak($childId),
     ];
+}
+
+/** Detect any newly-reached milestones for a child and store them (first hit
+ *  keeps the date). Cheap enough for dashboard / books / milestones page loads. */
+function record_milestones(int $childId): void {
+    $pdo = get_db();
+    $standings = milestone_standings($childId);
 
     // Real finish dates for the books ladder, so old achievements keep their date.
     $fd = $pdo->prepare("SELECT finished_date FROM books
@@ -1102,14 +1133,12 @@ function get_milestones(int $childId): array {
  *  (parent override, and the only source for custom milestones) wins. */
 function milestone_text(array $m): array {
     $n = (int) $m['threshold'];
-    switch ($m['kind']) {
-        case 'books':  $def = ['📚', $n . ($n === 1 ? ' raamat loetud' : ' raamatut loetud')]; break;
-        case 'pages':  $def = ['📖', number_format($n, 0, '', ' ') . ($n === 1 ? ' lehekülg loetud' : ' lehekülge loetud')]; break;
-        case 'hours':  $def = ['⏱️', $n . ($n === 1 ? ' tund loetud' : ' tundi loetud')]; break;
-        case 'days':   $def = ['📅', $n . ($n === 1 ? ' lugemispäev' : ' lugemispäeva')]; break;
-        case 'streak': $def = ['🔥', $n . ($n === 1 ? ' päev järjest tasakaalus' : ' päeva järjest tasakaalus')]; break;
-        case 'challenge': $def = ['🏆', 'Väljakutse täidetud: ' . ((string) ($m['label'] ?? 'väljakutse'))]; break;
-        default: $def = ['⭐', 'Verstapost'];
+    if (($m['kind'] ?? '') === 'challenge') {
+        $def = ['🏆', 'Väljakutse täidetud: ' . ((string) ($m['label'] ?? 'väljakutse'))];
+    } elseif (($m['kind'] ?? '') === 'custom') {
+        $def = ['⭐', 'Verstapost'];
+    } else {
+        $def = milestone_phrase((string) $m['kind'], $n);
     }
     $emoji = trim((string) ($m['emoji'] ?? ''));
     $label = trim((string) ($m['label'] ?? ''));
@@ -1211,6 +1240,39 @@ function render_milestones_list(int $childId, bool $editable = false): void {
         echo '</li>';
     }
     echo '</ul>';
+}
+
+/** The full catalogue of automatic milestone tiers (milestone_ladders), grouped
+ *  by kind, each row showing the date it was reached or "current / target". */
+function render_milestone_catalog(int $childId): void {
+    $standings = milestone_standings($childId);
+
+    $earned = [];
+    foreach (get_milestones($childId) as $m) {
+        if (in_array($m['kind'], ['challenge', 'custom'], true)) continue;
+        $earned[$m['kind'] . ':' . (int) $m['threshold']] = $m['achieved_on'];
+    }
+
+    $names = milestone_kind_names();
+    foreach (milestone_ladders() as $kind => $steps) {
+        $cur = (int) ($standings[$kind] ?? 0);
+        echo '<div class="mc-group"><h3 class="mc-title">' . htmlspecialchars($names[$kind] ?? $kind)
+           . ' <span class="mc-now">' . number_format($cur, 0, '', ' ') . '</span></h3><ul class="ms-list">';
+        foreach ($steps as $step) {
+            [$icon, $text] = milestone_phrase($kind, $step);
+            $key = $kind . ':' . $step;
+            $done = isset($earned[$key]);
+            $right = $done
+                ? date('d.m.Y', strtotime($earned[$key]))
+                : number_format(min($cur, $step), 0, '', ' ') . ' / ' . number_format($step, 0, '', ' ');
+            echo '<li class="ms-row' . ($done ? '' : ' mc-locked') . '">'
+               . '<span class="ms-icon">' . htmlspecialchars($done ? $icon : '🔒') . '</span>'
+               . '<span class="ms-text">' . htmlspecialchars($text) . '</span>'
+               . '<span class="ms-date">' . htmlspecialchars($right) . '</span>'
+               . '</li>';
+        }
+        echo '</ul></div>';
+    }
 }
 
 // =========================================================

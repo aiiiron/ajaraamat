@@ -74,7 +74,7 @@ record_milestones($childId);
     <?php render_milestone_banner($childId); ?>
 
     <div class="card">
-        <h2>Verstapostid — <?= htmlspecialchars($child['name']) ?></h2>
+        <h2>Saavutatud — <?= htmlspecialchars($child['name']) ?></h2>
         <p class="child-link-note" style="text-align:left;margin:4px 0 14px;">Iga saavutus ja kuupäev, mil see saavutati. Vajuta pliiatsile, et muuta.</p>
         <?php if ($error): ?><p class="error"><?= htmlspecialchars($error) ?></p><?php endif; ?>
         <?php render_milestones_list($childId, true); ?>
@@ -94,6 +94,12 @@ record_milestones($childId);
                 <button type="submit" class="btn btn-add full-width">Lisa verstapost</button>
             </form>
         </details>
+    </div>
+
+    <div class="card">
+        <h2>Kõik automaatsed verstapostid</h2>
+        <p class="child-link-note" style="text-align:left;margin:4px 0 14px;">Need tekivad ise, kui laps piirini jõuab. Number pealkirja kõrval on praegune seis.</p>
+        <?php render_milestone_catalog($childId); ?>
     </div>
 </div>
 </body>
