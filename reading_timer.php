@@ -139,7 +139,7 @@ $books = array_filter($books, fn($b) => $b['status'] !== 'loetud') ?: $books; //
     <div class="card" id="finish-view" style="display:none;text-align:center;">
         <h2>Tubli lugemine! 🎉</h2>
         <p class="finish-minutes" id="finish-minutes-label"></p>
-        <form method="post" id="save-form">
+        <form method="post" id="save-form" onsubmit="clearState()">
             <input type="hidden" name="action" value="save">
             <input type="hidden" name="book_id" id="save-book-id">
             <input type="hidden" name="minutes" id="save-minutes">

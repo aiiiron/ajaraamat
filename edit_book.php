@@ -43,6 +43,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $totalPages = (int) ($_POST['total_pages'] ?? 0);
     $currentPage = (int) ($_POST['current_page'] ?? 0);
 
+    // A fully-read book is finished, even if the status toggle wasn't touched.
+    if ($totalPages > 0 && $currentPage >= $totalPages) {
+        $status = 'loetud';
+    }
+
     if ($title === '') {
         $error = 'Sisesta raamatu pealkiri.';
     } else {
@@ -52,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ':author' => $author !== '' ? $author : null,
             ':status' => $status,
             ':started' => $started !== '' ? $started : null,
-            ':finished' => $finished !== '' ? $finished : null,
+            ':finished' => $finished !== '' ? $finished : ($status === 'loetud' ? date('Y-m-d') : null),
             ':note' => $note !== '' ? $note : null,
             ':total_pages' => $totalPages > 0 ? $totalPages : null,
             ':current_page' => $currentPage > 0 ? $currentPage : null,

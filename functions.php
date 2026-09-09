@@ -631,7 +631,8 @@ function count_finished_books(int $childId): int {
     return (int) $stmt->fetchColumn();
 }
 
-/** Advance a book's current page (never rewind), e.g. from a logged reading session. */
+/** Advance a book's current page (never rewind), e.g. from a logged reading session.
+ *  When the page reaches the last one, the book is marked finished automatically. */
 function update_book_page(int $bookId, int $childId, int $page): void {
     if ($bookId <= 0 || $page <= 0) {
         return;
@@ -640,6 +641,15 @@ function update_book_page(int $bookId, int $childId, int $page): void {
     $stmt = $pdo->prepare("UPDATE books SET current_page = :p
         WHERE id = :id AND child_id = :cid AND (current_page IS NULL OR current_page < :p2)");
     $stmt->execute([':p' => $page, ':id' => $bookId, ':cid' => $childId, ':p2' => $page]);
+
+    // Reached (or passed) the final page → finish the book automatically, so it
+    // counts towards reading challenges and drops out of the "still reading" list.
+    $done = $pdo->prepare("UPDATE books
+        SET status = 'loetud', finished_date = COALESCE(finished_date, CURDATE())
+        WHERE id = :id AND child_id = :cid AND status <> 'loetud'
+          AND total_pages IS NOT NULL AND total_pages > 0
+          AND current_page >= total_pages");
+    $done->execute([':id' => $bookId, ':cid' => $childId]);
 }
 
 /** Books / pages / reading time / active days for one child in a calendar year. */
