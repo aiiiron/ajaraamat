@@ -42,6 +42,7 @@ $totalDates = count_distinct_dates($childId);
 $totalPages = max(1, (int) ceil($totalDates / $perPage));
 $page = min($page, $totalPages);
 $recent = get_entries_page($childId, $page, $perPage);
+record_milestones($childId);
 
 $owed = $totals['owed'];
 if ($owed > 0) {
@@ -89,11 +90,14 @@ if ($owed > 0) {
     <nav class="tabs">
         <a href="child.php?token=<?= htmlspecialchars($token) ?>" class="tab active">Kokkuvõte</a>
         <a href="child_books.php?token=<?= htmlspecialchars($token) ?>" class="tab">Raamatud</a>
+        <a href="child_milestones.php?token=<?= htmlspecialchars($token) ?>" class="tab">Verstapostid</a>
     </nav>
 
     <?php if (($_GET['saved'] ?? '') === '1'): ?>
         <div class="milestone-banner"><?= icon("check") ?> Lugemine salvestatud!</div>
     <?php endif; ?>
+
+    <?php render_milestone_banner($childId); ?>
 
     <?php if ($streak > 0): ?>
         <div class="streak-badge"><?= icon("flame") ?> <?= $streak ?> päeva järjest tasakaalus</div>

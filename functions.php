@@ -999,13 +999,132 @@ function book_status_suffix(string $status): string {
     return '';
 }
 
-function get_book_milestone(int $count): ?int {
-    $milestones = [5, 10, 20, 30, 50, 75, 100, 150, 200];
-    $reached = null;
-    foreach ($milestones as $m) {
-        if ($count >= $m) $reached = $m;
+// =========================================================
+// Milestones / achievements (persisted, per child)
+// =========================================================
+
+/** Threshold ladders per milestone kind. */
+function milestone_ladders(): array {
+    return [
+        'books'  => [1, 5, 10, 20, 30, 50, 75, 100, 150, 200],
+        'pages'  => [500, 1000, 2500, 5000, 10000, 25000, 50000, 100000],
+        'hours'  => [10, 25, 50, 100, 250, 500, 1000],
+        'days'   => [10, 25, 50, 100, 200, 365, 500],
+        'streak' => [7, 14, 30, 60, 100, 200],
+    ];
+}
+
+/** Detect any newly-reached milestones for a child and store them (first hit
+ *  keeps the date). Cheap enough for dashboard / books / milestones page loads. */
+function record_milestones(int $childId): void {
+    $pdo = get_db();
+
+    $bp = $pdo->prepare("SELECT
+        COALESCE(SUM(CASE WHEN status = 'loetud' THEN total_pages END), 0)
+      + COALESCE(SUM(CASE WHEN status = 'loeb'   THEN current_page END), 0) AS pages
+      FROM books WHERE child_id = :cid");
+    $bp->execute([':cid' => $childId]);
+    $pages = (int) $bp->fetchColumn();
+
+    $en = $pdo->prepare("SELECT COALESCE(SUM(raamat), 0) AS mins,
+        COUNT(DISTINCT CASE WHEN raamat > 0 THEN entry_date END) AS days
+      FROM entries WHERE child_id = :cid");
+    $en->execute([':cid' => $childId]);
+    $enr = $en->fetch() ?: ['mins' => 0, 'days' => 0];
+
+    $standings = [
+        'books'  => count_finished_books($childId),
+        'pages'  => $pages,
+        'hours'  => intdiv((int) $enr['mins'], 60),
+        'days'   => (int) $enr['days'],
+        'streak' => get_current_streak($childId),
+    ];
+
+    // Real finish dates for the books ladder, so old achievements keep their date.
+    $fd = $pdo->prepare("SELECT finished_date FROM books
+        WHERE child_id = :cid AND status = 'loetud' AND finished_date IS NOT NULL
+        ORDER BY finished_date ASC, id ASC");
+    $fd->execute([':cid' => $childId]);
+    $bookDates = $fd->fetchAll(PDO::FETCH_COLUMN);
+
+    $ins = $pdo->prepare("INSERT IGNORE INTO milestones (child_id, kind, threshold, achieved_on, label)
+        VALUES (:cid, :k, :t, :d, :l)");
+
+    foreach (milestone_ladders() as $kind => $steps) {
+        foreach ($steps as $step) {
+            if ($standings[$kind] < $step) break;
+            $date = ($kind === 'books' && isset($bookDates[$step - 1]))
+                ? $bookDates[$step - 1]
+                : date('Y-m-d');
+            $ins->execute([':cid' => $childId, ':k' => $kind, ':t' => $step, ':d' => $date, ':l' => null]);
+        }
     }
-    return ($reached !== null && $count === $reached) ? $reached : null;
+
+    // One milestone per completed challenge (threshold = challenge id).
+    foreach (get_challenges($childId) as $ch) {
+        if (get_challenge_progress($ch) >= max(1, (int) $ch['goal_value'])) {
+            $ins->execute([
+                ':cid' => $childId, ':k' => 'challenge', ':t' => (int) $ch['id'],
+                ':d' => date('Y-m-d'), ':l' => mb_substr((string) $ch['title'], 0, 150),
+            ]);
+        }
+    }
+}
+
+/** All stored milestones for a child, newest achievement first. */
+function get_milestones(int $childId): array {
+    $pdo = get_db();
+    $stmt = $pdo->prepare("SELECT * FROM milestones WHERE child_id = :cid
+        ORDER BY achieved_on DESC, id DESC");
+    $stmt->execute([':cid' => $childId]);
+    return $stmt->fetchAll();
+}
+
+/** [emoji, Estonian phrase] for one milestone row. */
+function milestone_text(array $m): array {
+    $n = (int) $m['threshold'];
+    switch ($m['kind']) {
+        case 'books':  return ['📚', $n . ($n === 1 ? ' raamat loetud' : ' raamatut loetud')];
+        case 'pages':  return ['📖', number_format($n, 0, '', ' ') . ($n === 1 ? ' lehekülg loetud' : ' lehekülge loetud')];
+        case 'hours':  return ['⏱️', $n . ($n === 1 ? ' tund loetud' : ' tundi loetud')];
+        case 'days':   return ['📅', $n . ($n === 1 ? ' lugemispäev' : ' lugemispäeva')];
+        case 'streak': return ['🔥', $n . ($n === 1 ? ' päev järjest tasakaalus' : ' päeva järjest tasakaalus')];
+        case 'challenge': return ['🏆', 'Väljakutse täidetud: ' . ((string) ($m['label'] ?? 'väljakutse'))];
+    }
+    return ['⭐', 'Verstapost'];
+}
+
+/** Gold banner for a milestone reached today or yesterday. Persists for the whole
+ *  page view (no auto-dismiss) — unlike the transient save toast. */
+function render_milestone_banner(int $childId): void {
+    $pdo = get_db();
+    $stmt = $pdo->prepare("SELECT * FROM milestones
+        WHERE child_id = :cid AND achieved_on >= DATE_SUB(CURDATE(), INTERVAL 1 DAY)
+        ORDER BY achieved_on DESC, id DESC LIMIT 1");
+    $stmt->execute([':cid' => $childId]);
+    $m = $stmt->fetch();
+    if (!$m) return;
+    [$icon, $text] = milestone_text($m);
+    echo '<div class="achievement-banner">🎉 ' . htmlspecialchars($icon . ' Verstapost: ' . $text . '!') . '</div>';
+}
+
+/** Full achievement list for the Verstapostid page. */
+function render_milestones_list(int $childId): void {
+    $rows = get_milestones($childId);
+    if (empty($rows)) {
+        echo '<p class="empty">Verstaposte pole veel. Loe raamatuid ja täida väljakutseid!</p>';
+        return;
+    }
+    echo '<ul class="ms-list">';
+    foreach ($rows as $m) {
+        [$icon, $text] = milestone_text($m);
+        echo '<li class="ms-row">'
+           . '<span class="ms-icon">' . htmlspecialchars($icon) . '</span>'
+           . '<span class="ms-text">' . htmlspecialchars($text) . '</span>'
+           . '<span class="ms-date">' . htmlspecialchars(date('d.m.Y', strtotime($m['achieved_on']))) . '</span>'
+           . '</li>';
+    }
+    echo '</ul>';
 }
 
 // =========================================================

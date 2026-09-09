@@ -21,6 +21,7 @@ $topBooks = get_top_books($childId, 5);
 $topScreen = get_top_comments($childId, 'ekraan', 5);
 
 $recent = get_entries_page($childId, 1, 5); // dashboard shows only the latest 5
+record_milestones($childId);
 
 $owed = $totals['owed'];
 if ($owed > 0) {
@@ -74,8 +75,9 @@ $chartEkraan = array_map(fn($d) => $d['ekraan'], $daily);
 
     <nav class="tabs">
         <a href="paren.php?child=<?= $childId ?>" class="tab active">Töölaud</a>
-        <a href="history.php?child=<?= $childId ?>" class="tab">Kõik kanded</a>
+        <a href="history.php?child=<?= $childId ?>" class="tab">Kanded</a>
         <a href="books.php?child=<?= $childId ?>" class="tab">Raamatud</a>
+        <a href="milestones.php?child=<?= $childId ?>" class="tab">Verstapostid</a>
         <a href="children.php" class="tab">Lapsed</a>
     </nav>
 
@@ -84,6 +86,8 @@ $chartEkraan = array_map(fn($d) => $d['ekraan'], $daily);
     <?php if (($_GET['saved'] ?? '') === '1'): ?>
         <div class="milestone-banner"><?= icon("check") ?> Kanne salvestatud!</div>
     <?php endif; ?>
+
+    <?php render_milestone_banner($childId); ?>
 
     <?php if ((int) date('N') <= 2): ?>
         <a class="wk-banner" href="week.php?child=<?= $childId ?>">📊 Eelmise nädala kokkuvõte →</a>

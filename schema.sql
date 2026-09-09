@@ -66,6 +66,22 @@ CREATE TABLE IF NOT EXISTS challenges (
     FOREIGN KEY (child_id) REFERENCES children(id) ON DELETE CASCADE
 );
 
+-- Saavutatud verstapostid. Iga (child_id, kind, threshold) salvestatakse üks
+-- kord, esimesel korral kui piir ületati; `achieved_on` on siis fikseeritud.
+-- kind: books | pages | hours | days | streak | challenge
+-- challenge puhul on threshold väljakutse id ja label selle pealkiri.
+CREATE TABLE IF NOT EXISTS milestones (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    child_id INT NOT NULL,
+    kind VARCHAR(20) NOT NULL,
+    threshold INT NOT NULL,
+    label VARCHAR(160) DEFAULT NULL,
+    achieved_on DATE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY uniq_milestone (child_id, kind, threshold),
+    FOREIGN KEY (child_id) REFERENCES children(id) ON DELETE CASCADE
+);
+
 -- Parooli lähtestamise ühekordsed tokenid (vanema kontod).
 -- `token_hash` on väärtus, mida reset.php päringus otsib; `token` (toores)
 -- on ainult selleks, et admin.php saaks käsitsi jagatava lingi taastada,

@@ -22,20 +22,14 @@ if (!$child) {
 }
 
 $childId = (int) $child['id'];
-$books = get_books($childId);
 record_milestones($childId);
-
-[$minYear, $maxYear] = get_reading_year_range($childId);
-$year = (int) ($_GET['year'] ?? date('Y'));
-$year = max($minYear, min($maxYear, $year));
-$yearSummary = get_year_summary($childId, $year);
 ?>
 <!DOCTYPE html>
 <html lang="et">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Raamatud — Ajaraamat</title>
+<title>Verstapostid — Ajaraamat</title>
 <link rel="icon" href="favicon.ico?v=2" sizes="any">
 <link rel="icon" href="icon-192.png?v=2" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
@@ -61,36 +55,16 @@ $yearSummary = get_year_summary($childId, $year);
 
     <nav class="tabs">
         <a href="child.php?token=<?= htmlspecialchars($token) ?>" class="tab">Kokkuvõte</a>
-        <a href="child_books.php?token=<?= htmlspecialchars($token) ?>" class="tab active">Raamatud</a>
-        <a href="child_milestones.php?token=<?= htmlspecialchars($token) ?>" class="tab">Verstapostid</a>
+        <a href="child_books.php?token=<?= htmlspecialchars($token) ?>" class="tab">Raamatud</a>
+        <a href="child_milestones.php?token=<?= htmlspecialchars($token) ?>" class="tab active">Verstapostid</a>
     </nav>
-
-    <div class="card">
-        <div class="ys-head">
-            <h2>Aasta kokkuvõte</h2>
-            <?php render_year_nav($year, $minYear, $maxYear, 'child_books.php?token=' . urlencode($token)); ?>
-        </div>
-        <?php render_year_summary($yearSummary); ?>
-    </div>
 
     <?php render_milestone_banner($childId); ?>
 
-    <?php
-    $today = date('Y-m-d');
-    $challenges = array_filter(get_challenges($childId), fn($ch) => $today <= $ch['end_date']);
-    ?>
-    <?php if ($challenges): ?>
     <div class="card">
-        <h2>Väljakutsed</h2>
-        <?php foreach ($challenges as $ch): ?>
-            <?php render_challenge_card($ch, get_challenge_progress($ch), false); ?>
-        <?php endforeach; ?>
-    </div>
-    <?php endif; ?>
-
-    <div class="card">
-        <h2>Kõik raamatud</h2>
-        <?php render_books_table($books, false); ?>
+        <h2>Sinu verstapostid</h2>
+        <p class="child-link-note" style="text-align:left;margin:4px 0 14px;">Kõik, mille oled seni saavutanud.</p>
+        <?php render_milestones_list($childId); ?>
     </div>
 </div>
 </body>

@@ -35,8 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 $books = get_books($childId);
 $challenges = get_challenges($childId);
-$finishedCount = count_finished_books($childId);
-$milestone = get_book_milestone($finishedCount);
+record_milestones($childId);
 
 [$minYear, $maxYear] = get_reading_year_range($childId);
 $year = (int) ($_GET['year'] ?? date('Y'));
@@ -75,8 +74,9 @@ $yearSummary = get_year_summary($childId, $year);
 
     <nav class="tabs">
         <a href="paren.php?child=<?= $childId ?>" class="tab">Töölaud</a>
-        <a href="history.php?child=<?= $childId ?>" class="tab">Kõik kanded</a>
+        <a href="history.php?child=<?= $childId ?>" class="tab">Kanded</a>
         <a href="books.php?child=<?= $childId ?>" class="tab active">Raamatud</a>
+        <a href="milestones.php?child=<?= $childId ?>" class="tab">Verstapostid</a>
         <a href="children.php" class="tab">Lapsed</a>
     </nav>
 
@@ -90,9 +90,7 @@ $yearSummary = get_year_summary($childId, $year);
         <?php render_year_summary($yearSummary); ?>
     </div>
 
-    <?php if ($milestone): ?>
-        <div class="milestone-banner">🎉 Verstapost saavutatud: <?= $milestone ?> raamatut loetud!</div>
-    <?php endif; ?>
+    <?php render_milestone_banner($childId); ?>
 
     <div class="card">
         <h2>Väljakutsed</h2>
