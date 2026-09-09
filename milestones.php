@@ -12,8 +12,24 @@ if (empty($children)) {
 $child = resolve_current_child($familyId);
 $childId = (int) $child['id'];
 
+$error = '';
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'milestone_new') {
+    require_csrf();
+    $label = trim($_POST['label'] ?? '');
+    $emoji = trim($_POST['emoji'] ?? '');
+    $date  = $_POST['achieved_on'] ?? '';
+    if ($label === '') {
+        $error = 'Sisesta verstaposti nimi.';
+    } elseif (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
+        $error = 'Vali kuupäev.';
+    } else {
+        add_custom_milestone($childId, $label, $emoji, $date);
+        header('Location: milestones.php?child=' . $childId);
+        exit;
+    }
+}
+
 record_milestones($childId);
-$milestones = get_milestones($childId);
 ?>
 <!DOCTYPE html>
 <html lang="et">
@@ -59,8 +75,25 @@ $milestones = get_milestones($childId);
 
     <div class="card">
         <h2>Verstapostid — <?= htmlspecialchars($child['name']) ?></h2>
-        <p class="child-link-note" style="text-align:left;margin:4px 0 14px;">Iga saavutus ja kuupäev, mil see saavutati.</p>
-        <?php render_milestones_list($childId); ?>
+        <p class="child-link-note" style="text-align:left;margin:4px 0 14px;">Iga saavutus ja kuupäev, mil see saavutati. Vajuta pliiatsile, et muuta.</p>
+        <?php if ($error): ?><p class="error"><?= htmlspecialchars($error) ?></p><?php endif; ?>
+        <?php render_milestones_list($childId, true); ?>
+
+        <details class="chal-new"<?= $error ? ' open' : '' ?>>
+            <summary>+ Lisa verstapost</summary>
+            <form method="post">
+                <?= csrf_field() ?>
+                <input type="hidden" name="action" value="milestone_new">
+                <input type="hidden" name="child" value="<?= $childId ?>">
+                <div class="ms-new-row">
+                    <input type="text" name="emoji" maxlength="4" placeholder="🏅" value="<?= htmlspecialchars($_POST['emoji'] ?? '') ?>" aria-label="Ikoon" class="ms-emoji-input">
+                    <input type="text" name="label" placeholder="nt. Luges esimese raamatu ise läbi" value="<?= htmlspecialchars($_POST['label'] ?? '') ?>" required>
+                </div>
+                <label for="achieved_on">Kuupäev</label>
+                <input type="date" id="achieved_on" name="achieved_on" value="<?= htmlspecialchars($_POST['achieved_on'] ?? date('Y-m-d')) ?>" required>
+                <button type="submit" class="btn btn-add full-width">Lisa verstapost</button>
+            </form>
+        </details>
     </div>
 </div>
 </body>

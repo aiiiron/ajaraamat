@@ -711,6 +711,21 @@ function delete_challenge(int $id, int $childId): void {
     $stmt->execute([':id' => $id, ':cid' => $childId]);
 }
 
+function update_challenge(int $id, int $childId, string $title, string $type, int $value, string $start, string $end): void {
+    $pdo = get_db();
+    $stmt = $pdo->prepare("UPDATE challenges SET title = :t, goal_type = :gt, goal_value = :gv, start_date = :s, end_date = :e
+        WHERE id = :id AND child_id = :cid");
+    $stmt->execute([
+        ':t'   => mb_substr($title, 0, 120),
+        ':gt'  => $type === 'minutes' ? 'minutes' : 'books',
+        ':gv'  => max(1, $value),
+        ':s'   => $start,
+        ':e'   => $end,
+        ':id'  => $id,
+        ':cid' => $childId,
+    ]);
+}
+
 /** A child's challenges: active first, then upcoming, then past (newest end first). */
 function get_challenges(int $childId): array {
     $pdo = get_db();
@@ -795,12 +810,15 @@ function render_challenge_card(array $ch, int $progress, bool $editable): void {
             </div>
         <?php endif; ?>
         <?php if ($editable): ?>
-            <form method="post" class="chal-del" onsubmit="return confirm('Kustuta väljakutse?');">
-                <?= csrf_field() ?>
-                <input type="hidden" name="action" value="challenge_del">
-                <input type="hidden" name="challenge_id" value="<?= (int) $ch['id'] ?>">
-                <button type="submit" class="link-muted chal-del-btn">Kustuta</button>
-            </form>
+            <div class="chal-actions">
+                <a class="link-muted chal-edit-btn" href="edit_challenge.php?id=<?= (int) $ch['id'] ?>&child=<?= (int) $ch['child_id'] ?>"><?= icon('pencil') ?> Muuda</a>
+                <form method="post" class="chal-del" onsubmit="return confirm('Kustuta väljakutse?');">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="action" value="challenge_del">
+                    <input type="hidden" name="challenge_id" value="<?= (int) $ch['id'] ?>">
+                    <button type="submit" class="link-muted chal-del-btn">Kustuta</button>
+                </form>
+            </div>
         <?php endif; ?>
     </div>
     <?php
@@ -1080,18 +1098,82 @@ function get_milestones(int $childId): array {
     return $stmt->fetchAll();
 }
 
-/** [emoji, Estonian phrase] for one milestone row. */
+/** [emoji, Estonian phrase] for one milestone row. A stored emoji / label
+ *  (parent override, and the only source for custom milestones) wins. */
 function milestone_text(array $m): array {
     $n = (int) $m['threshold'];
     switch ($m['kind']) {
-        case 'books':  return ['📚', $n . ($n === 1 ? ' raamat loetud' : ' raamatut loetud')];
-        case 'pages':  return ['📖', number_format($n, 0, '', ' ') . ($n === 1 ? ' lehekülg loetud' : ' lehekülge loetud')];
-        case 'hours':  return ['⏱️', $n . ($n === 1 ? ' tund loetud' : ' tundi loetud')];
-        case 'days':   return ['📅', $n . ($n === 1 ? ' lugemispäev' : ' lugemispäeva')];
-        case 'streak': return ['🔥', $n . ($n === 1 ? ' päev järjest tasakaalus' : ' päeva järjest tasakaalus')];
-        case 'challenge': return ['🏆', 'Väljakutse täidetud: ' . ((string) ($m['label'] ?? 'väljakutse'))];
+        case 'books':  $def = ['📚', $n . ($n === 1 ? ' raamat loetud' : ' raamatut loetud')]; break;
+        case 'pages':  $def = ['📖', number_format($n, 0, '', ' ') . ($n === 1 ? ' lehekülg loetud' : ' lehekülge loetud')]; break;
+        case 'hours':  $def = ['⏱️', $n . ($n === 1 ? ' tund loetud' : ' tundi loetud')]; break;
+        case 'days':   $def = ['📅', $n . ($n === 1 ? ' lugemispäev' : ' lugemispäeva')]; break;
+        case 'streak': $def = ['🔥', $n . ($n === 1 ? ' päev järjest tasakaalus' : ' päeva järjest tasakaalus')]; break;
+        case 'challenge': $def = ['🏆', 'Väljakutse täidetud: ' . ((string) ($m['label'] ?? 'väljakutse'))]; break;
+        default: $def = ['⭐', 'Verstapost'];
     }
-    return ['⭐', 'Verstapost'];
+    $emoji = trim((string) ($m['emoji'] ?? ''));
+    $label = trim((string) ($m['label'] ?? ''));
+    $icon = $emoji !== '' ? $emoji : $def[0];
+    // 'challenge' already folds its label into $def[1]; every other kind lets a
+    // stored label replace the generated phrase outright.
+    $text = ($label !== '' && $m['kind'] !== 'challenge') ? $label : $def[1];
+    return [$icon, $text];
+}
+
+/** True for parent-created milestones (freely editable / deletable). */
+function milestone_is_custom(array $m): bool {
+    return ($m['kind'] ?? '') === 'custom';
+}
+
+/** Parent adds a free-form achievement. threshold is a per-child sequence so the
+ *  (child_id, kind, threshold) unique key still holds for custom rows. */
+function add_custom_milestone(int $childId, string $label, string $emoji, string $date): void {
+    $label = trim($label);
+    if ($label === '') return;
+    $pdo = get_db();
+    $seq = $pdo->prepare("SELECT COALESCE(MAX(threshold), 0) + 1 FROM milestones WHERE child_id = :cid AND kind = 'custom'");
+    $seq->execute([':cid' => $childId]);
+    $t = (int) $seq->fetchColumn();
+    $ins = $pdo->prepare("INSERT INTO milestones (child_id, kind, threshold, label, emoji, achieved_on)
+        VALUES (:cid, 'custom', :t, :l, :e, :d)");
+    $ins->execute([
+        ':cid' => $childId,
+        ':t'   => $t,
+        ':l'   => mb_substr($label, 0, 150),
+        ':e'   => ($e = trim($emoji)) !== '' ? mb_substr($e, 0, 12) : null,
+        ':d'   => $date,
+    ]);
+}
+
+/** Edit a milestone's emoji + date, and (only when $label is not null — i.e. a
+ *  custom row) its label. Passing null leaves the stored label untouched, so an
+ *  auto row's generated text and a challenge row's title copy are preserved. */
+function update_milestone(int $id, int $childId, ?string $label, string $emoji, string $date): void {
+    $pdo = get_db();
+    $emojiVal = ($e = trim($emoji)) !== '' ? mb_substr($e, 0, 12) : null;
+    if ($label === null) {
+        $stmt = $pdo->prepare("UPDATE milestones SET emoji = :e, achieved_on = :d
+            WHERE id = :id AND child_id = :cid");
+        $stmt->execute([':e' => $emojiVal, ':d' => $date, ':id' => $id, ':cid' => $childId]);
+        return;
+    }
+    $stmt = $pdo->prepare("UPDATE milestones SET label = :l, emoji = :e, achieved_on = :d
+        WHERE id = :id AND child_id = :cid");
+    $stmt->execute([
+        ':l'   => ($l = trim($label)) !== '' ? mb_substr($l, 0, 150) : null,
+        ':e'   => $emojiVal,
+        ':d'   => $date,
+        ':id'  => $id,
+        ':cid' => $childId,
+    ]);
+}
+
+/** Delete a milestone. Only custom rows — an auto row would just reappear on the
+ *  next scan, so the edit page hides delete for those. */
+function delete_milestone(int $id, int $childId): void {
+    $pdo = get_db();
+    $stmt = $pdo->prepare("DELETE FROM milestones WHERE id = :id AND child_id = :cid AND kind = 'custom'");
+    $stmt->execute([':id' => $id, ':cid' => $childId]);
 }
 
 /** Gold banner for a milestone reached today or yesterday. Persists for the whole
@@ -1108,8 +1190,9 @@ function render_milestone_banner(int $childId): void {
     echo '<div class="achievement-banner">🎉 ' . htmlspecialchars($icon . ' Verstapost: ' . $text . '!') . '</div>';
 }
 
-/** Full achievement list for the Verstapostid page. */
-function render_milestones_list(int $childId): void {
+/** Full achievement list for the Verstapostid page. When $editable (parent view)
+ *  each row links to edit_milestone.php. */
+function render_milestones_list(int $childId, bool $editable = false): void {
     $rows = get_milestones($childId);
     if (empty($rows)) {
         echo '<p class="empty">Verstaposte pole veel. Loe raamatuid ja täida väljakutseid!</p>';
@@ -1121,8 +1204,11 @@ function render_milestones_list(int $childId): void {
         echo '<li class="ms-row">'
            . '<span class="ms-icon">' . htmlspecialchars($icon) . '</span>'
            . '<span class="ms-text">' . htmlspecialchars($text) . '</span>'
-           . '<span class="ms-date">' . htmlspecialchars(date('d.m.Y', strtotime($m['achieved_on']))) . '</span>'
-           . '</li>';
+           . '<span class="ms-date">' . htmlspecialchars(date('d.m.Y', strtotime($m['achieved_on']))) . '</span>';
+        if ($editable) {
+            echo '<a class="ms-edit" href="edit_milestone.php?id=' . (int) $m['id'] . '&child=' . $childId . '" aria-label="Muuda" title="Muuda">' . icon('pencil') . '</a>';
+        }
+        echo '</li>';
     }
     echo '</ul>';
 }

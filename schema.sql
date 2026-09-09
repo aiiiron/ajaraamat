@@ -76,6 +76,7 @@ CREATE TABLE IF NOT EXISTS milestones (
     kind VARCHAR(20) NOT NULL,
     threshold INT NOT NULL,
     label VARCHAR(160) DEFAULT NULL,
+    emoji VARCHAR(16) DEFAULT NULL,
     achieved_on DATE NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     UNIQUE KEY uniq_milestone (child_id, kind, threshold),

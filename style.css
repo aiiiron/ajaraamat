@@ -1079,6 +1079,26 @@ select:focus { outline: 2px solid var(--accent-purple); border-color: transparen
   font-weight: 700;
   color: var(--text-muted);
 }
+.ms-edit {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-muted);
+  margin-left: 2px;
+}
+.ms-edit svg { width: 16px; height: 16px; }
+.ms-edit:active { transform: scale(0.9); }
+.ms-new-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.ms-new-row > input[type="text"]:last-child { flex: 1; }
+.ms-emoji-input {
+  width: 60px;
+  flex: none;
+  text-align: center;
+}
 
 /* Heatmap */
 .heatmap {
@@ -1248,7 +1268,20 @@ select:focus { outline: 2px solid var(--accent-purple); border-color: transparen
 }
 .chal-dot.filled { background: var(--accent-purple); }
 .chal-done .chal-dot.filled { background: #2FBE86; }
-.chal-del { margin-top: 8px; }
+.chal-actions {
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.chal-del { margin: 0; }
+.chal-edit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+}
+.chal-edit-btn svg { width: 14px; height: 14px; }
 .chal-del-btn {
   background: none;
   border: none;
