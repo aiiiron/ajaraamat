@@ -32,11 +32,12 @@ try {
 $parentHash = password_hash(DEMO_PARENT_PASSWORD, PASSWORD_DEFAULT);
 $familyId = (int) $pdo->query("SELECT id FROM families WHERE is_demo = 1 ORDER BY id ASC LIMIT 1")->fetchColumn();
 if ($familyId === 0) {
-    $ins = $pdo->prepare("INSERT INTO families (email, password_hash, status, is_demo) VALUES (:e, :h, 'approved', 1)");
+    $ins = $pdo->prepare("INSERT INTO families (email, password_hash, status, is_demo, plan) VALUES (:e, :h, 'approved', 1, 'pere_plus')");
     $ins->execute([':e' => DEMO_PARENT_EMAIL, ':h' => $parentHash]);
     $familyId = (int) $pdo->lastInsertId();
 } else {
-    $pdo->prepare("UPDATE families SET email = :e, password_hash = :h, status = 'approved', is_demo = 1 WHERE id = :id")
+    // Demo always shows the full Pere+ feature set, so visitors see what they'd get.
+    $pdo->prepare("UPDATE families SET email = :e, password_hash = :h, status = 'approved', is_demo = 1, plan = 'pere_plus' WHERE id = :id")
         ->execute([':e' => DEMO_PARENT_EMAIL, ':h' => $parentHash, ':id' => $familyId]);
 }
 

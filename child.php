@@ -23,6 +23,7 @@ if (!$child) {
 }
 
 $childId = (int) $child['id'];
+$canSelfLog = has_feature((int) $child['family_id'], 'child_self_log');
 $totals = get_totals($childId);
 $stats = get_stats_matrix($childId);
 $streak = get_current_streak($childId);
@@ -138,7 +139,9 @@ if ($owed > 0) {
 
     <div class="actions actions-stack">
         <a href="reading_timer.php?token=<?= htmlspecialchars($token) ?>" class="btn btn-add full-width"><?= icon("timer") ?> Alusta lugemist</a>
-        <a href="child_add.php?token=<?= htmlspecialchars($token) ?>" class="btn btn-outline full-width"><?= icon("plus") ?> Lisa kanne ise</a>
+        <?php if ($canSelfLog): ?>
+            <a href="child_add.php?token=<?= htmlspecialchars($token) ?>" class="btn btn-outline full-width"><?= icon("plus") ?> Lisa kanne ise</a>
+        <?php endif; ?>
     </div>
 
     <?php if ($myPending): ?>

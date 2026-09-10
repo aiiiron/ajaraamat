@@ -23,7 +23,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $end   = $_POST['end_date'] ?? '';
         $validDates = preg_match('/^\d{4}-\d{2}-\d{2}$/', $start)
             && preg_match('/^\d{4}-\d{2}-\d{2}$/', $end) && $end >= $start;
-        if ($title !== '' && $value > 0 && $validDates) {
+        $today = date('Y-m-d');
+        $activeCount = count(array_filter(get_challenges($childId), fn($ch) => $today >= $ch['start_date'] && $today <= $ch['end_date']));
+        $canAddChallenge = $activeCount < 1 || has_feature($familyId, 'unlimited_challenges');
+        if ($title !== '' && $value > 0 && $validDates && $canAddChallenge) {
             create_challenge($childId, $title, $type, $value, $start, $end);
         }
     } elseif ($act === 'challenge_del') {
@@ -36,6 +39,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $books = get_books($childId);
 $challenges = get_challenges($childId);
 record_milestones($childId);
+
+$todayDate2 = date('Y-m-d');
+$activeChallengeCount = count(array_filter($challenges, fn($ch) => $todayDate2 >= $ch['start_date'] && $todayDate2 <= $ch['end_date']));
+$canAddChallenge = $activeChallengeCount < 1 || has_feature($familyId, 'unlimited_challenges');
 
 [$minYear, $maxYear] = get_reading_year_range($childId);
 $year = (int) ($_GET['year'] ?? date('Y'));
@@ -106,6 +113,7 @@ $yearSummary = get_year_summary($childId, $year);
             <?php endforeach; ?>
         <?php endif; ?>
 
+        <?php if ($canAddChallenge): ?>
         <details class="chal-new">
             <summary>+ Uus väljakutse</summary>
             <form method="post">
@@ -129,6 +137,9 @@ $yearSummary = get_year_summary($childId, $year);
                 <button type="submit" class="btn btn-add full-width">Loo väljakutse</button>
             </form>
         </details>
+        <?php else: ?>
+            <p class="child-link-note" style="text-align:left;margin-top:10px;">Rohkem kui 1 aktiivne väljakutse korraga on <span class="gate-inline">🌟 Pere+</span> pere jaoks.</p>
+        <?php endif; ?>
     </div>
 
     <div class="actions">

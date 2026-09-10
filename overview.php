@@ -9,6 +9,7 @@ if (empty($children)) {
     header('Location: children.php');
     exit;
 }
+$gated = !has_feature($familyId, 'family_overview');
 ?>
 <!DOCTYPE html>
 <html lang="et">
@@ -37,6 +38,9 @@ if (empty($children)) {
     </header>
     <h2 style="margin-bottom:16px;">Kõik lapsed korraga</h2>
 
+    <?php if ($gated): ?>
+        <?php render_upgrade_gate('Kõik lapsed korraga') ?>
+    <?php else: ?>
     <?php foreach ($children as $c):
         $cid = (int) $c['id'];
         $totals = get_totals($cid);
@@ -79,6 +83,7 @@ if (empty($children)) {
         <a href="paren.php?child=<?= $cid ?>" class="btn btn-add full-width">Ava <?= htmlspecialchars($c['name']) ?> →</a>
     </div>
     <?php endforeach; ?>
+    <?php endif; ?>
 </div>
 </body>
 </html>

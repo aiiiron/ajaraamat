@@ -25,8 +25,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $d = (int) ($_POST['daily_goal_min'] ?? 0);
             $w = (int) ($_POST['weekly_goal_min'] ?? 0);
             $r = (int) ($_POST['screen_reward_cap_min'] ?? 0);
-            $ratio = (float) str_replace(',', '.', (string) ($_POST['reading_ratio'] ?? ''));
-            $ratio = $ratio > 0 ? min(9.99, round($ratio, 2)) : 0.0;
+            $ratio = 0.0;
+            if (has_feature($familyId, 'custom_reading_ratio')) {
+                $ratio = (float) str_replace(',', '.', (string) ($_POST['reading_ratio'] ?? ''));
+                $ratio = $ratio > 0 ? min(9.99, round($ratio, 2)) : 0.0;
+            }
             set_child_goal($cid, $d > 0 ? $d : null, $w > 0 ? $w : null, $r > 0 ? $r : null, $ratio > 0 ? $ratio : null);
         }
         header('Location: children.php');
@@ -34,6 +37,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($action === 'add_login') {
         if ($isDemo) {
             $error = 'Demo režiimis ei saa kontosid muuta.';
+        } elseif (!has_feature($familyId, 'second_parent_login')) {
+            $error = 'Teise vanema lisamine on Pere+ pere jaoks.';
         } else {
             $email = trim($_POST['email'] ?? '');
             $name  = trim($_POST['name'] ?? '');
@@ -82,6 +87,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $name = trim($_POST['name'] ?? '');
         if ($name === '') {
             $error = 'Sisesta lapse nimi.';
+        } elseif (count(get_children($familyId)) >= 1 && !has_feature($familyId, 'multi_child')) {
+            $error = 'Rohkem kui 1 laps on Pere+ pere jaoks.';
         } else {
             create_child($familyId, $name);
             header('Location: children.php');
@@ -97,6 +104,9 @@ if (($_GET['pw'] ?? '') === '1')      $notice = 'Parool muudetud.';
 $children = get_children($familyId);
 $family = get_family($familyId);
 $logins = get_family_logins($familyId);
+$canMultiChild = has_feature($familyId, 'multi_child');
+$canCustomRatio = has_feature($familyId, 'custom_reading_ratio');
+$canSecondParent = has_feature($familyId, 'second_parent_login');
 $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https://' : 'http://';
 $baseUrl = $scheme . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['SCRIPT_NAME']), '/');
 ?>
@@ -193,7 +203,8 @@ $baseUrl = $scheme . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['SCRIPT_NAME
                 </div>
                 <div>
                     <label for="rr<?= $c['id'] ?>">Lugemise ja ekraani suhe</label>
-                    <input type="number" id="rr<?= $c['id'] ?>" name="reading_ratio" min="0.1" max="9.99" step="0.1" inputmode="decimal" placeholder="1" value="<?= isset($c['reading_ratio']) && $c['reading_ratio'] !== null ? (float) $c['reading_ratio'] : '' ?>">
+                    <input type="number" id="rr<?= $c['id'] ?>" name="reading_ratio" min="0.1" max="9.99" step="0.1" inputmode="decimal" placeholder="1" value="<?= isset($c['reading_ratio']) && $c['reading_ratio'] !== null ? (float) $c['reading_ratio'] : '' ?>" <?= $canCustomRatio ? '' : 'disabled' ?>>
+                    <?php if (!$canCustomRatio): ?><span class="gate-inline">🌟 Pere+</span><?php endif; ?>
                 </div>
             </div>
             <button type="submit" class="btn btn-add full-width">Salvesta</button>
@@ -202,6 +213,9 @@ $baseUrl = $scheme . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['SCRIPT_NAME
     </div>
     <?php endforeach; ?>
 
+    <?php if (!empty($children) && !$canMultiChild): ?>
+        <?php render_upgrade_gate('Rohkem kui 1 laps') ?>
+    <?php else: ?>
     <div class="card">
         <h2>Lisa uus laps</h2>
         <form method="post">
@@ -211,6 +225,7 @@ $baseUrl = $scheme . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['SCRIPT_NAME
             <button type="submit" class="btn btn-add full-width">Lisa laps</button>
         </form>
     </div>
+    <?php endif; ?>
 
     <div class="card">
         <h2>Vanemate ligipääs</h2>
@@ -240,6 +255,9 @@ $baseUrl = $scheme . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['SCRIPT_NAME
         <?php endforeach; ?>
     </div>
 
+    <?php if (!$canSecondParent): ?>
+        <?php render_upgrade_gate('Teise vanema lisamine') ?>
+    <?php else: ?>
     <div class="card">
         <h2>Lisa teine vanem</h2>
         <form method="post">
@@ -256,6 +274,7 @@ $baseUrl = $scheme . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['SCRIPT_NAME
             <button type="submit" class="btn btn-add full-width" <?= $isDemo ? 'disabled' : '' ?>>Lisa vanem</button>
         </form>
     </div>
+    <?php endif; ?>
 
     <div class="card">
         <h2>Muuda oma parooli</h2>

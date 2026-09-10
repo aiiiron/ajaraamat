@@ -30,6 +30,7 @@ if ($bookCount > 60) {
     $books = array_slice($books, 0, 60);
 }
 $certDensity = $bookCount > 40 ? 'cert-dense' : ($bookCount > 12 ? 'cert-compact' : '');
+$canNoWatermark = has_feature($familyId, 'certificate_no_watermark');
 ?>
 <!DOCTYPE html>
 <html lang="et">
@@ -180,7 +181,7 @@ $certDensity = $bookCount > 40 ? 'cert-dense' : ($bookCount > 12 ? 'cert-compact
       </div>
 
         <div class="cert-footer">
-            <span>Väljastatud <?= htmlspecialchars(date('d.m.Y')) ?> — Ajaraamat</span>
+            <span>Väljastatud <?= htmlspecialchars(date('d.m.Y')) ?> — Ajaraamat<?= $canNoWatermark ? '' : '<br><span style="opacity:.7;">Loodud tasuta Ajaraamatu kontoga — Pere+ eemaldab selle märke</span>' ?></span>
             <span class="cert-sign">Vanema allkiri</span>
         </div>
     </div>

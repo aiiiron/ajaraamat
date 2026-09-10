@@ -401,6 +401,103 @@ function is_demo_session(): bool {
     return !empty($_SESSION['is_demo']);
 }
 
+// =========================================================
+// Pere+ plan & feature flags
+// =========================================================
+//
+// families.plan is 'free' or 'pere_plus'. feature_flags lists the optional
+// features that currently require Pere+ (is_premium=1); the owner toggles
+// each one from admin.php with no code change needed. has_feature() is the
+// single check every gate calls — flip a flag to free for everyone, or mark
+// a family Pere+, and every page respects it immediately.
+
+/** The canonical feature list. Only used to (re)seed feature_flags — the
+ *  is_premium value here is just the *initial* default; admin.php is the
+ *  actual source of truth once a row exists. */
+function feature_flag_defaults(): array {
+    return [
+        'multi_child'               => ['Rohkem kui 1 laps peres', 1],
+        'family_overview'           => ['Pere ülevaade (kõik lapsed korraga)', 1],
+        'child_self_log'            => ['Lapse enda lisatud kanded ("Lisa kanne ise")', 1],
+        'unlimited_challenges'      => ['Rohkem kui 1 aktiivne väljakutse lapse kohta', 1],
+        'custom_milestones'         => ['Oma verstapostide lisamine', 1],
+        'custom_reading_ratio'      => ['Kohandatud lugemise ja ekraani suhe', 1],
+        'certificate_no_watermark'  => ['Lugemistunnistus ilma Ajaraamatu märketa', 1],
+        'second_parent_login'       => ['Teise vanema lisamine', 0],
+        'undo_trash'                => ['Kustutatud kannete taastamine', 0],
+        'csv_export'                => ['Kannete allalaadimine CSV-na', 0],
+    ];
+}
+
+/** All feature flags, keyed by id. Self-seeds any missing row from the
+ *  canonical list above, so no manual data-entry step is needed after the
+ *  CREATE TABLE. */
+function get_feature_flags(): array {
+    $pdo = get_db();
+    $ins = $pdo->prepare("INSERT IGNORE INTO feature_flags (id, label, is_premium) VALUES (:id, :l, :p)");
+    foreach (feature_flag_defaults() as $id => [$label, $premium]) {
+        $ins->execute([':id' => $id, ':l' => $label, ':p' => $premium]);
+    }
+    $rows = $pdo->query("SELECT * FROM feature_flags ORDER BY id ASC")->fetchAll();
+    $byId = [];
+    foreach ($rows as $r) {
+        $byId[$r['id']] = $r;
+    }
+    return $byId;
+}
+
+function set_feature_premium(string $flagId, bool $isPremium): void {
+    $pdo = get_db();
+    $pdo->prepare("UPDATE feature_flags SET is_premium = :p WHERE id = :id")
+        ->execute([':p' => $isPremium ? 1 : 0, ':id' => $flagId]);
+}
+
+function get_family_plan(int $familyId): string {
+    static $cache = [];
+    if (!array_key_exists($familyId, $cache)) {
+        $pdo = get_db();
+        $stmt = $pdo->prepare("SELECT plan FROM families WHERE id = :id");
+        $stmt->execute([':id' => $familyId]);
+        $plan = $stmt->fetchColumn();
+        $cache[$familyId] = ($plan === 'pere_plus') ? 'pere_plus' : 'free';
+    }
+    return $cache[$familyId];
+}
+
+function set_family_plan(int $familyId, string $plan): void {
+    $plan = $plan === 'pere_plus' ? 'pere_plus' : 'free';
+    $pdo = get_db();
+    $pdo->prepare("UPDATE families SET plan = :p WHERE id = :id")->execute([':p' => $plan, ':id' => $familyId]);
+}
+
+/** The one check every gate calls. A flag with is_premium=0 is free for
+ *  everyone regardless of plan; otherwise only Pere+ families pass. */
+function has_feature(int $familyId, string $flagId): bool {
+    $flags = get_feature_flags();
+    if (empty($flags[$flagId]['is_premium'])) {
+        return true;
+    }
+    return get_family_plan($familyId) === 'pere_plus';
+}
+
+/** The upsell block shown wherever a gate blocks a free-tier family. No
+ *  self-serve payment yet — points at ADMIN_EMAIL so upgrading is a real,
+ *  if manual, conversation rather than a dead end. */
+function render_upgrade_gate(string $label): void {
+    $adminEmail = defined('ADMIN_EMAIL') ? trim((string) ADMIN_EMAIL) : '';
+    ?>
+    <div class="gate-card">
+        <div class="gate-badge">🌟 Pere+</div>
+        <p class="gate-text"><?= htmlspecialchars($label) ?> on Pere+ pere jaoks.</p>
+        <?php if ($adminEmail !== ''): ?>
+            <a class="btn btn-add full-width" href="mailto:<?= htmlspecialchars($adminEmail) ?>?subject=<?= rawurlencode('Pere+ liitumine') ?>">Küsi Pere+ ligipääsu</a>
+        <?php else: ?>
+            <p class="gate-text">Võta ühendust saidi omanikuga, et liituda.</p>
+        <?php endif; ?>
+    </div>
+    <?php
+}
+
 /**
  * True for the site owner. Qualifies in either of two ways:
  *  - a legacy `admin_login.php` session (`$_SESSION['is_admin']`), or

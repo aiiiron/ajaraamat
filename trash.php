@@ -4,8 +4,9 @@ require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/functions.php';
 
 $familyId = current_family_id();
+$gated = !has_feature($familyId, 'undo_trash');
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if (!$gated && $_SERVER['REQUEST_METHOD'] === 'POST') {
     require_csrf();
     $action = $_POST['action'] ?? '';
     $id = (int) ($_POST['id'] ?? 0);
@@ -18,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     exit;
 }
 
-$rows = get_deleted_entries_for_family($familyId);
+$rows = $gated ? [] : get_deleted_entries_for_family($familyId);
 ?>
 <!DOCTYPE html>
 <html lang="et">
@@ -45,6 +46,9 @@ $rows = get_deleted_entries_for_family($familyId);
     <header class="topbar">
         <a href="children.php" class="link-muted"><?= icon("arrow-left") ?> Tagasi</a>
     </header>
+    <?php if ($gated): ?>
+        <?php render_upgrade_gate('Kustutatud kannete taastamine') ?>
+    <?php else: ?>
     <div class="card">
         <h2>Kustutatud kanded</h2>
         <p class="child-link-note" style="text-align:left;margin:4px 0 14px;">Kustutatud kanded jäävad siia ootama, kuni taastad need või kustutad jäädavalt.</p>
@@ -85,6 +89,7 @@ $rows = get_deleted_entries_for_family($familyId);
         </div>
         <?php endif; ?>
     </div>
+    <?php endif; ?>
 </div>
 </body>
 </html>

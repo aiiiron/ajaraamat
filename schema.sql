@@ -10,6 +10,17 @@ CREATE TABLE IF NOT EXISTS families (
     password_hash VARCHAR(255) NOT NULL,
     status ENUM('pending','approved','rejected') NOT NULL DEFAULT 'pending',
     is_demo TINYINT NOT NULL DEFAULT 0,
+    plan ENUM('free','pere_plus') NOT NULL DEFAULT 'free',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Which optional features currently require the Pere+ plan. Seeded/self-healed
+-- by get_feature_flags() in functions.php; the owner flips is_premium per
+-- feature from admin.php — no code change needed to change the split later.
+CREATE TABLE IF NOT EXISTS feature_flags (
+    id VARCHAR(40) PRIMARY KEY,
+    label VARCHAR(120) NOT NULL,
+    is_premium TINYINT NOT NULL DEFAULT 1,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

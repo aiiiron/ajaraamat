@@ -24,6 +24,23 @@ if (!$child) {
 }
 
 $childId = (int) $child['id'];
+
+if (!has_feature((int) $child['family_id'], 'child_self_log')) {
+    ?>
+    <!DOCTYPE html>
+    <html lang="et"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ajaraamat</title><link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css?v=<?= @filemtime(__DIR__ . "/style.css") ?>"></head>
+    <body><div class="wrap narrow">
+    <header class="topbar"><a href="child.php?token=<?= htmlspecialchars($token) ?>" class="link-muted"><?= icon("arrow-left") ?> Tagasi</a></header>
+    <div class="card" style="text-align:center;"><p>See funktsioon pole praegu saadaval. Palu vanemal lisada see kanne sinu eest.</p></div>
+    </div></body></html>
+    <?php
+    exit;
+}
+
 $books = get_books($childId);
 $currentBooks = array_values(array_filter($books, fn($b) => $b['status'] === 'loeb'));
 $error = '';

@@ -11,6 +11,30 @@ if (!child_belongs_to_family($childId, $familyId)) {
 }
 $child = get_child($childId);
 
+if (!has_feature($familyId, 'csv_export')) {
+    ?>
+    <!DOCTYPE html>
+    <html lang="et">
+    <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ajaraamat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css?v=<?= @filemtime(__DIR__ . "/style.css") ?>">
+    </head>
+    <body>
+    <div class="wrap narrow">
+        <header class="topbar">
+            <a href="paren.php?child=<?= $childId ?>" class="link-muted"><?= icon("arrow-left") ?> Tagasi</a>
+        </header>
+        <?php render_upgrade_gate('Kannete allalaadimine CSV-na') ?>
+    </div>
+    </body>
+    </html>
+    <?php
+    exit;
+}
+
 $pdo = get_db();
 $stmt = $pdo->prepare("SELECT entry_date, raamat, raamat_comment, ekraan, ekraan_comment FROM entries WHERE child_id = :cid ORDER BY entry_date ASC, id ASC");
 $stmt->execute([':cid' => $childId]);

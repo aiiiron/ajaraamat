@@ -12,13 +12,16 @@ if (empty($children)) {
 $child = resolve_current_child($familyId);
 $childId = (int) $child['id'];
 
+$canCustomMilestone = has_feature($familyId, 'custom_milestones');
 $error = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'milestone_new') {
     require_csrf();
     $label = trim($_POST['label'] ?? '');
     $emoji = trim($_POST['emoji'] ?? '');
     $date  = $_POST['achieved_on'] ?? '';
-    if ($label === '') {
+    if (!$canCustomMilestone) {
+        $error = 'Oma saavutuste lisamine on Pere+ pere jaoks.';
+    } elseif ($label === '') {
         $error = 'Sisesta saavutuse nimi.';
     } elseif (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
         $error = 'Vali kuupäev.';
@@ -82,6 +85,7 @@ record_milestones($childId);
         <?php if ($error): ?><p class="error"><?= htmlspecialchars($error) ?></p><?php endif; ?>
         <?php render_milestones_list($childId, true); ?>
 
+        <?php if ($canCustomMilestone): ?>
         <details class="chal-new"<?= $error ? ' open' : '' ?>>
             <summary>+ Lisa saavutus</summary>
             <form method="post">
@@ -97,6 +101,9 @@ record_milestones($childId);
                 <button type="submit" class="btn btn-add full-width">Lisa saavutus</button>
             </form>
         </details>
+        <?php else: ?>
+            <p class="child-link-note" style="text-align:left;margin-top:10px;">Oma saavutuste lisamine on <span class="gate-inline">🌟 Pere+</span> pere jaoks.</p>
+        <?php endif; ?>
     </div>
 
     <div class="card">

@@ -12,6 +12,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($resetId > 0) {
             get_db()->prepare("DELETE FROM password_resets WHERE id = :id")->execute([':id' => $resetId]);
         }
+    } elseif ($action === 'set_plan') {
+        $id = (int) ($_POST['family_id'] ?? 0);
+        if ($id > 0) {
+            set_family_plan($id, ($_POST['plan'] ?? '') === 'pere_plus' ? 'pere_plus' : 'free');
+        }
+    } elseif ($action === 'toggle_feature') {
+        set_feature_premium((string) ($_POST['flag_id'] ?? ''), !empty($_POST['is_premium']));
     } else {
         $id = (int) ($_POST['family_id'] ?? 0);
         if ($id > 0 && in_array($action, ['approved', 'rejected', 'pending'], true)) {
@@ -25,6 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $pending = get_families_by_status('pending');
 $all = get_all_families();
 $resets = get_active_password_resets();
+$featureFlags = get_feature_flags();
 ?>
 <!DOCTYPE html>
 <html lang="et">
@@ -112,11 +120,31 @@ $resets = get_active_password_resets();
     </section>
 
     <section class="card">
+        <h2>Pere+ funktsioonid</h2>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">
+            Lülita, millised funktsioonid on hetkel Pere+ jaoks (lülita välja, et teha
+            kõigile tasuta — nt kui katsetad hinnastust või piirad ajutiselt midagi muud).
+        </p>
+        <?php foreach ($featureFlags as $flag): ?>
+            <form method="post" style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);">
+                <?= csrf_field() ?>
+                <input type="hidden" name="action" value="toggle_feature">
+                <input type="hidden" name="flag_id" value="<?= htmlspecialchars($flag['id']) ?>">
+                <input type="hidden" name="is_premium" value="<?= $flag['is_premium'] ? '0' : '1' ?>">
+                <span style="font-size:14px;"><?= htmlspecialchars($flag['label']) ?></span>
+                <button type="submit" class="tag <?= $flag['is_premium'] ? 'tag-reading' : '' ?>" style="border:none;cursor:pointer;white-space:nowrap;">
+                    <?= $flag['is_premium'] ? '🌟 Pere+' : 'Tasuta kõigile' ?>
+                </button>
+            </form>
+        <?php endforeach; ?>
+    </section>
+
+    <section class="card">
         <h2>Kõik pered (<?= count($all) ?>)</h2>
         <div class="table-scroll">
         <table class="entries-table">
             <thead>
-                <tr><th>E-post</th><th>Staatus</th><th>Lapsi</th><th>Registreeris</th><th></th></tr>
+                <tr><th>E-post</th><th>Staatus</th><th>Plaan</th><th>Lapsi</th><th>Registreeris</th><th></th></tr>
             </thead>
             <tbody>
             <?php foreach ($all as $f): ?>
@@ -130,6 +158,17 @@ $resets = get_active_password_resets();
                         <?php else: ?>
                             <span class="tag" style="background:#fee2e2;color:#b91c1c;">Tagasi lükatud</span>
                         <?php endif; ?>
+                    </td>
+                    <td>
+                        <form method="post" style="display:flex;gap:6px;align-items:center;">
+                            <?= csrf_field() ?>
+                            <input type="hidden" name="action" value="set_plan">
+                            <input type="hidden" name="family_id" value="<?= $f['id'] ?>">
+                            <select name="plan" onchange="this.form.submit()" style="width:auto;min-height:0;padding:4px 8px;font-size:12px;">
+                                <option value="free" <?= ($f['plan'] ?? 'free') === 'free' ? 'selected' : '' ?>>Free</option>
+                                <option value="pere_plus" <?= ($f['plan'] ?? 'free') === 'pere_plus' ? 'selected' : '' ?>>Pere+</option>
+                            </select>
+                        </form>
                     </td>
                     <td><?= $f['child_count'] ?></td>
                     <td><?= htmlspecialchars(date('d.m.Y', strtotime($f['created_at']))) ?></td>

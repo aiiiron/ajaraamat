@@ -1563,6 +1563,50 @@ select:focus { outline: 2px solid var(--accent-purple); border-color: transparen
 .actions-stack { flex-direction: column; }
 .actions-stack .btn { flex: none; }
 
+/* Pere+ upgrade gate */
+.gate-card {
+  background: linear-gradient(135deg, #F6EEFF 0%, #FFF0F7 100%);
+  border: 1.5px solid #EADCFB;
+  border-radius: var(--radius-card);
+  padding: 20px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+.gate-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--gradient-primary);
+  color: #fff;
+  font-family: var(--font-heading);
+  font-weight: 800;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 4px 11px;
+  border-radius: 999px;
+  margin-bottom: 10px;
+}
+.gate-text {
+  font-size: 14px;
+  color: var(--ink);
+  margin: 0 0 14px;
+  line-height: 1.5;
+}
+.gate-text:last-child { margin-bottom: 0; }
+.gate-inline {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--accent-purple);
+  background: #F6EEFF;
+  border-radius: 999px;
+  padding: 4px 10px;
+  margin-top: 6px;
+}
+
 /* Child self-log — parent approval queue */
 .pending-card { border: 1.5px solid var(--accent-purple); }
 .pending-count {
