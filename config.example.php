@@ -30,3 +30,9 @@ define('READING_RATIO', 1.0);
 // vastu. 2.0 => 15 min pähe õpitut kustutab 30 min ekraanivõlga.
 // (Kui siin defineerimata, kasutab functions.php vaikeväärtust 2.0.)
 define('POEM_BONUS_MULT', 2.0);
+
+// Salajane võti, mis lubab seed_demo.php käivitada ilma sisse logimata —
+// selle vajab öine cron-töö, mis avaliku demo pere andmed iga öö taastab.
+// Vali midagi juhuslikku ja pikka; sama väärtus läheb cron-käsu ?key= külge.
+// Saidi omanik (ADMIN_EMAIL) saab seda ka ilma võtmeta käivitada.
+define('DEMO_SEED_KEY', 'changeme-long-random-string');

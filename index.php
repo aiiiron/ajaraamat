@@ -176,6 +176,7 @@ if (!empty($_SESSION['family_id'])) {
     <p class="lede">Ajaraamat on lihtne perele mõeldud rakendus, mis jälgib lapse lugemis- ja ekraaniaega — nii et üks ei kao teise varju, ilma pideva vaidluseta selle üle, kes on mida ja kui palju teinud.</p>
     <div class="hero-ctas">
       <a href="register.php" class="btn btn-primary">Registreeri oma pere</a>
+      <a href="demo_login.php" class="btn btn-ghost">👀 Proovi demot</a>
       <a href="#vaade" class="btn btn-ghost">Vaata, kuidas see töötab</a>
     </div>
   </div>

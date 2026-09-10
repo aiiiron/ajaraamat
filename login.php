@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/config.php';
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/functions.php';
 configure_session();
 
 // Don't let Safari cache the login page (see functions.php — iOS with a Screen
@@ -26,25 +27,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = trim($_POST['email'] ?? '');
         $password = $_POST['password'] ?? '';
 
-        $pdo = get_db();
-        $stmt = $pdo->prepare("SELECT * FROM families WHERE email = :email");
-        $stmt->execute([':email' => $email]);
-        $family = $stmt->fetch();
+        $auth = authenticate_parent($email, $password);
 
-        if (!$family || !password_verify($password, $family['password_hash'])) {
+        if (!$auth) {
             $_SESSION['login_fails'] = (int) ($_SESSION['login_fails'] ?? 0) + 1;
             if ($_SESSION['login_fails'] >= 5) {
                 $_SESSION['login_lock_until'] = $now + 60;
                 $_SESSION['login_fails'] = 0;
             }
             $error = 'Vale e-post või parool.';
-        } elseif ($family['status'] === 'pending') {
+        } elseif ($auth['status'] === 'pending') {
             $error = 'Sinu konto ootab veel kinnitust. Anname e-postiga teada, kui see on kinnitatud.';
-        } elseif ($family['status'] === 'rejected') {
+        } elseif ($auth['status'] === 'rejected') {
             $error = 'Sinu kontoga on probleem. Võta ühendust saidi omanikuga.';
         } else {
             unset($_SESSION['login_fails'], $_SESSION['login_lock_until']);
-            $_SESSION['family_id'] = $family['id'];
+            $_SESSION['family_id']   = $auth['family_id'];
+            $_SESSION['login_kind']  = $auth['kind'];
+            $_SESSION['login_id']    = $auth['login_id'];
+            $_SESSION['login_email'] = $auth['email'];
+            $_SESSION['is_demo']     = $auth['is_demo'] ? 1 : 0;
             header('Location: paren.php');
             exit;
         }
@@ -86,6 +88,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <button type="submit">Logi sisse</button>
     </form>
+    <a href="demo_login.php" class="link-muted login-home-link">👀 Proovi demot (näidisandmed)</a><br>
     <a href="forgot.php" class="link-muted login-home-link">Unustasid parooli?</a><br>
     <a href="register.php" class="link-muted login-home-link">Pole veel kontot? Registreeru</a><br>
     <a href="index.php" class="link-muted login-home-link">← Avaleht</a>

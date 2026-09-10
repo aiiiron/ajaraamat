@@ -22,9 +22,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $error = 'Sisesta lapse nimi.';
     } else {
         $pdo = get_db();
-        $stmt = $pdo->prepare("SELECT id FROM families WHERE email = :email");
-        $stmt->execute([':email' => $email]);
-        if ($stmt->fetch()) {
+        if (parent_email_exists($email)) {
             $error = 'Selle e-postiga konto on juba olemas.';
         } else {
             $stmt = $pdo->prepare("INSERT INTO families (email, password_hash, status) VALUES (:email, :hash, 'pending')");

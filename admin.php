@@ -121,7 +121,7 @@ $resets = get_active_password_resets();
             <tbody>
             <?php foreach ($all as $f): ?>
                 <tr>
-                    <td><?= htmlspecialchars($f['email']) ?></td>
+                    <td><?= htmlspecialchars($f['email']) ?><?php if (!empty($f['is_demo'])): ?> <span class="tag" style="background:#FFF3D0;color:#93450A;">demo</span><?php endif; ?></td>
                     <td>
                         <?php if ($f['status'] === 'approved'): ?>
                             <span class="tag tag-reading">Kinnitatud</span>

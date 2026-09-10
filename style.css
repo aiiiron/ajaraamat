@@ -1623,6 +1623,30 @@ select:focus { outline: 2px solid var(--accent-purple); border-color: transparen
   color: var(--text-muted);
 }
 
+/* Family logins list */
+.fl-row {
+  display: flex;
+  align-items: center;
+  gap: 10px 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.fl-row:last-child { border-bottom: none; }
+.fl-main { flex: 1 1 auto; min-width: 0; }
+.fl-email {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.fl-tag {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-top: 1px;
+}
+
 @media (max-width: 480px) {
   h1 { font-size: 20px; }
 }

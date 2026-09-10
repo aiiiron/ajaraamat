@@ -301,6 +301,106 @@ function get_family_by_email(string $email): ?array {
     return $row ?: null;
 }
 
+// =========================================================
+// Parent logins — the primary account (families row) plus any
+// co-parent logins (family_logins) that resolve to the same family.
+// =========================================================
+
+/** Verify email+password against the primary account and any co-parent login.
+ *  Returns [family_id, kind ('family'|'login'), login_id, email, status,
+ *  is_demo] or null. */
+function authenticate_parent(string $email, string $password): ?array {
+    $email = trim($email);
+    if ($email === '') return null;
+    $pdo = get_db();
+
+    $stmt = $pdo->prepare("SELECT id, email, password_hash, status, is_demo FROM families WHERE email = :e");
+    $stmt->execute([':e' => $email]);
+    if ($f = $stmt->fetch()) {
+        if (!password_verify($password, $f['password_hash'])) return null;
+        return ['family_id' => (int) $f['id'], 'kind' => 'family', 'login_id' => (int) $f['id'],
+                'email' => $f['email'], 'status' => $f['status'], 'is_demo' => (int) $f['is_demo']];
+    }
+
+    $stmt = $pdo->prepare("SELECT l.id, l.email, l.password_hash, l.family_id, f.status, f.is_demo
+        FROM family_logins l JOIN families f ON f.id = l.family_id WHERE l.email = :e");
+    $stmt->execute([':e' => $email]);
+    if ($l = $stmt->fetch()) {
+        if (!password_verify($password, $l['password_hash'])) return null;
+        return ['family_id' => (int) $l['family_id'], 'kind' => 'login', 'login_id' => (int) $l['id'],
+                'email' => $l['email'], 'status' => $l['status'], 'is_demo' => (int) $l['is_demo']];
+    }
+    return null;
+}
+
+/** Is this email already in use as any parent login (primary or co-parent)? */
+function parent_email_exists(string $email): bool {
+    $pdo = get_db();
+    $email = trim($email);
+    $a = $pdo->prepare("SELECT 1 FROM families WHERE email = :e");
+    $a->execute([':e' => $email]);
+    if ($a->fetchColumn()) return true;
+    $b = $pdo->prepare("SELECT 1 FROM family_logins WHERE email = :e");
+    $b->execute([':e' => $email]);
+    return (bool) $b->fetchColumn();
+}
+
+function get_family_logins(int $familyId): array {
+    $pdo = get_db();
+    $stmt = $pdo->prepare("SELECT * FROM family_logins WHERE family_id = :fid ORDER BY created_at ASC, id ASC");
+    $stmt->execute([':fid' => $familyId]);
+    return $stmt->fetchAll();
+}
+
+function add_family_login(int $familyId, string $email, string $name, string $password): void {
+    $pdo = get_db();
+    $stmt = $pdo->prepare("INSERT INTO family_logins (family_id, email, name, password_hash) VALUES (:fid, :e, :n, :h)");
+    $stmt->execute([
+        ':fid' => $familyId,
+        ':e'   => trim($email),
+        ':n'   => ($n = trim($name)) !== '' ? mb_substr($n, 0, 100) : null,
+        ':h'   => password_hash($password, PASSWORD_DEFAULT),
+    ]);
+}
+
+function delete_family_login(int $loginId, int $familyId): void {
+    $pdo = get_db();
+    $pdo->prepare("DELETE FROM family_logins WHERE id = :id AND family_id = :fid")
+        ->execute([':id' => $loginId, ':fid' => $familyId]);
+}
+
+/** Change the password of whichever record the current session logged in as. */
+function change_current_password(string $current, string $new): bool {
+    $kind = $_SESSION['login_kind'] ?? 'family';
+    $loginId = (int) ($_SESSION['login_id'] ?? 0);
+    $familyId = (int) ($_SESSION['family_id'] ?? 0);
+    $pdo = get_db();
+    if ($kind === 'login') {
+        $stmt = $pdo->prepare("SELECT password_hash FROM family_logins WHERE id = :id AND family_id = :fid");
+        $stmt->execute([':id' => $loginId, ':fid' => $familyId]);
+        $hash = $stmt->fetchColumn();
+        if ($hash === false || !password_verify($current, (string) $hash)) return false;
+        $pdo->prepare("UPDATE family_logins SET password_hash = :h WHERE id = :id")
+            ->execute([':h' => password_hash($new, PASSWORD_DEFAULT), ':id' => $loginId]);
+        return true;
+    }
+    $stmt = $pdo->prepare("SELECT password_hash FROM families WHERE id = :id");
+    $stmt->execute([':id' => $familyId]);
+    $hash = $stmt->fetchColumn();
+    if ($hash === false || !password_verify($current, (string) $hash)) return false;
+    $pdo->prepare("UPDATE families SET password_hash = :h WHERE id = :id")
+        ->execute([':h' => password_hash($new, PASSWORD_DEFAULT), ':id' => $familyId]);
+    return true;
+}
+
+function current_login_email(): string {
+    return (string) ($_SESSION['login_email'] ?? '');
+}
+
+function is_demo_session(): bool {
+    return !empty($_SESSION['is_demo']);
+}
+
 /**
  * True for the site owner. Qualifies in either of two ways:
  *  - a legacy `admin_login.php` session (`$_SESSION['is_admin']`), or

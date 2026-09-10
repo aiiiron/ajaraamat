@@ -9,7 +9,21 @@ CREATE TABLE IF NOT EXISTS families (
     email VARCHAR(255) NOT NULL UNIQUE,
     password_hash VARCHAR(255) NOT NULL,
     status ENUM('pending','approved','rejected') NOT NULL DEFAULT 'pending',
+    is_demo TINYINT NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Additional parent logins for the same family (second parent etc.). The
+-- primary account stays on the families row; these are extra email+password
+-- pairs that resolve to the same family_id.
+CREATE TABLE IF NOT EXISTS family_logins (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    family_id INT NOT NULL,
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    name VARCHAR(100) DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (family_id) REFERENCES families(id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS children (
