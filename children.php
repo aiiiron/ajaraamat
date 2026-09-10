@@ -67,6 +67,7 @@ $baseUrl = $scheme . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['SCRIPT_NAME
         <h1 class="app-logo"><img src="logo-mark.png" alt="" width="44" height="44">Ajaraamat</h1>
         <div class="header-actions">
             <button type="button" class="icon-btn" onclick="location.reload();" aria-label="Värskenda" title="Värskenda"><?= icon("refresh") ?></button>
+            <a href="children.php" class="link-muted current" aria-current="page">Lapsed</a>
             <a href="logout.php" class="link-muted">Logi välja</a>
         </div>
     </header>
@@ -76,7 +77,6 @@ $baseUrl = $scheme . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['SCRIPT_NAME
         <a href="history.php" class="tab">Kanded</a>
         <a href="books.php" class="tab">Raamatud</a>
         <a href="milestones.php" class="tab">Verstapostid</a>
-        <a href="children.php" class="tab active">Lapsed</a>
     </nav>
 
     <?php foreach ($children as $c):

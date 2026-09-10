@@ -57,6 +57,7 @@ record_milestones($childId);
         <h1 class="app-logo"><img src="logo-mark.png" alt="" width="44" height="44">Ajaraamat</h1>
         <div class="header-actions">
             <button type="button" class="icon-btn" onclick="location.reload();" aria-label="Värskenda" title="Värskenda"><?= icon("refresh") ?></button>
+            <a href="children.php" class="link-muted">Lapsed</a>
             <a href="logout.php" class="link-muted">Logi välja</a>
         </div>
     </header>
@@ -66,7 +67,6 @@ record_milestones($childId);
         <a href="history.php?child=<?= $childId ?>" class="tab">Kanded</a>
         <a href="books.php?child=<?= $childId ?>" class="tab">Raamatud</a>
         <a href="milestones.php?child=<?= $childId ?>" class="tab active">Verstapostid</a>
-        <a href="children.php" class="tab">Lapsed</a>
     </nav>
 
     <?php render_child_switcher($children, $childId, 'milestones.php'); ?>

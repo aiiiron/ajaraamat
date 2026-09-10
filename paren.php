@@ -66,6 +66,7 @@ $chartEkraan = array_map(fn($d) => $d['ekraan'], $daily);
         <h1 class="app-logo"><img src="logo-mark.png" alt="" width="44" height="44">Ajaraamat</h1>
         <div class="header-actions">
             <button type="button" class="icon-btn" onclick="location.reload();" aria-label="Värskenda" title="Värskenda"><?= icon("refresh") ?></button>
+            <a href="children.php" class="link-muted">Lapsed</a>
             <?php if (is_admin()): ?>
                 <a href="admin.php" class="link-muted">Admin</a>
             <?php endif; ?>
@@ -78,7 +79,6 @@ $chartEkraan = array_map(fn($d) => $d['ekraan'], $daily);
         <a href="history.php?child=<?= $childId ?>" class="tab">Kanded</a>
         <a href="books.php?child=<?= $childId ?>" class="tab">Raamatud</a>
         <a href="milestones.php?child=<?= $childId ?>" class="tab">Verstapostid</a>
-        <a href="children.php" class="tab">Lapsed</a>
     </nav>
 
     <?php render_child_switcher($children, $childId, 'paren.php'); ?>
