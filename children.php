@@ -73,8 +73,9 @@ $baseUrl = $scheme . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['SCRIPT_NAME
 
     <nav class="tabs">
         <a href="paren.php" class="tab">Töölaud</a>
-        <a href="history.php" class="tab">Kõik kanded</a>
+        <a href="history.php" class="tab">Kanded</a>
         <a href="books.php" class="tab">Raamatud</a>
+        <a href="milestones.php" class="tab">Verstapostid</a>
         <a href="children.php" class="tab active">Lapsed</a>
     </nav>
 
