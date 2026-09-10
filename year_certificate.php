@@ -93,9 +93,10 @@ $nf = fn($n) => number_format((int) $n, 0, ',', "\u{202F}");
             <?php if ($year > $minYear): ?><a href="?child=<?= $childId ?>&year=<?= $year - 1 ?>" class="icon-btn" aria-label="Eelmine aasta">‹</a><?php endif; ?>
             <strong><?= $year ?></strong>
             <?php if ($year < $maxYear): ?><a href="?child=<?= $childId ?>&year=<?= $year + 1 ?>" class="icon-btn" aria-label="Järgmine aasta">›</a><?php endif; ?>
-            <button type="button" class="btn btn-add" onclick="window.print()" style="flex:none;">🖨️ Prindi</button>
+            <button type="button" class="btn btn-add" onclick="window.print()" style="flex:none;">⬇️ Lae alla PDF</button>
         </div>
     </div>
+    <p class="child-link-note no-print" style="text-align:right;margin:-10px 0 14px;">Vali avanevas aknas sihtkohaks „Salvesta PDF-ina" (Save as PDF).</p>
 
     <div class="cert-page">
         <div class="cert-mark"><img src="logo-mark.png" alt=""></div>
