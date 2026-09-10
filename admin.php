@@ -134,6 +134,10 @@ $resets = get_active_password_resets();
                     <td><?= $f['child_count'] ?></td>
                     <td><?= htmlspecialchars(date('d.m.Y', strtotime($f['created_at']))) ?></td>
                     <td>
+                        <?php if (!empty($f['is_demo'])): ?>
+                        <a href="demo_login.php" target="_blank" rel="noopener" style="margin-right:10px;">Ava →</a>
+                        <a href="seed_demo.php" target="_blank" rel="noopener" style="margin-right:10px;">Taasta →</a>
+                        <?php endif; ?>
                         <?php if ($f['status'] !== 'approved'): ?>
                         <form method="post" style="display:inline;">
                             <?= csrf_field() ?>

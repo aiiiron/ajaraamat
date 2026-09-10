@@ -10,6 +10,10 @@ $id = (int) $pdo->query("SELECT id FROM families WHERE is_demo = 1 AND status = 
 
 if ($id > 0) {
     session_regenerate_id(true);
+    // Clear any leftover admin-panel flag from this browser (e.g. the owner
+    // trying the demo from the same session they use for admin.php) so the
+    // demo account never shows the Admin link.
+    unset($_SESSION['is_admin']);
     $_SESSION['family_id']   = $id;
     $_SESSION['login_kind']  = 'demo';
     $_SESSION['login_id']    = $id;

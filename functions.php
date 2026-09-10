@@ -413,6 +413,11 @@ function is_admin(): bool {
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
     }
+    // The demo account is never the owner, even if a stale admin flag from an
+    // earlier admin.php session lingers in the same browser.
+    if (!empty($_SESSION['is_demo'])) {
+        return false;
+    }
     if (!empty($_SESSION['is_admin'])) {
         return true;
     }
