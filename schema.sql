@@ -81,6 +81,24 @@ CREATE TABLE IF NOT EXISTS challenges (
     FOREIGN KEY (child_id) REFERENCES children(id) ON DELETE CASCADE
 );
 
+-- Kustutatud kanded (praht) — kande kustutamisel liigub rida siia, mitte ei
+-- kao jäädavalt. "Kustutatud kanded" (Pere) lehelt saab need taastada.
+CREATE TABLE IF NOT EXISTS deleted_entries (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    child_id INT NOT NULL,
+    entry_date DATE NOT NULL,
+    raamat INT NOT NULL DEFAULT 0,
+    book_id INT DEFAULT NULL,
+    raamat_comment VARCHAR(255) DEFAULT NULL,
+    kind VARCHAR(16) DEFAULT NULL,
+    ekraan INT NOT NULL DEFAULT 0,
+    ekraan_comment VARCHAR(255) DEFAULT NULL,
+    original_created_at TIMESTAMP NULL DEFAULT NULL,
+    deleted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (child_id) REFERENCES children(id) ON DELETE CASCADE,
+    FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE SET NULL
+);
+
 -- Lapse enda lisatud kanded, mis ootavad vanema kinnitust. Kinnitamisel
 -- tekitatakse päris `entries` rida ja see rida kustutatakse; tagasilükkamisel
 -- lihtsalt kustutatakse. Statistika neid ei arvesta enne kinnitamist.

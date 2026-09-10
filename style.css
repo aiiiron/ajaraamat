@@ -494,6 +494,16 @@ h2 { font-size: 18px; margin: 0 0 16px; }
   margin-bottom: 12px;
 }
 .card-header h2 { margin: 0; }
+.ov-streak {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 13px;
+  color: #C9691E;
+}
+.ov-streak svg { width: 15px; height: 15px; }
 
 .entries-table {
   width: 100%;

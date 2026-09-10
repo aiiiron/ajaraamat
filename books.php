@@ -91,6 +91,7 @@ $yearSummary = get_year_summary($childId, $year);
             <?php render_year_nav($year, $minYear, $maxYear, 'books.php?child=' . $childId); ?>
         </div>
         <?php render_year_summary($yearSummary); ?>
+        <a href="year_certificate.php?child=<?= $childId ?>&year=<?= $year ?>" class="link-muted" style="display:inline-block;margin-top:10px;">🖨️ Prindi lugemistunnistus →</a>
     </div>
 
     <?php render_milestone_banner($childId); ?>

@@ -144,6 +144,12 @@ $baseUrl = $scheme . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['SCRIPT_NAME
     <?php if ($error): ?><p class="error"><?= htmlspecialchars($error) ?></p><?php endif; ?>
     <?php if ($notice): ?><div class="milestone-banner"><?= icon("check") ?> <?= htmlspecialchars($notice) ?></div><?php endif; ?>
 
+    <p class="child-link-note" style="text-align:left;margin:-4px 0 14px;">
+        <a href="overview.php">📊 Kõik lapsed korraga →</a>
+        &nbsp;·&nbsp;
+        <a href="trash.php">🗑️ Kustutatud kanded →</a>
+    </p>
+
     <?php foreach ($children as $c):
         $link = $baseUrl . '/child.php?token=' . $c['public_token'];
     ?>

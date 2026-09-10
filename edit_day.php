@@ -31,8 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $ownsEntry = (bool) $ownCheck->fetch();
 
     if ($action === 'delete' && $id > 0 && $ownsEntry) {
-        $stmt = $pdo->prepare("DELETE FROM entries WHERE id = :id");
-        $stmt->execute([':id' => $id]);
+        soft_delete_entry($id, $childId); // moved to trash, not gone — see Pere → Kustutatud kanded
         header('Location: edit_day.php?date=' . urlencode($date) . '&child=' . $childId);
         exit;
     }
@@ -198,7 +197,7 @@ $dateLabel = date('d.m.Y', strtotime($date));
                 <button type="submit" class="btn btn-add">Salvesta</button>
             </div>
         </form>
-        <form method="post" onsubmit="return confirm('Kustutada see kanne täielikult?');" class="day-entry-delete-form">
+        <form method="post" onsubmit="return confirm('Kustutada see kanne? Selle saab hiljem Pere lehelt taastada.');" class="day-entry-delete-form">
             <?= csrf_field() ?>
             <input type="hidden" name="date" value="<?= htmlspecialchars($date) ?>">
             <input type="hidden" name="child" value="<?= $childId ?>">

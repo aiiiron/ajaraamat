@@ -959,6 +959,29 @@ function get_year_summary(int $childId, int $year): array {
     ];
 }
 
+/** Books finished within a calendar year, oldest first — for the printable
+ *  year certificate. */
+function get_books_finished_in_year(int $childId, int $year): array {
+    $pdo = get_db();
+    $start = sprintf('%04d-01-01', $year);
+    $end   = sprintf('%04d-12-31', $year);
+    $stmt = $pdo->prepare("SELECT title, author, total_pages, finished_date FROM books
+        WHERE child_id = :cid AND status = 'loetud' AND finished_date BETWEEN :s AND :e
+        ORDER BY finished_date ASC");
+    $stmt->execute([':cid' => $childId, ':s' => $start, ':e' => $end]);
+    return $stmt->fetchAll();
+}
+
+/** Milestones reached within a calendar year (excludes custom ones — those
+ *  aren't tied to a specific ladder and would clutter the certificate less
+ *  meaningfully than the automatic ones). */
+function get_milestones_in_year(int $childId, int $year): array {
+    $rows = array_filter(get_milestones($childId), function ($m) use ($year) {
+        return (int) substr((string) $m['achieved_on'], 0, 4) === $year && $m['kind'] !== 'custom';
+    });
+    return array_values($rows);
+}
+
 // =========================================================
 // Reading challenges (per child)
 // =========================================================
@@ -1635,6 +1658,75 @@ function search_entries(int $childId, string $q): array {
         ORDER BY e.entry_date DESC, e.id ASC LIMIT 200");
     $stmt->execute([':cid' => $childId, ':q1' => $like, ':q2' => $like, ':q3' => $like]);
     return $stmt->fetchAll();
+}
+
+// =========================================================
+// Deleted entries (trash) — a deleted entry moves here instead of vanishing,
+// so a parent can undo a misclick from the Pere page.
+// =========================================================
+
+/** Move one entry to the trash. Verifies the entry belongs to $childId first. */
+function soft_delete_entry(int $entryId, int $childId): bool {
+    $pdo = get_db();
+    $stmt = $pdo->prepare("SELECT * FROM entries WHERE id = :id AND child_id = :cid");
+    $stmt->execute([':id' => $entryId, ':cid' => $childId]);
+    $e = $stmt->fetch();
+    if (!$e) return false;
+
+    $ins = $pdo->prepare("INSERT INTO deleted_entries
+        (child_id, entry_date, raamat, book_id, raamat_comment, kind, ekraan, ekraan_comment, original_created_at)
+        VALUES (:cid, :d, :r, :bid, :rc, :k, :e, :ec, :created)");
+    $ins->execute([
+        ':cid' => $childId, ':d' => $e['entry_date'], ':r' => $e['raamat'], ':bid' => $e['book_id'],
+        ':rc' => $e['raamat_comment'], ':k' => $e['kind'], ':e' => $e['ekraan'], ':ec' => $e['ekraan_comment'],
+        ':created' => $e['created_at'],
+    ]);
+    $pdo->prepare("DELETE FROM entries WHERE id = :id")->execute([':id' => $entryId]);
+    return true;
+}
+
+/** Every deleted entry across a family's children, newest deletion first. */
+function get_deleted_entries_for_family(int $familyId): array {
+    $pdo = get_db();
+    $stmt = $pdo->prepare("SELECT d.*, c.name AS child_name, b.title AS book_title
+        FROM deleted_entries d
+        JOIN children c ON c.id = d.child_id
+        LEFT JOIN books b ON b.id = d.book_id
+        WHERE c.family_id = :fid
+        ORDER BY d.deleted_at DESC, d.id DESC");
+    $stmt->execute([':fid' => $familyId]);
+    return $stmt->fetchAll();
+}
+
+/** Move a deleted entry back into entries. Verifies it belongs to the family. */
+function restore_deleted_entry(int $id, int $familyId): bool {
+    $pdo = get_db();
+    $stmt = $pdo->prepare("SELECT d.* FROM deleted_entries d
+        JOIN children c ON c.id = d.child_id
+        WHERE d.id = :id AND c.family_id = :fid");
+    $stmt->execute([':id' => $id, ':fid' => $familyId]);
+    $e = $stmt->fetch();
+    if (!$e) return false;
+
+    $ins = $pdo->prepare("INSERT INTO entries
+        (child_id, entry_date, raamat, book_id, raamat_comment, kind, ekraan, ekraan_comment, created_at)
+        VALUES (:cid, :d, :r, :bid, :rc, :k, :e, :ec, :created)");
+    $ins->execute([
+        ':cid' => $e['child_id'], ':d' => $e['entry_date'], ':r' => $e['raamat'], ':bid' => $e['book_id'],
+        ':rc' => $e['raamat_comment'], ':k' => $e['kind'], ':e' => $e['ekraan'], ':ec' => $e['ekraan_comment'],
+        ':created' => $e['original_created_at'] ?: date('Y-m-d H:i:s'),
+    ]);
+    $pdo->prepare("DELETE FROM deleted_entries WHERE id = :id")->execute([':id' => $id]);
+    return true;
+}
+
+/** Permanently remove one trashed entry (no way back after this). */
+function purge_deleted_entry(int $id, int $familyId): void {
+    $pdo = get_db();
+    $pdo->prepare("DELETE d FROM deleted_entries d
+        JOIN children c ON c.id = d.child_id
+        WHERE d.id = :id AND c.family_id = :fid")
+        ->execute([':id' => $id, ':fid' => $familyId]);
 }
 
 /** Slim horizontal bar showing reading vs. screen minutes side by side. */
