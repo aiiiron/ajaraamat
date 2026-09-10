@@ -1545,3 +1545,140 @@ select:focus { outline: 2px solid var(--accent-purple); border-color: transparen
 @media (max-width: 480px) {
   h1 { font-size: 20px; }
 }
+
+/* ============================================================
+   Dark theme — automatic, follows the device's colour-scheme
+   setting. Redefines the palette tokens, then patches the spots
+   that hard-coded a light colour.
+   ============================================================ */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --screen-color: #86A6FF;
+    --reading-color: #FF7BA6;
+    --owed-color: #FFB454;
+    --credit-color: #45D9A0;
+    --success-color: #45D9A0;
+    --even-color: #B0A3DE;
+
+    --screen-bg: #232A45;
+    --reading-bg: #3E2334;
+
+    --bg-grad-start: #221B34;
+    --bg-grad-mid: #2A1D3A;
+    --bg-grad-end: #1A1928;
+
+    --card-bg: #2C2745;
+    --ink: #ECE8F6;
+    --text-muted: #A79EC4;
+    --border: #3B3357;
+
+    --accent-purple: #B79EFF;
+    --accent-pink: #F773B4;
+    /* deeper than the light gradient so active tabs / buttons don't glare */
+    --gradient-primary: linear-gradient(135deg, #7349DD 0%, #CC4686 100%);
+
+    --bg: #1A1828;
+  }
+
+  body { background-color: var(--bg); }
+
+  /* Raised surfaces need a real shadow — the light purple glow disappears. */
+  .card,
+  .balance-card,
+  .stat-card,
+  .period-tile,
+  .goal-card {
+    box-shadow: 0 16px 34px -22px rgba(0, 0, 0, 0.7), 0 2px 8px -5px rgba(0, 0, 0, 0.5);
+  }
+  .icon-btn,
+  .header-actions .link-muted,
+  .tabs { box-shadow: 0 4px 14px -8px rgba(0, 0, 0, 0.5); }
+  .tab.active { box-shadow: 0 6px 16px -8px rgba(0, 0, 0, 0.6); }
+  .icon-btn,
+  .header-actions .link-muted { background: rgba(255, 255, 255, 0.07); }
+
+  /* Form controls */
+  input[type="text"],
+  input[type="number"],
+  input[type="date"],
+  input[type="password"],
+  input[type="email"],
+  textarea,
+  select { background: #241F3B; background-color: #241F3B; color: var(--text); }
+
+  /* Reward card text sits on the dark-blue --screen-bg */
+  .reward-label,
+  .reward-sub { color: #A6BCFF; }
+  .reward-value { color: #C9D6FF; }
+  .reward-icon { background: rgba(255, 255, 255, 0.08); }
+
+  /* Category text colours tuned for pale backgrounds → lighten */
+  .pt-row.pt-screen .pt-v,
+  .tag-screen,
+  .top-block.tb-screen .top-heading,
+  .bl-group-head.bl-reading { color: #A6BCFF; }
+  .pt-row.pt-reading .pt-v,
+  .tag-reading,
+  .top-block.tb-reading .top-heading,
+  .bl-group-head.bl-done,
+  .bl-mins,
+  .bl-pct { color: #FF9DBE; }
+  .tag-unread,
+  .bl-group-head.bl-unread { color: #B7ADD6; }
+
+  /* Entry day-group tints */
+  .day-blue   { background: #242C48; }
+  .day-green  { background: #1E3A31; }
+  .day-peach  { background: #3C3020; }
+  .day-purple { background: #312748; }
+  .entry-row { border-top-color: rgba(255, 255, 255, 0.09); }
+
+  /* Book-list rows + "Enim aega" rows */
+  .bl-item.bl-reading,
+  .top-block.tb-screen .top-list li { background: #1F2740; }
+  .bl-item.bl-unread { background: #262038; }
+  .bl-item.bl-done,
+  .top-block.tb-reading .top-list li { background: #33202E; }
+  .tag-unread { background: rgba(255, 255, 255, 0.06); }
+  .bl-count { background: rgba(255, 255, 255, 0.08); }
+  .bl-progress { background: rgba(255, 255, 255, 0.12); }
+  .bl-progress-fill { background: var(--reading-color); }
+
+  /* Rings / bars / progress tracks */
+  .goal-ring {
+    background: conic-gradient(var(--goal-color, var(--reading-color)) calc(var(--pct, 0) * 1%),
+                               rgba(255, 255, 255, 0.13) calc(var(--pct, 0) * 1%));
+  }
+  .goal-card.done .goal-ring { --goal-color: var(--success-color); }
+  .goal-card.done .goal-ring-num,
+  .wk-good,
+  .chal-done .chal-status { color: var(--success-color); }
+  .chal-bar,
+  .chal-dot { background: rgba(255, 255, 255, 0.13); }
+  .chal-done .chal-bar-fill,
+  .chal-done .chal-dot.filled { background: var(--success-color); }
+  .chal-done { background: rgba(69, 217, 160, 0.12); }
+  .wk-stat { background: rgba(255, 255, 255, 0.04); }
+  .pt-row.pt-balance .pt-k { background: rgba(255, 255, 255, 0.08); }
+
+  /* Warm accent surfaces — dial the gold banners back so they don't blaze */
+  .streak-badge { background: linear-gradient(90deg, #CFA062, #C98AAC); color: #2E1E00; }
+  .milestone-banner,
+  .achievement-banner { background: linear-gradient(90deg, #C9A24E, #C67FA4); color: #2E1E00; }
+  .poem-star { color: #FFC94D; }
+
+  /* Error + delete affordances */
+  .error { background: #3A2230; color: #FFA9C0; }
+  .btn-delete,
+  .btn-delete-full { color: #FF9DBE; }
+  .btn-delete-full { background: #33222C; }
+  .btn-delete-full:hover { background: #3E2833; }
+
+  /* Subtle purple/pink tints read a bit stronger on dark */
+  .period-tile.pt-total {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.28), rgba(236, 72, 153, 0.22));
+  }
+  .wk-banner {
+    background: linear-gradient(135deg, rgba(139, 92, 246, 0.2), rgba(236, 72, 153, 0.18));
+  }
+}
