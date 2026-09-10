@@ -49,7 +49,9 @@ $certDensity = $bookCount > 40 ? 'cert-dense' : ($bookCount > 12 ? 'cert-compact
     padding: 40px 32px; position: relative;
     border: 3px solid #EADCFB;
     box-shadow: 0 20px 46px -24px rgba(139,92,246,0.4);
+    display: flex; flex-direction: column;
   }
+  .cert-body { flex: 1 1 auto; }
   .cert-mark { text-align: center; }
   .cert-mark img { width: 64px; height: 64px; border-radius: 16px; }
   .cert-kicker {
@@ -118,7 +120,7 @@ $certDensity = $bookCount > 40 ? 'cert-dense' : ($bookCount > 12 ? 'cert-compact
     html, body { background: #fff !important; }
     .no-print { display: none !important; }
     .wrap { max-width: none; padding: 0; }
-    .cert-page { box-shadow: none; }
+    .cert-page { box-shadow: none; min-height: calc(297mm - 28mm); }
     .cert-stats, .cert-mark, .cert-kicker, .cert-name, .cert-year,
     .cert-section-title, .cert-footer { break-inside: avoid; }
     .cert-books li, .cert-ms { break-inside: avoid; }
@@ -140,6 +142,7 @@ $certDensity = $bookCount > 40 ? 'cert-dense' : ($bookCount > 12 ? 'cert-compact
     <p class="child-link-note no-print" style="text-align:right;margin:-10px 0 14px;">Vali avanevas aknas sihtkohaks „Salvesta PDF-ina" (Save as PDF) ja luba „Taustapildid"/„Background graphics".</p>
 
     <div class="cert-page <?= $certDensity ?>">
+      <div class="cert-body">
         <div class="cert-mark"><img src="logo-mark.png" alt=""></div>
         <p class="cert-kicker">Lugemistunnistus</p>
         <p class="cert-name"><?= htmlspecialchars($child['name']) ?></p>
@@ -174,6 +177,7 @@ $certDensity = $bookCount > 40 ? 'cert-dense' : ($bookCount > 12 ? 'cert-compact
                 <?php endforeach; ?>
             </div>
         <?php endif; ?>
+      </div>
 
         <div class="cert-footer">
             <span>Väljastatud <?= htmlspecialchars(date('d.m.Y')) ?> — Ajaraamat</span>
