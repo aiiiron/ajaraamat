@@ -166,6 +166,7 @@ $adminEmail = defined('ADMIN_EMAIL') ? trim((string) ADMIN_EMAIL) : '';
   .tour-frame { position: relative; width: 300px; max-width: 100%; border-radius: 32px; background: #fff; padding: 30px 10px 10px; box-shadow: 0 30px 60px -24px rgba(61,51,88,0.45); border: 1px solid #F0E6F5; }
   .tour-notch { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 70px; height: 16px; background: #392F4D; border-radius: 999px; }
   .tour-frame img { width: 100%; border-radius: 18px; display: block; }
+  .tour-frame img[hidden] { display: none; }
   .tour-cta { text-align: center; margin-top: 32px; }
 
   /* Tasuta vs. Pere+ */
