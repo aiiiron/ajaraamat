@@ -39,7 +39,7 @@ record_milestones($childId);
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Saavutused — Ajaraamat</title>
+<title>Saavutused · Ajaraamat</title>
 <link rel="icon" href="favicon.ico?v=2" sizes="any">
 <link rel="icon" href="icon-192.png?v=2" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
@@ -80,7 +80,7 @@ record_milestones($childId);
     <?php render_milestone_banner($childId); ?>
 
     <div class="card">
-        <h2>Saavutatud — <?= htmlspecialchars($child['name']) ?></h2>
+        <h2>Saavutatud · <?= htmlspecialchars($child['name']) ?></h2>
         <p class="child-link-note" style="text-align:left;margin:4px 0 14px;">Iga saavutus ja kuupäev, mil see saavutati. Vajuta pliiatsile, et muuta.</p>
         <?php if ($error): ?><p class="error"><?= htmlspecialchars($error) ?></p><?php endif; ?>
         <?php render_milestones_list($childId, true); ?>

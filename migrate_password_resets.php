@@ -31,7 +31,7 @@ register_shutdown_function(function () use (&$finished) {
 
 echo '<!DOCTYPE html><html lang="et"><head><meta charset="UTF-8">';
 echo '<meta name="viewport" content="width=device-width, initial-scale=1.0">';
-echo '<title>password_resets — Ajaraamat</title></head><body style="font-family:-apple-system,sans-serif;max-width:600px;margin:40px auto;padding:0 20px;">';
+echo '<title>password_resets · Ajaraamat</title></head><body style="font-family:-apple-system,sans-serif;max-width:600px;margin:40px auto;padding:0 20px;">';
 echo '<h1>🔑 password_resets tabel</h1>';
 if (ob_get_level() > 0) { ob_flush(); }
 flush();
@@ -48,7 +48,7 @@ flush();
 $exists = $pdo->query("SHOW TABLES LIKE 'password_resets'")->fetch();
 
 if ($exists) {
-    echo '<p>✅ Tabel <code>password_resets</code> on juba olemas — midagi rohkem pole vaja teha.</p>';
+    echo '<p>✅ Tabel <code>password_resets</code> on juba olemas, midagi rohkem pole vaja teha.</p>';
 } else {
     echo '<p>2. Loon tabeli...</p>';
     if (ob_get_level() > 0) { ob_flush(); }

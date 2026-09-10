@@ -633,12 +633,12 @@ function get_active_password_resets(): array {
  */
 function send_password_reset_email(string $toEmail, string $link): bool {
     $host = $_SERVER['HTTP_HOST'] ?? 'ajaraamat.ee';
-    $subject = 'Ajaraamat — parooli lähtestamine';
+    $subject = 'Ajaraamat: parooli lähtestamine';
     $body =
         "Keegi (loodetavasti sina) palus Ajaraamatus parooli lähtestamist.\n\n" .
         "Ava see link 24 tunni jooksul ja vali uus parool:\n" .
         $link . "\n\n" .
-        "Kui sa ei palunud parooli lähtestamist, jäta see kiri tähelepanuta — " .
+        "Kui sa ei palunud parooli lähtestamist, jäta see kiri tähelepanuta, " .
         "sinu parool ei muutu.\n";
     $headers = implode("\r\n", [
         'From: Ajaraamat <no-reply@' . $host . '>',
@@ -1864,7 +1864,7 @@ function render_heatmap(array $dailyTotals, float $ratio = READING_RATIO): void 
                 $class = 'hm-good';
                 $state = 'Tasakaalus';
             }
-            $label = date('d.m', strtotime($d['date'])) . ': ' . $d['raamat'] . ' min raamat, ' . $d['ekraan'] . ' min ekraan — ' . $state;
+            $label = date('d.m', strtotime($d['date'])) . ': ' . $d['raamat'] . ' min raamat, ' . $d['ekraan'] . ' min ekraan, ' . $state;
         ?>
             <div class="hm-cell <?= $class ?>" title="<?= htmlspecialchars($label) ?>"></div>
         <?php endforeach; ?>
@@ -1941,7 +1941,7 @@ function render_entries_table(array $entries, bool $editable = false, int $child
                                 <span class="tag tag-screen"><?= emoji_svg('screen') ?> <?= $a['minutes'] ?> min</span>
                             <?php endif; ?>
                             <div class="entry-label">
-                                <?= $a['label'] ? htmlspecialchars($a['label']) : '–' ?><?php if ($a['type'] === 'luuletus'): ?> <span class="poem-star" title="Luuletus pähe õpitud — 2× boonus">★</span><?php endif; ?>
+                                <?= $a['label'] ? htmlspecialchars($a['label']) : '–' ?><?php if ($a['type'] === 'luuletus'): ?> <span class="poem-star" title="Luuletus pähe õpitud (2× boonus)">★</span><?php endif; ?>
                                 <?php if ($a['sub']): ?><span class="entry-sub"><?= htmlspecialchars($a['sub']) ?></span><?php endif; ?>
                             </div>
                         </div>

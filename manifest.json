@@ -1,7 +1,7 @@
 {
   "name": "Ajaraamat",
   "short_name": "Ajaraamat",
-  "description": "Laste lugemis- ja ekraaniaja jälgija — hoia tasakaalu.",
+  "description": "Laste lugemis- ja ekraaniaja jälgija, mis aitab hoida tasakaalu.",
   "lang": "et",
   "categories": ["education", "lifestyle", "productivity"],
   "icons": [

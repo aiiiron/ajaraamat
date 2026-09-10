@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Loo konto — Ajaraamat</title>
+<title>Loo konto · Ajaraamat</title>
 <link rel="icon" href="favicon.ico?v=2" sizes="any">
 <link rel="icon" href="icon-192.png?v=2" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
@@ -62,7 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <div class="brand-logo-full"><img src="logo-full.png" alt="Ajaraamat" width="240"></div>
 
     <?php if ($success): ?>
-        <p style="margin:16px 0;">Aitäh registreerimast! Sinu konto ootab hetkel kinnitust — anname e-postiga teada, kui saad sisse logida.</p>
+        <p style="margin:16px 0;">Aitäh registreerimast! Sinu konto ootab hetkel kinnitust. Anname e-postiga teada, kui saad sisse logida.</p>
         <a href="index.php" class="link-muted login-home-link">← Avaleht</a>
     <?php else: ?>
         <p style="color:var(--text-muted);font-size:14px;margin-bottom:16px;">Loo oma pere konto</p>

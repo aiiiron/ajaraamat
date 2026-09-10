@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Proovi demot — Ajaraamat</title>
+<title>Proovi demot · Ajaraamat</title>
 <link rel="icon" href="favicon.ico?v=2" sizes="any">
 <link rel="icon" href="icon-192.png?v=2" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body class="centered">
 <div class="card login-card">
     <div class="brand-logo-full"><img src="logo-full.png" alt="Ajaraamat" width="240"></div>
-    <h2>Demo — lapse vaade</h2>
+    <h2>Demo: lapse vaade</h2>
     <p style="margin:4px 0 14px;color:var(--text-muted);font-size:14px;">Küsi demo sisselogimisandmed saidi omanikult.</p>
     <?php if ($error): ?>
         <p class="error"><?= htmlspecialchars($error) ?></p>

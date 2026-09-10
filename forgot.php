@@ -57,7 +57,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Unustasid parooli? — Ajaraamat</title>
+<title>Unustasid parooli? · Ajaraamat</title>
 <link rel="icon" href="favicon.ico?v=2" sizes="any">
 <link rel="icon" href="icon-192.png?v=2" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             Vaata ka rämpsposti kausta. Link kehtib 24 tundi.
         </p>
         <p style="font-size:13px;color:var(--text-muted);margin-bottom:16px;">
-            Kirja ei tulnud? Võta ühendust saidi omanikuga — tema saab lingi sulle käsitsi anda.
+            Kirja ei tulnud? Võta ühendust saidi omanikuga, tema saab lingi sulle käsitsi anda.
         </p>
         <a href="login.php" class="link-muted login-home-link">← Tagasi sisselogimisse</a>
     <?php else: ?>

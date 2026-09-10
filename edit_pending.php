@@ -71,7 +71,7 @@ $currentPage = $_POST['current_page'] ?? ($p['current_page'] ?? '');
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Muuda kannet — Ajaraamat</title>
+<title>Muuda kannet · Ajaraamat</title>
 <link rel="icon" href="favicon.ico?v=2" sizes="any">
 <link rel="icon" href="icon-192.png?v=2" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
@@ -92,7 +92,7 @@ $currentPage = $_POST['current_page'] ?? ($p['current_page'] ?? '');
         <a href="paren.php?child=<?= $childId ?>" class="link-muted"><?= icon("arrow-left") ?> Tagasi</a>
     </header>
     <div class="card">
-        <h2>Muuda kannet — <?= htmlspecialchars($child['name']) ?></h2>
+        <h2>Muuda kannet · <?= htmlspecialchars($child['name']) ?></h2>
         <p class="child-link-note" style="text-align:left;margin:0 0 12px;"><?= htmlspecialchars($child['name']) ?> lisas selle ise<?= $p['source'] === 'taimer' ? ' taimeriga' : '' ?>. Paranda vajadusel ja kinnita.</p>
         <?php if ($error): ?><p class="error"><?= htmlspecialchars($error) ?></p><?php endif; ?>
         <form method="post">
@@ -120,7 +120,7 @@ $currentPage = $_POST['current_page'] ?? ($p['current_page'] ?? '');
             <div class="type-fields" data-type="raamat" <?= $type === 'raamat' ? '' : 'hidden' ?>>
                 <label for="book_id">Milline raamat?</label>
                 <select id="book_id" name="book_id" onchange="document.getElementById('new_book_title').style.display = this.value === 'new' ? 'block' : 'none';">
-                    <option value="">— vali raamat —</option>
+                    <option value="">Vali raamat…</option>
                     <?php foreach ($books as $b): ?>
                         <option value="<?= $b['id'] ?>" <?= (string) $bookId === (string) $b['id'] ? 'selected' : '' ?>><?= htmlspecialchars($b['title']) ?><?= book_status_suffix($b['status']) ?></option>
                     <?php endforeach; ?>

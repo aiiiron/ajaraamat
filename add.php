@@ -79,7 +79,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Lisa kanne — Ajaraamat</title>
+<title>Lisa kanne · Ajaraamat</title>
 <link rel="icon" href="favicon.ico?v=2" sizes="any">
 <link rel="icon" href="icon-192.png?v=2" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
@@ -100,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <a href="<?= $fromDay !== '' ? 'edit_day.php?date=' . urlencode($fromDay) . '&child=' . $childId : 'paren.php?child=' . $childId ?>" class="link-muted"><?= icon("arrow-left") ?> Tagasi</a>
     </header>
     <div class="card">
-        <h2>Lisa kanne — <?= htmlspecialchars($child['name']) ?></h2>
+        <h2>Lisa kanne · <?= htmlspecialchars($child['name']) ?></h2>
         <?php if ($error): ?><p class="error"><?= htmlspecialchars($error) ?></p><?php endif; ?>
         <form method="post">
             <?= csrf_field() ?>
@@ -131,7 +131,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 <label for="book_id">Milline raamat?</label>
                 <select id="book_id" name="book_id" onchange="document.getElementById('new_book_title').style.display = this.value === 'new' ? 'block' : 'none';">
-                    <option value="">— vali raamat —</option>
+                    <option value="">Vali raamat…</option>
                     <?php foreach ($books as $b): ?>
                         <option value="<?= $b['id'] ?>" <?= ($_POST['book_id'] ?? '') == $b['id'] ? 'selected' : '' ?>><?= htmlspecialchars($b['title']) ?><?= book_status_suffix($b['status']) ?></option>
                     <?php endforeach; ?>

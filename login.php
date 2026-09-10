@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Logi sisse — Ajaraamat</title>
+<title>Logi sisse · Ajaraamat</title>
 <link rel="icon" href="favicon.ico?v=2" sizes="any">
 <link rel="icon" href="icon-192.png?v=2" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
@@ -88,8 +88,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         <button type="submit" class="btn btn-add full-width">Logi sisse</button>
     </form>
-    <a href="demo_parent.php" class="link-muted login-home-link">👀 Proovi demot — vanema vaade</a><br>
-    <a href="demo_child.php" class="link-muted login-home-link">👦 Proovi demot — lapse vaade</a><br>
+    <a href="demo_parent.php" class="link-muted login-home-link">👀 Proovi demot: vanema vaade</a><br>
+    <a href="demo_child.php" class="link-muted login-home-link">👦 Proovi demot: lapse vaade</a><br>
     <a href="forgot.php" class="link-muted login-home-link">Unustasid parooli?</a><br>
     <a href="register.php" class="link-muted login-home-link">Pole veel kontot? Registreeru</a><br>
     <a href="index.php" class="link-muted login-home-link">← Avaleht</a>

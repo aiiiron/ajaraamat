@@ -82,7 +82,7 @@ $currentPage = $_POST['current_page'] ?? $book['current_page'] ?? '';
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Muuda raamatut — Ajaraamat</title>
+<title>Muuda raamatut · Ajaraamat</title>
 <link rel="icon" href="favicon.ico?v=2" sizes="any">
 <link rel="icon" href="icon-192.png?v=2" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
@@ -103,7 +103,7 @@ $currentPage = $_POST['current_page'] ?? $book['current_page'] ?? '';
         <a href="books.php?child=<?= $childId ?>" class="link-muted"><?= icon("arrow-left") ?> Tagasi</a>
     </header>
     <div class="card">
-        <h2>Muuda raamatut — <?= htmlspecialchars($book['child_name']) ?></h2>
+        <h2>Muuda raamatut · <?= htmlspecialchars($book['child_name']) ?></h2>
         <?php if ($error): ?><p class="error"><?= htmlspecialchars($error) ?></p><?php endif; ?>
         <form method="post">
             <?= csrf_field() ?>

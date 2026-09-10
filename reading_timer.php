@@ -9,7 +9,7 @@ if (!$child) {
     ?>
     <!DOCTYPE html>
     <html lang="et"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Ei leitud — Ajaraamat</title><link rel="preconnect" href="https://fonts.googleapis.com">
+    <title>Ei leitud · Ajaraamat</title><link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css?v=<?= @filemtime(__DIR__ . "/style.css") ?>"></head>
@@ -44,7 +44,7 @@ $books = array_filter($books, fn($b) => $b['status'] !== 'loetud') ?: $books; //
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Lugemistaimer — Ajaraamat</title>
+<title>Lugemistaimer · Ajaraamat</title>
 <link rel="icon" href="favicon.ico?v=2" sizes="any">
 <link rel="icon" href="icon-192.png?v=2" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
@@ -241,7 +241,7 @@ function tick() {
         display.textContent = formatTime(remaining);
         if (remaining <= 0) {
             display.classList.add('timer-overtime');
-            statusEl.textContent = remaining === 0 ? 'Aeg on täis! 🎉' : 'Aeg on täis — jätkad lisaajaga';
+            statusEl.textContent = remaining === 0 ? 'Aeg on täis! 🎉' : 'Aeg on täis, jätkad lisaajaga';
             if (!state.chimed) {
                 state.chimed = true;
                 saveState();
@@ -289,7 +289,7 @@ function finishTimer() {
 
     document.getElementById('timer-view').style.display = 'none';
     document.getElementById('finish-view').style.display = 'block';
-    document.getElementById('finish-minutes-label').textContent = state.bookTitle + ' — ' + minutes + ' min';
+    document.getElementById('finish-minutes-label').textContent = state.bookTitle + ' · ' + minutes + ' min';
     document.getElementById('save-book-id').value = state.bookId;
     document.getElementById('save-minutes').value = minutes;
 }

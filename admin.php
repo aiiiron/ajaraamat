@@ -39,7 +39,7 @@ $featureFlags = get_feature_flags();
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Admin — Ajaraamat</title>
+<title>Admin · Ajaraamat</title>
 <link rel="icon" href="favicon.ico?v=2" sizes="any">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -123,7 +123,7 @@ $featureFlags = get_feature_flags();
         <h2>Plaanide võrdlus</h2>
         <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">
             Iga funktsioon kuulub kas Tasuta või Pere+ plaani. Klõpsa punktiirringil,
-            et tõsta funktsioon teise plaani alla — muudatus kehtib kohe kõigile peredele,
+            et tõsta funktsioon teise plaani alla. Muudatus kehtib kohe kõigile peredele,
             kelle enda plaani sa pole eraldi määranud.
         </p>
         <div class="table-scroll">

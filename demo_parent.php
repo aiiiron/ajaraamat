@@ -20,7 +20,7 @@ if (!empty($_SESSION['family_id']) && empty($_SESSION['is_demo'])) {
     <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Proovi demot — Ajaraamat</title>
+    <title>Proovi demot · Ajaraamat</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -29,7 +29,7 @@ if (!empty($_SESSION['family_id']) && empty($_SESSION['is_demo'])) {
     <body class="centered">
     <div class="card login-card">
         <h2>Oled juba sisse logitud</h2>
-        <p style="margin-top:8px;color:var(--text-muted);">Demo vaatamiseks pead esmalt oma kontost välja logima — muidu kirjutaks see su praeguse sisselogimise üle.</p>
+        <p style="margin-top:8px;color:var(--text-muted);">Demo vaatamiseks pead esmalt oma kontost välja logima, muidu kirjutaks see su praeguse sisselogimise üle.</p>
         <a href="logout.php?then=demo" class="btn btn-add full-width" style="margin-top:16px;display:block;text-align:center;">Logi välja ja ava demo</a>
         <a href="paren.php" class="link-muted login-home-link">← Tagasi minu kontole</a>
     </div>
@@ -70,7 +70,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Proovi demot — Ajaraamat</title>
+<title>Proovi demot · Ajaraamat</title>
 <link rel="icon" href="favicon.ico?v=2" sizes="any">
 <link rel="icon" href="icon-192.png?v=2" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body class="centered">
 <div class="card login-card">
     <div class="brand-logo-full"><img src="logo-full.png" alt="Ajaraamat" width="240"></div>
-    <h2>Demo — vanema vaade</h2>
+    <h2>Demo: vanema vaade</h2>
     <p style="margin:4px 0 14px;color:var(--text-muted);font-size:14px;">Küsi demo sisselogimisandmed saidi omanikult.</p>
     <?php if ($error): ?>
         <p class="error"><?= htmlspecialchars($error) ?></p>

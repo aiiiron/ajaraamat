@@ -115,7 +115,7 @@ $baseUrl = $scheme . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['SCRIPT_NAME
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Pere — Ajaraamat</title>
+<title>Pere · Ajaraamat</title>
 <link rel="icon" href="favicon.ico?v=2" sizes="any">
 <link rel="icon" href="icon-192.png?v=2" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
@@ -167,7 +167,7 @@ $baseUrl = $scheme . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['SCRIPT_NAME
             <h2><?= htmlspecialchars($c['name']) ?></h2>
         </div>
         <p style="font-size:14px;color:var(--text-muted);margin-bottom:8px;">
-            Lapse enda link (ilma sisselogimiseta) — jaga seda lapse enda seadmesse järjehoidjaks:
+            Lapse enda link (ilma sisselogimiseta). Jaga seda lapse enda seadmesse järjehoidjaks:
         </p>
         <div style="display:flex;gap:8px;align-items:center;margin-bottom:14px;">
             <input type="text" readonly value="<?= htmlspecialchars($link) ?>" onclick="this.select();" style="flex:1;font-size:13px;">

@@ -33,7 +33,7 @@ $totals = get_totals($childId);
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Kõik kanded — Ajaraamat</title>
+<title>Kõik kanded · Ajaraamat</title>
 <link rel="icon" href="favicon.ico?v=2" sizes="any">
 <link rel="icon" href="icon-192.png?v=2" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
@@ -90,7 +90,7 @@ $totals = get_totals($childId);
     </div>
 
     <div class="card">
-        <h2><?= htmlspecialchars($child['name']) ?> — kõik kanded</h2>
+        <h2><?= htmlspecialchars($child['name']) ?> · kõik kanded</h2>
         <form method="get" class="search-row">
             <input type="hidden" name="child" value="<?= $childId ?>">
             <input type="text" name="q" value="<?= htmlspecialchars($q) ?>" placeholder="Otsi kommentaari järgi (nt. Youtube, Karlsson)">
@@ -98,7 +98,7 @@ $totals = get_totals($childId);
         </form>
         <?php if ($q !== ''): ?>
             <p class="child-link-note" style="text-align:left;margin:-8px 0 12px;">
-                <?= count($entries) ?> tulemust otsingule "<?= htmlspecialchars($q) ?>" —
+                <?= count($entries) ?> tulemust otsingule "<?= htmlspecialchars($q) ?>" ·
                 <a href="history.php?child=<?= $childId ?>">tühjenda otsing</a>
             </p>
         <?php endif; ?>

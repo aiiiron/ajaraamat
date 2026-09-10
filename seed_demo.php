@@ -20,7 +20,7 @@ if (!$allowed) {
 
 if (!defined('DEMO_PARENT_EMAIL') || !defined('DEMO_PARENT_PASSWORD')) {
     http_response_code(500);
-    exit("DEMO_PARENT_EMAIL / DEMO_PARENT_PASSWORD not set in config.php — see config.example.php.\n");
+    exit("DEMO_PARENT_EMAIL / DEMO_PARENT_PASSWORD not set in config.php. See config.example.php.\n");
 }
 
 $pdo = get_db();
@@ -146,7 +146,7 @@ foreach ($kids as $k) {
 $pdo->commit();
 
 header('Content-Type: text/plain; charset=utf-8');
-echo "Demo family #$familyId re-seeded OK — " . date('Y-m-d H:i:s') . "\n";
+echo "Demo family #$familyId re-seeded OK, " . date('Y-m-d H:i:s') . "\n";
 
 } catch (Throwable $e) {
     $pdo->rollBack();

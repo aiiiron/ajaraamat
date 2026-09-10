@@ -55,7 +55,7 @@ $date  = $_POST['achieved_on'] ?? $m['achieved_on'];
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Muuda saavutust — Ajaraamat</title>
+<title>Muuda saavutust · Ajaraamat</title>
 <link rel="icon" href="favicon.ico?v=2" sizes="any">
 <link rel="icon" href="icon-192.png?v=2" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
@@ -76,12 +76,12 @@ $date  = $_POST['achieved_on'] ?? $m['achieved_on'];
         <a href="milestones.php?child=<?= $childId ?>" class="link-muted"><?= icon("arrow-left") ?> Tagasi</a>
     </header>
     <div class="card">
-        <h2>Muuda saavutust — <?= htmlspecialchars($m['child_name']) ?></h2>
+        <h2>Muuda saavutust · <?= htmlspecialchars($m['child_name']) ?></h2>
         <?php if ($error): ?><p class="error"><?= htmlspecialchars($error) ?></p><?php endif; ?>
 
         <?php if (!$isCustom): ?>
             <p class="child-link-note" style="text-align:left;margin:0 0 12px;">
-                Automaatne saavutus — <strong><?= htmlspecialchars($curText) ?></strong>. Muuta saab ikooni ja kuupäeva; teksti arvutab rakendus ise.
+                Automaatne saavutus: <strong><?= htmlspecialchars($curText) ?></strong>. Muuta saab ikooni ja kuupäeva; teksti arvutab rakendus ise.
             </p>
         <?php endif; ?>
 

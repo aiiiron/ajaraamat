@@ -104,7 +104,7 @@ $dateLabel = date('d.m.Y', strtotime($date));
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Muuda päeva — Ajaraamat</title>
+<title>Muuda päeva · Ajaraamat</title>
 <link rel="icon" href="favicon.ico?v=2" sizes="any">
 <link rel="icon" href="icon-192.png?v=2" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
@@ -125,7 +125,7 @@ $dateLabel = date('d.m.Y', strtotime($date));
         <a href="history.php?child=<?= $childId ?>" class="link-muted"><?= icon("arrow-left") ?> Tagasi</a>
     </header>
 
-    <h2 class="day-edit-title"><?= htmlspecialchars($child['name']) ?> — <?= htmlspecialchars($dateLabel) ?></h2>
+    <h2 class="day-edit-title"><?= htmlspecialchars($child['name']) ?> · <?= htmlspecialchars($dateLabel) ?></h2>
     <?php if ($error): ?><p class="error"><?= htmlspecialchars($error) ?></p><?php endif; ?>
 
     <?php if (empty($dayEntries)): ?>
@@ -148,7 +148,7 @@ $dateLabel = date('d.m.Y', strtotime($date));
 
             <?php if ($eMixed): ?>
                 <input type="hidden" name="type" value="mixed">
-                <p class="child-link-note" style="text-align:left;margin:0 0 10px;">Vana kanne — sisaldab nii raamatut kui ekraani.</p>
+                <p class="child-link-note" style="text-align:left;margin:0 0 10px;">Vana kanne (sisaldab nii raamatut kui ekraani).</p>
             <?php else: ?>
                 <div class="toggle-group">
                     <label class="toggle-btn <?= $eType === 'raamat' ? 'active' : '' ?>">
@@ -173,7 +173,7 @@ $dateLabel = date('d.m.Y', strtotime($date));
 
                 <label for="book_id_<?= $e['id'] ?>">Milline raamat?</label>
                 <select id="book_id_<?= $e['id'] ?>" name="book_id" onchange="document.getElementById('new_book_title_<?= $e['id'] ?>').style.display = this.value === 'new' ? 'block' : 'none';">
-                    <option value="">— vali raamat —</option>
+                    <option value="">Vali raamat…</option>
                     <?php foreach ($books as $b): ?>
                         <option value="<?= $b['id'] ?>" <?= (int) $e['book_id'] === (int) $b['id'] ? 'selected' : '' ?>><?= htmlspecialchars($b['title']) ?><?= book_status_suffix($b['status']) ?></option>
                     <?php endforeach; ?>

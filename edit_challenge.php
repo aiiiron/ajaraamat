@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } elseif ($value <= 0) {
         $error = 'Eesmärk peab olema suurem kui 0.';
     } elseif (!$validDates) {
-        $error = 'Kontrolli kuupäevi — lõpp ei tohi olla enne algust.';
+        $error = 'Kontrolli kuupäevi: lõpp ei tohi olla enne algust.';
     } else {
         update_challenge($id, $childId, $title, $type, $value, $start, $end);
         header('Location: books.php?child=' . $childId);
@@ -58,7 +58,7 @@ $end   = $_POST['end_date'] ?? $ch['end_date'];
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Muuda väljakutset — Ajaraamat</title>
+<title>Muuda väljakutset · Ajaraamat</title>
 <link rel="icon" href="favicon.ico?v=2" sizes="any">
 <link rel="icon" href="icon-192.png?v=2" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
@@ -79,7 +79,7 @@ $end   = $_POST['end_date'] ?? $ch['end_date'];
         <a href="books.php?child=<?= $childId ?>" class="link-muted"><?= icon("arrow-left") ?> Tagasi</a>
     </header>
     <div class="card">
-        <h2>Muuda väljakutset — <?= htmlspecialchars($ch['child_name']) ?></h2>
+        <h2>Muuda väljakutset · <?= htmlspecialchars($ch['child_name']) ?></h2>
         <?php if ($error): ?><p class="error"><?= htmlspecialchars($error) ?></p><?php endif; ?>
         <form method="post">
             <?= csrf_field() ?>

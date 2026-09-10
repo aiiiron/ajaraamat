@@ -16,7 +16,7 @@ $child = $token !== '' ? get_child_by_token($token) : null;
 $manifest = [
     'name'             => 'Ajaraamat',
     'short_name'       => 'Ajaraamat',
-    'description'      => 'Laste lugemis- ja ekraaniaja jälgija — hoia tasakaalu.',
+    'description'      => 'Laste lugemis- ja ekraaniaja jälgija, mis aitab hoida tasakaalu.',
     'lang'            => 'et',
     'icons'            => [
         ['src' => 'icon-192.png?v=2', 'sizes' => '192x192', 'type' => 'image/png'],
@@ -34,7 +34,7 @@ if ($child) {
     $t = rawurlencode($token);
     $manifest['start_url']  = 'child.php?token=' . $t;
     $manifest['id']         = 'child-' . $t;               // distinct install per child
-    $manifest['name']       = $child['name'] . ' — Ajaraamat';
+    $manifest['name']       = $child['name'] . ' · Ajaraamat';
     $manifest['short_name'] = $child['name'];
     $manifest['shortcuts']  = [
         ['name' => 'Alusta lugemist', 'short_name' => 'Taimer', 'url' => 'reading_timer.php?token=' . $t],

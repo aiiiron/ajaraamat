@@ -37,7 +37,7 @@ $canNoWatermark = has_feature($familyId, 'certificate_no_watermark');
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Lugemistunnistus — Ajaraamat</title>
+<title>Lugemistunnistus · Ajaraamat</title>
 <link rel="icon" href="favicon.ico?v=2" sizes="any">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -162,7 +162,7 @@ $canNoWatermark = has_feature($familyId, 'certificate_no_watermark');
         <?php else: ?>
             <ul class="cert-books">
                 <?php foreach ($books as $b): ?>
-                    <li><?= htmlspecialchars($b['title']) ?><?php if ($b['author']): ?> <span class="a">— <?= htmlspecialchars($b['author']) ?></span><?php endif; ?></li>
+                    <li><?= htmlspecialchars($b['title']) ?><?php if ($b['author']): ?> <span class="a">, <?= htmlspecialchars($b['author']) ?></span><?php endif; ?></li>
                 <?php endforeach; ?>
             </ul>
             <?php if ($moreBooks > 0): ?>
@@ -181,7 +181,7 @@ $canNoWatermark = has_feature($familyId, 'certificate_no_watermark');
       </div>
 
         <div class="cert-footer">
-            <span>Väljastatud <?= htmlspecialchars(date('d.m.Y')) ?> — Ajaraamat<?= $canNoWatermark ? '' : '<br><span style="opacity:.7;">Loodud tasuta Ajaraamatu kontoga — Pere+ eemaldab selle märke</span>' ?></span>
+            <span>Väljastatud <?= htmlspecialchars(date('d.m.Y')) ?> · Ajaraamat<?= $canNoWatermark ? '' : '<br><span style="opacity:.7;">Loodud tasuta Ajaraamatu kontoga. Pere+ eemaldab selle märke</span>' ?></span>
             <span class="cert-sign">Vanema allkiri</span>
         </div>
     </div>

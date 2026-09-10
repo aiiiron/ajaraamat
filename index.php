@@ -21,8 +21,8 @@ $adminEmail = defined('ADMIN_EMAIL') ? trim((string) ADMIN_EMAIL) : '';
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Ajaraamat — tasakaal lugemise ja ekraaniaja vahel</title>
-<meta name="description" content="Ajaraamat aitab peredel jälgida lapse lugemis- ja ekraaniaega, seada väljakutseid, koguda saavutusi ja hoida kõik lapsed ühes kohas — nii et üks tegevus ei kao teise varju.">
+<title>Ajaraamat · tasakaal lugemise ja ekraaniaja vahel</title>
+<meta name="description" content="Ajaraamat aitab peredel jälgida lapse lugemis- ja ekraaniaega, seada väljakutseid, koguda saavutusi ja hoida kõik lapsed ühes kohas, nii et üks tegevus ei kao teise varju.">
 <link rel="icon" href="favicon.ico?v=2" sizes="any">
 <link rel="icon" href="icon-192.png?v=2" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
@@ -134,13 +134,39 @@ $adminEmail = defined('ADMIN_EMAIL') ? trim((string) ADMIN_EMAIL) : '';
   .feature h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
   .feature p { font-size: 14.5px; }
 
-  /* Real in-app screenshots — horizontally scrollable, like an app-store gallery */
-  .gallery { display: flex; gap: 20px; overflow-x: auto; padding: 6px 6px 18px; margin: 0 -6px; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
-  .gallery-item { flex: 0 0 auto; width: 230px; scroll-snap-align: start; }
-  .gallery-frame { border-radius: 20px; overflow: hidden; background: var(--paper-raised); box-shadow: 0 16px 40px -22px rgba(61,51,88,0.4); height: 400px; }
-  .gallery-frame img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
-  .gallery-cap { margin-top: 12px; font-family: 'Baloo 2', sans-serif; font-size: 14.5px; font-weight: 700; text-align: center; }
-  .gallery-cap span { display: block; font-family: 'Nunito', sans-serif; font-size: 12.5px; font-weight: 600; color: var(--ink-soft); margin-top: 2px; }
+  /* Motivatsioon: badges strung along a dashed path, alternating height */
+  .path-features { position: relative; display: flex; gap: 20px; padding-top: 6px; }
+  .path-features::before { content: ''; position: absolute; top: 48px; left: 76px; right: 76px; border-top: 3px dashed #F0C7DE; z-index: 0; }
+  .path-item { position: relative; z-index: 1; flex: 1; text-align: center; display: flex; flex-direction: column; align-items: center; }
+  .path-item:nth-child(2), .path-item:nth-child(4) { transform: translateY(-20px); }
+  .path-badge { width: 76px; height: 76px; border-radius: 50%; background: var(--gradient-primary); display: flex; align-items: center; justify-content: center; font-size: 30px; box-shadow: 0 16px 30px -12px rgba(139,92,246,0.5); border: 5px solid #FFF6FA; margin-bottom: 16px; }
+  .path-item:nth-child(2n) .path-badge { background: linear-gradient(135deg, #5B7FE8 0%, #8B5CF6 100%); }
+  .path-item h3 { font-size: 16px; margin-bottom: 6px; }
+  .path-item p { font-size: 13.5px; }
+
+  /* Kogu pere: one panel, icon rows */
+  .feature-panel { background: var(--paper-raised); border-radius: 22px; box-shadow: 0 16px 40px -24px rgba(61,51,88,0.35); overflow: hidden; }
+  .feature-row { display: flex; align-items: flex-start; gap: 18px; padding: 24px 28px; border-bottom: 1px solid var(--line); }
+  .feature-row:last-child { border-bottom: none; }
+  .row-icon { flex: none; width: 46px; height: 46px; border-radius: 14px; background: var(--reading-tint); display: flex; align-items: center; justify-content: center; font-size: 21px; }
+  .feature-row:nth-child(2n) .row-icon { background: var(--screen-tint); }
+  .feature-row h3 { font-size: 16px; margin-bottom: 4px; }
+  .feature-row p { font-size: 14.5px; }
+
+  /* Vaata lähemalt: tabbed tour with one big phone preview */
+  .tour { display: grid; grid-template-columns: 300px 1fr; gap: 32px; align-items: start; }
+  .tour-tabs { display: flex; flex-direction: column; gap: 6px; }
+  .tour-tab { display: block; width: 100%; text-align: left; background: transparent; border: none; border-radius: 14px; padding: 13px 16px; cursor: pointer; font-family: 'Nunito', sans-serif; }
+  .tour-tab strong { display: block; font-family: 'Baloo 2', sans-serif; font-size: 14.5px; color: var(--ink); }
+  .tour-tab span { display: block; font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; }
+  .tour-tab.active { background: #fff; box-shadow: 0 10px 26px -16px rgba(61,51,88,0.4); }
+  .tour-tab.active strong { color: var(--reading); }
+  .tour-tab:hover:not(.active) { background: rgba(255,255,255,0.6); }
+  .tour-preview { display: flex; justify-content: center; position: sticky; top: 24px; }
+  .tour-frame { position: relative; width: 300px; max-width: 100%; border-radius: 32px; background: #fff; padding: 30px 10px 10px; box-shadow: 0 30px 60px -24px rgba(61,51,88,0.45); border: 1px solid #F0E6F5; }
+  .tour-notch { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 70px; height: 16px; background: #392F4D; border-radius: 999px; }
+  .tour-frame img { width: 100%; border-radius: 18px; display: block; }
+  .tour-cta { text-align: center; margin-top: 32px; }
 
   /* Tasuta vs. Pere+ */
   .plans { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: stretch; }
@@ -156,16 +182,21 @@ $adminEmail = defined('ADMIN_EMAIL') ? trim((string) ADMIN_EMAIL) : '';
   .plan-card.highlight .plan-list li::before { content: '★'; background: var(--gradient-primary); color: #fff; }
   .plan-card .btn { margin-top: 26px; text-align: center; }
 
-  .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
-  .step .num { font-family: 'Baloo 2', sans-serif; font-size: 34px; color: var(--screen); font-weight: 800; }
-  .step h3 { font-size: 17px; margin: 10px 0 8px; }
+  /* Alustamine: numbered nodes joined by a chevron connector */
+  .steps { display: flex; align-items: flex-start; gap: 0; }
+  .step { flex: 1; text-align: center; padding: 0 16px; position: relative; }
+  .step .num { display: flex; align-items: center; justify-content: center; width: 54px; height: 54px; margin: 0 auto 16px; border-radius: 50%; background: var(--gradient-primary); color: #fff; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 22px; box-shadow: 0 14px 28px -12px rgba(139,92,246,0.55); }
+  .step:not(:last-child)::after { content: '›'; position: absolute; top: 4px; right: -10px; font-size: 34px; font-weight: 800; color: #D9C6F5; font-family: 'Baloo 2', sans-serif; }
+  .step h3 { font-size: 17px; margin: 0 0 8px; }
   .step p { font-size: 15px; }
 
-  .cta-band { background: var(--ink); color: #fff; border-radius: 24px; padding: 56px 48px; text-align: center; }
-  .cta-band h2 { color: #fff; font-size: 30px; margin-bottom: 14px; }
-  .cta-band p { color: #C9C4DE; font-size: 16px; max-width: 46ch; margin: 0 auto 28px; }
+  .cta-band { background: var(--ink); color: #fff; border-radius: 24px; padding: 56px 48px; display: grid; grid-template-columns: 1.3fr 0.7fr; gap: 30px; align-items: center; }
+  .cta-band h2 { color: #fff; font-size: 30px; margin-bottom: 14px; text-align: left; }
+  .cta-band p { color: #C9C4DE; font-size: 16px; max-width: 44ch; margin: 0 0 26px; text-align: left; }
   .cta-band .btn-primary { background: var(--gradient-primary); }
   .form-note { font-size: 13px; color: #9C96B8; margin-top: 16px; }
+  .cta-visual { position: relative; height: 170px; }
+  .cta-chip { position: absolute; background: #fff; color: var(--ink); font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 13.5px; padding: 10px 16px; border-radius: 14px; box-shadow: 0 16px 32px -14px rgba(0,0,0,0.5); white-space: nowrap; }
 
   footer { padding: 40px 0 60px; text-align: center; }
   footer p { font-size: 14px; color: var(--ink-soft); }
@@ -175,10 +206,23 @@ $adminEmail = defined('ADMIN_EMAIL') ? trim((string) ADMIN_EMAIL) : '';
     .hero { grid-template-columns: 1fr; }
     .hero h1 { font-size: 32px; }
     .features { grid-template-columns: 1fr; }
+    .path-features { flex-direction: column; gap: 28px; }
+    .path-features::before { display: none; }
+    .path-item, .path-item:nth-child(2), .path-item:nth-child(4) { transform: none; }
+    .feature-row { padding: 18px; gap: 14px; }
+    .tour { grid-template-columns: 1fr; }
+    .tour-tabs { flex-direction: row; flex-wrap: wrap; gap: 8px; justify-content: center; }
+    .tour-tab { width: auto; text-align: center; padding: 9px 14px; }
+    .tour-tab span { display: none; }
+    .tour-preview { position: static; margin-top: 8px; }
     .plans { grid-template-columns: 1fr; }
-    .steps { grid-template-columns: 1fr; }
+    .steps { flex-direction: column; gap: 30px; }
+    .step { padding: 0; }
+    .step:not(:last-child)::after { content: '⌄'; top: auto; bottom: -22px; right: auto; left: 50%; transform: translateX(-50%); }
+    .cta-band { grid-template-columns: 1fr; padding: 40px 24px; text-align: center; }
+    .cta-band h2, .cta-band p { text-align: center; margin-left: auto; margin-right: auto; }
+    .cta-visual { display: none; }
     nav.top-links a:not(.cta-link) { display: none; }
-    .cta-band { padding: 40px 24px; }
   }
 
   :focus-visible { outline: 2px solid var(--screen); outline-offset: 2px; }
@@ -200,13 +244,11 @@ $adminEmail = defined('ADMIN_EMAIL') ? trim((string) ADMIN_EMAIL) : '';
 <div class="hero">
   <div>
     <h1>Loe raamatut.<br>Vaata ekraani.<br><span class="em">Pea</span> <span class="in">tasakaalu</span>.</h1>
-    <p class="lede">Ajaraamat on lihtne perele mõeldud rakendus, mis jälgib lapse lugemis- ja ekraaniaega — koos väljakutsete, saavutuste ja aastase lugemistunnistusega —, nii et üks ei kao teise varju, ilma pideva vaidluseta selle üle, kes on mida ja kui palju teinud.</p>
+    <p class="lede">Ajaraamat on lihtne perele mõeldud rakendus, mis jälgib lapse lugemis- ja ekraaniaega, seab väljakutseid, kogub saavutusi ja loob aastase lugemistunnistuse, nii et üks tegevus ei kao teise varju, ilma pideva vaidluseta selle üle, kes on mida ja kui palju teinud.</p>
     <div class="hero-ctas">
       <a href="register.php" class="btn btn-primary">Registreeri oma pere</a>
-      <a href="demo_parent.php" class="btn btn-ghost">👀 Proovi demot</a>
       <a href="#vaade" class="btn btn-ghost">Vaata, kuidas see töötab</a>
     </div>
-    <p style="margin-top:14px;"><a href="demo_child.php">👦 Või proovi lapse vaadet →</a></p>
   </div>
   <div class="mock-wrap">
     <div class="streak-chip">🔥 6 päeva järjest</div>
@@ -235,28 +277,28 @@ $adminEmail = defined('ADMIN_EMAIL') ? trim((string) ADMIN_EMAIL) : '';
     <div class="section-head">
       <span class="section-kicker">Iga päev</span>
       <h2>Kõik, mida perel igapäevaselt vaja on</h2>
-      <p>Ei mingeid keerulisi seadeid ega müügijutte — lihtsalt selge ülevaade sellest, kuidas laps oma aega veedab.</p>
+      <p>Ei mingeid keerulisi seadeid ega müügijutte, lihtsalt selge ülevaade sellest, kuidas laps oma aega veedab.</p>
     </div>
     <div class="features">
       <div class="feature">
         <span class="icon">⚖️</span>
         <h3>Tasakaalu ülevaade ja preemiad</h3>
-        <p>Näe ühe pilguga, kas lugemine ja ekraaniaeg on tasakaalus, kui palju on kummastki "võlgu" või boonuseks kogunenud — ja mitu minutit ekraaniaega on selle eest teenitud.</p>
+        <p>Näe ühe pilguga, kas lugemine ja ekraaniaeg on tasakaalus, kui palju on kummastki "võlgu" või boonuseks kogunenud, ja mitu minutit ekraaniaega on selle eest teenitud.</p>
       </div>
       <div class="feature">
         <span class="icon">📚</span>
         <h3>Raamatute nimekiri</h3>
-        <p>Pea arvet, mis raamatuid on täpselt loetud — pealkirjad, autorid, leheküljed ja lugemise seis (pooleli, loetud, riiulis).</p>
+        <p>Pea arvet, mis raamatuid on täpselt loetud: pealkirjad, autorid, leheküljed ja lugemise seis (pooleli, loetud, riiulis).</p>
       </div>
       <div class="feature">
         <span class="icon">🔗</span>
         <h3>Lapsele oma link ja taimer</h3>
-        <p>Laps näeb oma tasakaalu ilma sisselogimiseta — lihtsalt tema enda link — ja saab lugemise käivitada ühe nupuvajutusega taimeriga.</p>
+        <p>Laps näeb oma tasakaalu ilma sisselogimiseta, lihtsalt tema enda lingiga, ja saab lugemise käivitada ühe nupuvajutusega taimeriga.</p>
       </div>
       <div class="feature">
         <span class="icon">🌙</span>
         <h3>Automaatne tume režiim</h3>
-        <p>Rakendus järgib seadme teemat ise — mugav vaadata ka õhtusel lugemisajal, ilma eraldi lülitita.</p>
+        <p>Rakendus järgib seadme teemat ise, mugav vaadata ka õhtusel lugemisajal, ilma eraldi lülitita.</p>
       </div>
     </div>
   </div>
@@ -267,26 +309,26 @@ $adminEmail = defined('ADMIN_EMAIL') ? trim((string) ADMIN_EMAIL) : '';
     <div class="section-head">
       <span class="section-kicker">Motivatsioon</span>
       <h2>Väikesed võidud, mis lugemist edasi kannavad</h2>
-      <p>Väljakutsed, saavutused ja aastakokkuvõtted — et lugemine tunduks lapsele lõbus, mitte kohustus.</p>
+      <p>Väljakutsed, saavutused ja aastakokkuvõtted, et lugemine tunduks lapsele lõbus, mitte kohustus.</p>
     </div>
-    <div class="features">
-      <div class="feature">
-        <span class="icon">🏆</span>
+    <div class="path-features">
+      <div class="path-item">
+        <span class="path-badge">🏆</span>
         <h3>Lugemisväljakutsed</h3>
         <p>Sea eesmärk raamatute või minutite kaupa, vali periood ja jälgi koos lapsega, kuidas edenemine liigub.</p>
       </div>
-      <div class="feature">
-        <span class="icon">⭐</span>
+      <div class="path-item">
+        <span class="path-badge">⭐</span>
         <h3>Saavutused ja lugemisstreak</h3>
-        <p>Automaatsed verstapostid tähistavad iga vahva hetke — pluss järjestikuste tasakaalus päevade streak, mis hoiab harjumuse elus.</p>
+        <p>Automaatsed verstapostid tähistavad iga vahva hetke, pluss järjestikuste tasakaalus päevade streak, mis hoiab harjumuse elus.</p>
       </div>
-      <div class="feature">
-        <span class="icon">📅</span>
+      <div class="path-item">
+        <span class="path-badge">📅</span>
         <h3>Iganädalane kokkuvõte</h3>
         <p>Üks vaade, mis näitab nädala tipphetki ja seda, kas nädala eesmärk sai täidetud.</p>
       </div>
-      <div class="feature">
-        <span class="icon">🎓</span>
+      <div class="path-item">
+        <span class="path-badge">🎓</span>
         <h3>Aastane lugemistunnistus</h3>
         <p>Aasta lõpus saab iga lapse jaoks luua ilusa, väljaprinditava (PDF) lugemistunnistuse koos loetud raamatute ja saavutustega.</p>
       </div>
@@ -301,31 +343,26 @@ $adminEmail = defined('ADMIN_EMAIL') ? trim((string) ADMIN_EMAIL) : '';
       <h2>Kasvab koos perega</h2>
       <p>Ükskõik, kas peres on üks laps või mitu, ja kas lugemist jälgib üks vanem või kaks.</p>
     </div>
-    <div class="features">
-      <div class="feature">
-        <span class="icon">👨‍👩‍👧‍👦</span>
-        <h3>Mitu last, üks ülevaade</h3>
-        <p>Lisa nii palju lapsi kui vaja — igaühel oma tasakaal ja raamatunimekiri — ning vaata kõiki peres korraga ühelt lehelt.</p>
+    <div class="feature-panel">
+      <div class="feature-row">
+        <span class="row-icon">👨‍👩‍👧‍👦</span>
+        <div><h3>Mitu last, üks ülevaade</h3><p>Lisa nii palju lapsi kui vaja, igaühel oma tasakaal ja raamatunimekiri, ning vaata kõiki peres korraga ühelt lehelt.</p></div>
       </div>
-      <div class="feature">
-        <span class="icon">✋</span>
-        <h3>Laps lisab, vanem kinnitab</h3>
-        <p>Vanema loal saab laps ise oma lugemis- või ekraanikanded lisada — need lähevad vanemale ülevaatamiseks ja kinnitamiseks.</p>
+      <div class="feature-row">
+        <span class="row-icon">✋</span>
+        <div><h3>Laps lisab, vanem kinnitab</h3><p>Vanema loal saab laps ise oma lugemis- või ekraanikanded lisada. Need lähevad vanemale ülevaatamiseks ja kinnitamiseks.</p></div>
       </div>
-      <div class="feature">
-        <span class="icon">👥</span>
-        <h3>Teine vanem samas peres</h3>
-        <p>Lisa teisele vanemale oma sisselogimine samale perele, nii et mõlemad näevad sama tasakaalu ja saavad kandeid hallata.</p>
+      <div class="feature-row">
+        <span class="row-icon">👥</span>
+        <div><h3>Teine vanem samas peres</h3><p>Lisa teisele vanemale oma sisselogimine samale perele, nii et mõlemad näevad sama tasakaalu ja saavad kandeid hallata.</p></div>
       </div>
-      <div class="feature">
-        <span class="icon">🗑️</span>
-        <h3>Kustutatud kanded taastatavad</h3>
-        <p>Eksisti juhtub — kustutatud kanded lähevad prügikasti, kust need saab kuni taastamiseni tagasi tuua.</p>
+      <div class="feature-row">
+        <span class="row-icon">🗑️</span>
+        <div><h3>Kustutatud kanded taastatavad</h3><p>Eksisti juhtub. Kustutatud kanded lähevad prügikasti, kust need saab kuni taastamiseni tagasi tuua.</p></div>
       </div>
-      <div class="feature">
-        <span class="icon">⬇️</span>
-        <h3>CSV eksport</h3>
-        <p>Vaja andmeid mujal analüüsida? Laadi kõik kanded alla CSV-failina.</p>
+      <div class="feature-row">
+        <span class="row-icon">⬇️</span>
+        <div><h3>CSV eksport</h3><p>Vaja andmeid mujal analüüsida? Laadi kõik kanded alla CSV-failina.</p></div>
       </div>
     </div>
   </div>
@@ -358,7 +395,7 @@ $adminEmail = defined('ADMIN_EMAIL') ? trim((string) ADMIN_EMAIL) : '';
       <div class="plan-card highlight">
         <span class="plan-name">🌟 Pere+</span>
         <div class="plan-price">Küsi pakkumist</div>
-        <p class="plan-sub">Praegu liitumine käsitsi — kirjuta meile, ja aktiveerime selle sinu perele.</p>
+        <p class="plan-sub">Praegu liitumine käsitsi, kirjuta meile ja aktiveerime selle sinu perele.</p>
         <ul class="plan-list">
           <?php foreach ($premiumFlags as $flag): ?>
             <li><?= htmlspecialchars($flag['label']) ?></li>
@@ -378,44 +415,35 @@ $adminEmail = defined('ADMIN_EMAIL') ? trim((string) ADMIN_EMAIL) : '';
   <div class="wrap">
     <div class="section-head">
       <span class="section-kicker">Vaata lähemalt</span>
-      <h2>Otse rakendusest — päris vaated</h2>
-      <p>Ehtsad kuvatõmmised meie avalikust demo perest: vanema töölaud, pere ülevaade, raamatud, saavutused ja lapse enda vaade.</p>
+      <h2>Päris vaated otse rakendusest</h2>
+      <p>Ehtsad kuvatõmmised meie avalikust demo perest. Vali funktsioon vasakult ja vaata, milline see välja näeb.</p>
     </div>
-    <div class="gallery">
-      <div class="gallery-item">
-        <div class="gallery-frame"><img src="screens/01_dashboard.webp" width="640" height="1000" alt="Vanema töölaud Ajaraamatus — kinnitamist ootavad kanded ja tasakaal" loading="lazy"></div>
-        <p class="gallery-cap">Vanema töölaud<span>Kinnitusootel kanded, tasakaal, eesmärk</span></p>
+    <div class="tour">
+      <div class="tour-tabs">
+        <button type="button" class="tour-tab active" data-i="0"><strong>Vanema töölaud</strong><span>Kinnitusootel kanded, tasakaal, eesmärk</span></button>
+        <button type="button" class="tour-tab" data-i="1"><strong>Pere ülevaade</strong><span>Kõik lapsed ühel lehel</span></button>
+        <button type="button" class="tour-tab" data-i="2"><strong>Raamatud ja väljakutsed</strong><span>Aasta kokkuvõte, väljakutse, raamaturiiul</span></button>
+        <button type="button" class="tour-tab" data-i="3"><strong>Saavutused</strong><span>Automaatsed ja oma lisatud verstapostid</span></button>
+        <button type="button" class="tour-tab" data-i="4"><strong>Iganädalane kokkuvõte</strong><span>Nädala tipphetked ja eesmärgi täitmine</span></button>
+        <button type="button" class="tour-tab" data-i="5"><strong>Aastane lugemistunnistus</strong><span>Ilus, allalaaditav PDF</span></button>
+        <button type="button" class="tour-tab" data-i="6"><strong>Lapse vaade</strong><span>Ilma sisselogimiseta, oma lingiga</span></button>
+        <button type="button" class="tour-tab" data-i="7"><strong>Lapse enda saavutused</strong><span>Motiveeriv, lapsele mõistetav</span></button>
       </div>
-      <div class="gallery-item">
-        <div class="gallery-frame"><img src="screens/02_overview.webp" width="640" height="820" alt="Pere ülevaade — kõik lapsed korraga" loading="lazy"></div>
-        <p class="gallery-cap">Pere ülevaade<span>Kõik lapsed ühel lehel</span></p>
-      </div>
-      <div class="gallery-item">
-        <div class="gallery-frame"><img src="screens/03_books.webp" width="640" height="1200" alt="Raamatute nimekiri ja lugemisväljakutse" loading="lazy"></div>
-        <p class="gallery-cap">Raamatud ja väljakutsed<span>Aasta kokkuvõte, väljakutse, raamaturiiul</span></p>
-      </div>
-      <div class="gallery-item">
-        <div class="gallery-frame"><img src="screens/04_milestones.webp" width="640" height="1033" alt="Saavutuste vaade koos automaatsete verstapostidega" loading="lazy"></div>
-        <p class="gallery-cap">Saavutused<span>Automaatsed ja oma lisatud verstapostid</span></p>
-      </div>
-      <div class="gallery-item">
-        <div class="gallery-frame"><img src="screens/05_week.webp" width="640" height="867" alt="Iganädalane kokkuvõte tipphetkedega" loading="lazy"></div>
-        <p class="gallery-cap">Iganädalane kokkuvõte<span>Nädala tipphetked ja eesmärgi täitmine</span></p>
-      </div>
-      <div class="gallery-item">
-        <div class="gallery-frame"><img src="screens/06_certificate.webp" width="640" height="1133" alt="Väljaprinditav aastane lugemistunnistus" loading="lazy"></div>
-        <p class="gallery-cap">Aastane lugemistunnistus<span>Ilus, allalaaditav PDF</span></p>
-      </div>
-      <div class="gallery-item">
-        <div class="gallery-frame"><img src="screens/07_child.webp" width="640" height="1143" alt="Lapse enda vaade ilma sisselogimiseta" loading="lazy"></div>
-        <p class="gallery-cap">Lapse vaade<span>Ilma sisselogimiseta, oma lingiga</span></p>
-      </div>
-      <div class="gallery-item">
-        <div class="gallery-frame"><img src="screens/08_child_milestones.webp" width="640" height="762" alt="Lapse enda saavutuste vaade" loading="lazy"></div>
-        <p class="gallery-cap">Lapse enda saavutused<span>Motiveeriv, lapsele mõistetav</span></p>
+      <div class="tour-preview">
+        <div class="tour-frame">
+          <span class="tour-notch"></span>
+          <img src="screens/01_dashboard.webp" width="640" height="1000" alt="Vanema töölaud" data-i="0">
+          <img src="screens/02_overview.webp" width="640" height="820" alt="Pere ülevaade" data-i="1" hidden>
+          <img src="screens/03_books.webp" width="640" height="1200" alt="Raamatud ja väljakutsed" data-i="2" hidden>
+          <img src="screens/04_milestones.webp" width="640" height="1033" alt="Saavutused" data-i="3" hidden>
+          <img src="screens/05_week.webp" width="640" height="867" alt="Iganädalane kokkuvõte" data-i="4" hidden>
+          <img src="screens/06_certificate.webp" width="640" height="1133" alt="Aastane lugemistunnistus" data-i="5" hidden>
+          <img src="screens/07_child.webp" width="640" height="1143" alt="Lapse vaade" data-i="6" hidden>
+          <img src="screens/08_child_milestones.webp" width="640" height="762" alt="Lapse enda saavutused" data-i="7" hidden>
+        </div>
       </div>
     </div>
-    <p style="text-align:center;margin-top:8px;"><a href="demo_parent.php" class="btn btn-ghost">👀 Proovi ise, vanema vaade</a> <a href="demo_child.php" class="btn btn-ghost">👦 Proovi ise, lapse vaade</a></p>
+    <p class="tour-cta"><a href="demo_parent.php" class="btn btn-ghost">👀 Proovi ise, vanema vaade</a> <a href="demo_child.php" class="btn btn-ghost">👦 Proovi ise, lapse vaade</a></p>
   </div>
 </section>
 
@@ -424,23 +452,23 @@ $adminEmail = defined('ADMIN_EMAIL') ? trim((string) ADMIN_EMAIL) : '';
     <div class="section-head">
       <span class="section-kicker">Alustamine</span>
       <h2>Kuidas alustada</h2>
-      <p>Konto loomine võtab paar minutit — ei mingit tehnilist seadistust.</p>
+      <p>Konto loomine võtab paar minutit. Tehnilist seadistust pole vaja.</p>
     </div>
     <div class="steps">
       <div class="step">
-        <div class="num">1</div>
+        <span class="num">1</span>
         <h3>Registreeri konto</h3>
         <p>Sisesta oma e-post, parool ja lapse nimi.</p>
       </div>
       <div class="step">
-        <div class="num">2</div>
+        <span class="num">2</span>
         <h3>Oota kinnitust</h3>
         <p>Vaatame üle ja kinnitame sinu konto käsitsi paari päeva jooksul.</p>
       </div>
       <div class="step">
-        <div class="num">3</div>
+        <span class="num">3</span>
         <h3>Hakka kandeid lisama</h3>
-        <p>Logi sisse ja alusta — esimene raamat, esimene ekraaniaeg.</p>
+        <p>Logi sisse ja alusta: esimene raamat, esimene ekraaniaeg.</p>
       </div>
     </div>
   </div>
@@ -449,17 +477,37 @@ $adminEmail = defined('ADMIN_EMAIL') ? trim((string) ADMIN_EMAIL) : '';
 <section>
   <div class="wrap">
     <div class="cta-band">
-      <h2>Valmis alustama?</h2>
-      <p>Registreeri oma pere ja hakka lugemis- ja ekraaniaega jälgima juba täna.</p>
-      <a href="register.php" class="btn btn-primary">Registreeru tasuta</a>
-      <p class="form-note">Uued kontod kinnitatakse käsitsi, et hoida rakendus turvaline ja töökindel kõigile peredele.</p>
+      <div>
+        <h2>Valmis alustama?</h2>
+        <p>Registreeri oma pere ja hakka lugemis- ja ekraaniaega jälgima juba täna.</p>
+        <a href="register.php" class="btn btn-primary">Registreeru tasuta</a>
+        <p class="form-note">Uued kontod kinnitatakse käsitsi, et hoida rakendus turvaline ja töökindel kõigile peredele.</p>
+      </div>
+      <div class="cta-visual">
+        <span class="cta-chip" style="top:4px;left:2px;transform:rotate(-7deg);">🔥 12 päeva järjest</span>
+        <span class="cta-chip" style="top:66px;right:-4px;transform:rotate(5deg);">⭐ 18 saavutust</span>
+        <span class="cta-chip" style="bottom:2px;left:34px;transform:rotate(-3deg);">📚 240 raamatut</span>
+      </div>
     </div>
   </div>
 </section>
 
 <footer>
-  <p>Ajaraamat — tehtud ühe Eesti pere poolt, teiste Eesti perede jaoks. <a href="admin_login.php">Admin</a></p>
+  <p>Ajaraamat on tehtud ühe Eesti pere poolt, teiste Eesti perede jaoks.</p>
 </footer>
 
+<script>
+(function () {
+  var tabs = document.querySelectorAll('.tour-tab');
+  var imgs = document.querySelectorAll('.tour-frame img');
+  tabs.forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      var i = tab.getAttribute('data-i');
+      tabs.forEach(function (t) { t.classList.toggle('active', t === tab); });
+      imgs.forEach(function (img) { img.hidden = (img.getAttribute('data-i') !== i); });
+    });
+  });
+})();
+</script>
 </body>
 </html>
