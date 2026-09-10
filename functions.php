@@ -1253,11 +1253,34 @@ function render_milestone_catalog(int $childId): void {
         $earned[$m['kind'] . ':' . (int) $m['threshold']] = $m['achieved_on'];
     }
 
-    $names = milestone_kind_names();
-    foreach (milestone_ladders() as $kind => $steps) {
+    $names   = milestone_kind_names();
+    $ladders = milestone_ladders();
+
+    // Auto-expand a single group: the one whose next unearned tier is closest to
+    // done. If every tier everywhere is earned, all groups stay collapsed.
+    $openKind = null;
+    $bestFrac = -1.0;
+    foreach ($ladders as $kind => $steps) {
         $cur = (int) ($standings[$kind] ?? 0);
-        echo '<div class="mc-group"><h3 class="mc-title">' . htmlspecialchars($names[$kind] ?? $kind)
-           . ' <span class="mc-now">' . number_format($cur, 0, '', ' ') . '</span></h3><ul class="ms-list">';
+        foreach ($steps as $step) {
+            if (isset($earned["$kind:$step"])) continue;
+            $frac = $step > 0 ? min($cur, $step) / $step : 0;
+            if ($frac > $bestFrac) { $bestFrac = $frac; $openKind = $kind; }
+            break; // only the first unearned tier per group matters
+        }
+    }
+
+    foreach ($ladders as $kind => $steps) {
+        $cur = (int) ($standings[$kind] ?? 0);
+        $doneCount = 0;
+        foreach ($steps as $step) {
+            if (isset($earned["$kind:$step"])) $doneCount++;
+        }
+        echo '<details class="mc-group"' . ($kind === $openKind ? ' open' : '') . '>'
+           . '<summary class="mc-title"><span class="mc-name">' . htmlspecialchars($names[$kind] ?? $kind) . '</span>'
+           . '<span class="mc-meta">' . $doneCount . '/' . count($steps)
+           . ' · <span class="mc-now">' . number_format($cur, 0, '', ' ') . '</span></span></summary>'
+           . '<ul class="ms-list">';
         foreach ($steps as $step) {
             [$icon, $text] = milestone_phrase($kind, $step);
             $key = $kind . ':' . $step;
@@ -1271,7 +1294,7 @@ function render_milestone_catalog(int $childId): void {
                . '<span class="ms-date">' . htmlspecialchars($right) . '</span>'
                . '</li>';
         }
-        echo '</ul></div>';
+        echo '</ul></details>';
     }
 }
 
