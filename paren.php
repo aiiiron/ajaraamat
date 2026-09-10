@@ -13,6 +13,19 @@ if (empty($children)) {
 $child = resolve_current_child($familyId);
 $childId = (int) $child['id'];
 
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_csrf();
+    $act = $_POST['action'] ?? '';
+    $pid = (int) ($_POST['pending_id'] ?? 0);
+    if ($act === 'pending_approve') {
+        approve_pending_entry($pid, $childId);
+    } elseif ($act === 'pending_reject') {
+        reject_pending_entry($pid, $childId);
+    }
+    header('Location: paren.php?child=' . $childId);
+    exit;
+}
+
 $totals = get_totals($childId);
 $stats = get_stats_matrix($childId);
 $streak = get_current_streak($childId);
@@ -88,6 +101,16 @@ $chartEkraan = array_map(fn($d) => $d['ekraan'], $daily);
     <?php endif; ?>
 
     <?php render_milestone_banner($childId); ?>
+
+    <?php $pending = get_pending_entries($childId); ?>
+    <?php if ($pending): ?>
+        <div class="card pending-card">
+            <div class="card-header">
+                <h2><?= icon('check') ?> <?= htmlspecialchars($child['name']) ?> lisas kandeid <span class="pending-count"><?= count($pending) ?></span></h2>
+            </div>
+            <?php render_pending_queue($pending, $childId); ?>
+        </div>
+    <?php endif; ?>
 
     <?php if ((int) date('N') <= 2): ?>
         <a class="wk-banner" href="week.php?child=<?= $childId ?>">📊 Eelmise nädala kokkuvõte →</a>

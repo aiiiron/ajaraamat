@@ -42,6 +42,7 @@ $totalDates = count_distinct_dates($childId);
 $totalPages = max(1, (int) ceil($totalDates / $perPage));
 $page = min($page, $totalPages);
 $recent = get_entries_page($childId, $page, $perPage);
+$myPending = get_pending_entries($childId);
 record_milestones($childId);
 
 $owed = $totals['owed'];
@@ -97,6 +98,10 @@ if ($owed > 0) {
         <div class="milestone-banner"><?= icon("check") ?> Lugemine salvestatud!</div>
     <?php endif; ?>
 
+    <?php if (($_GET['pending'] ?? '') === '1'): ?>
+        <div class="milestone-banner">✋ Saadetud vanemale kinnitamiseks!</div>
+    <?php endif; ?>
+
     <?php render_milestone_banner($childId); ?>
 
     <?php if ($streak > 0): ?>
@@ -131,9 +136,17 @@ if ($owed > 0) {
         <p class="child-link-note" style="margin-top:-8px;margin-bottom:16px;">Täna pole veel midagi lisatud.</p>
     <?php endif; ?>
 
-    <div class="actions">
+    <div class="actions actions-stack">
         <a href="reading_timer.php?token=<?= htmlspecialchars($token) ?>" class="btn btn-add full-width"><?= icon("timer") ?> Alusta lugemist</a>
+        <a href="child_add.php?token=<?= htmlspecialchars($token) ?>" class="btn btn-outline full-width"><?= icon("plus") ?> Lisa kanne ise</a>
     </div>
+
+    <?php if ($myPending): ?>
+        <section class="card">
+            <h2>Ootab vanema kinnitust</h2>
+            <?php render_pending_queue($myPending, $childId, false); ?>
+        </section>
+    <?php endif; ?>
 
     <section class="card">
         <div class="card-header">

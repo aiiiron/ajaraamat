@@ -1542,6 +1542,87 @@ select:focus { outline: 2px solid var(--accent-purple); border-color: transparen
 }
 .btn-ghost-solid:hover { background: var(--screen-bg); }
 
+/* Secondary action button (outline) */
+.btn-outline {
+  background: var(--card-bg);
+  color: var(--accent-purple);
+  border: 1.5px solid var(--border);
+  box-shadow: none;
+}
+.btn-outline:hover { filter: none; background: var(--screen-bg); }
+.actions-stack { flex-direction: column; }
+.actions-stack .btn { flex: none; }
+
+/* Child self-log — parent approval queue */
+.pending-card { border: 1.5px solid var(--accent-purple); }
+.pending-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: var(--radius-pill);
+  background: var(--gradient-primary);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 800;
+  margin-left: 6px;
+}
+.pending-list { display: flex; flex-direction: column; gap: 12px; }
+.pending-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.pending-row:last-child { border-bottom: none; padding-bottom: 0; }
+.pending-main { display: flex; align-items: center; gap: 10px; flex: 1 1 auto; min-width: 0; }
+.pending-label {
+  min-width: 0;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: var(--font-heading);
+  color: var(--ink);
+  overflow-wrap: anywhere;
+}
+.pending-meta {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-family: var(--font-body);
+}
+.pending-actions { display: flex; gap: 8px; flex: none; }
+.pending-actions form { margin: 0; }
+.btn-approve,
+.btn-reject {
+  border: none;
+  cursor: pointer;
+  border-radius: 12px;
+  padding: 9px 14px;
+  font-family: var(--font-heading);
+  font-weight: 700;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  transition: transform 0.1s ease;
+}
+.btn-approve:active,
+.btn-reject:active { transform: scale(0.96); }
+.btn-approve { background: var(--gradient-primary); color: #fff; }
+.btn-approve svg { width: 15px; height: 15px; }
+.btn-reject { background: var(--border); color: var(--text-muted); }
+.pending-wait {
+  flex: none;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-muted);
+}
+
 @media (max-width: 480px) {
   h1 { font-size: 20px; }
 }

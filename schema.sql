@@ -67,6 +67,24 @@ CREATE TABLE IF NOT EXISTS challenges (
     FOREIGN KEY (child_id) REFERENCES children(id) ON DELETE CASCADE
 );
 
+-- Lapse enda lisatud kanded, mis ootavad vanema kinnitust. Kinnitamisel
+-- tekitatakse päris `entries` rida ja see rida kustutatakse; tagasilükkamisel
+-- lihtsalt kustutatakse. Statistika neid ei arvesta enne kinnitamist.
+CREATE TABLE IF NOT EXISTS pending_entries (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    child_id INT NOT NULL,
+    entry_date DATE NOT NULL,
+    type ENUM('raamat','ekraan') NOT NULL,
+    minutes INT NOT NULL,
+    book_id INT DEFAULT NULL,
+    note VARCHAR(255) DEFAULT NULL,
+    current_page INT DEFAULT NULL,
+    source VARCHAR(16) DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (child_id) REFERENCES children(id) ON DELETE CASCADE,
+    FOREIGN KEY (book_id) REFERENCES books(id) ON DELETE SET NULL
+);
+
 -- Saavutatud verstapostid. Iga (child_id, kind, threshold) salvestatakse üks
 -- kord, esimesel korral kui piir ületati; `achieved_on` on siis fikseeritud.
 -- kind: books | pages | hours | days | streak | challenge

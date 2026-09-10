@@ -23,27 +23,16 @@ if (!$child) {
 
 $childId = (int) $child['id'];
 
-// Save a finished session as a normal entry.
+// Save a finished session — held for a parent to approve.
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'save') {
     $bookId = (int) ($_POST['book_id'] ?? 0);
     $minutes = (int) ($_POST['minutes'] ?? 0);
 
     $book = get_book_for_child($bookId, $childId);
-    $minutes = max(1, min(600, $minutes));
-
     if ($book) {
-        $pdo = get_db();
-        $stmt = $pdo->prepare("INSERT INTO entries (child_id, entry_date, raamat, book_id, raamat_comment) VALUES (:cid, CURDATE(), :min, :bid, :note)");
-        $stmt->execute([
-            ':cid' => $childId,
-            ':min' => $minutes,
-            ':bid' => $bookId,
-            ':note' => 'Lisatud taimeriga',
-        ]);
-        mark_book_started($bookId);
-        update_book_page($bookId, $childId, (int) ($_POST['current_page'] ?? 0));
+        add_pending_entry($childId, date('Y-m-d'), 'raamat', $minutes, $bookId, 'Lisatud taimeriga', (int) ($_POST['current_page'] ?? 0), 'taimer');
     }
-    header('Location: child.php?token=' . urlencode($token) . '&saved=1');
+    header('Location: child.php?token=' . urlencode($token) . '&pending=1');
     exit;
 }
 
@@ -139,13 +128,14 @@ $books = array_filter($books, fn($b) => $b['status'] !== 'loetud') ?: $books; //
     <div class="card" id="finish-view" style="display:none;text-align:center;">
         <h2>Tubli lugemine! 🎉</h2>
         <p class="finish-minutes" id="finish-minutes-label"></p>
+        <p class="child-link-note" style="margin:-4px 0 4px;">Kanne läheb vanemale kinnitamiseks.</p>
         <form method="post" id="save-form" onsubmit="clearState()">
             <input type="hidden" name="action" value="save">
             <input type="hidden" name="book_id" id="save-book-id">
             <input type="hidden" name="minutes" id="save-minutes">
             <label for="save-page" style="text-align:left;">Praegu leheküljel (valikuline)</label>
             <input type="number" id="save-page" name="current_page" min="0" inputmode="numeric" placeholder="nt. 84">
-            <button type="submit" class="btn btn-add full-width" style="margin-top:12px;">Salvesta</button>
+            <button type="submit" class="btn btn-add full-width" style="margin-top:12px;">Saada kinnitamiseks</button>
         </form>
         <button type="button" class="link-muted" style="margin-top:12px;background:none;border:none;cursor:pointer;font-size:14px;" onclick="discardFinish()">Ei, ära salvesta</button>
     </div>

@@ -494,6 +494,128 @@ function get_today_totals(int $childId): array {
     return ['raamat' => (int) $row['raamat'], 'ekraan' => (int) $row['ekraan']];
 }
 
+// =========================================================
+// Child self-logging — entries the child adds, held for parent approval.
+// Kept in a separate table so nothing counts them until approved.
+// =========================================================
+
+function add_pending_entry(int $childId, string $date, string $type, int $minutes, ?int $bookId, ?string $note, ?int $currentPage, ?string $source = null): void {
+    if (!in_array($type, ['raamat', 'ekraan'], true)) return;
+    if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) $date = date('Y-m-d');
+    $minutes = max(1, min(600, $minutes));
+    $note = trim((string) $note);
+    $pdo = get_db();
+    $stmt = $pdo->prepare("INSERT INTO pending_entries (child_id, entry_date, type, minutes, book_id, note, current_page, source)
+        VALUES (:cid, :d, :t, :m, :bid, :note, :page, :src)");
+    $stmt->execute([
+        ':cid'  => $childId,
+        ':d'    => $date,
+        ':t'    => $type,
+        ':m'    => $minutes,
+        ':bid'  => $type === 'raamat' && $bookId > 0 ? $bookId : null,
+        ':note' => $note !== '' ? mb_substr($note, 0, 255) : null,
+        ':page' => $type === 'raamat' && $currentPage > 0 ? $currentPage : null,
+        ':src'  => $source !== null ? mb_substr($source, 0, 16) : null,
+    ]);
+}
+
+function get_pending_entries(int $childId): array {
+    $pdo = get_db();
+    $stmt = $pdo->prepare("SELECT p.*, b.title AS book_title
+        FROM pending_entries p LEFT JOIN books b ON b.id = p.book_id
+        WHERE p.child_id = :cid ORDER BY p.entry_date DESC, p.id ASC");
+    $stmt->execute([':cid' => $childId]);
+    return $stmt->fetchAll();
+}
+
+function count_pending_entries(int $childId): int {
+    $pdo = get_db();
+    $stmt = $pdo->prepare("SELECT COUNT(*) FROM pending_entries WHERE child_id = :cid");
+    $stmt->execute([':cid' => $childId]);
+    return (int) $stmt->fetchColumn();
+}
+
+/** Turn one pending entry into a real entry, then drop it from the queue. */
+function approve_pending_entry(int $id, int $childId): void {
+    $pdo = get_db();
+    $stmt = $pdo->prepare("SELECT * FROM pending_entries WHERE id = :id AND child_id = :cid");
+    $stmt->execute([':id' => $id, ':cid' => $childId]);
+    $p = $stmt->fetch();
+    if (!$p) return;
+
+    $isRaamat = $p['type'] === 'raamat';
+    $bookId = null;
+    if ($isRaamat && (int) $p['book_id'] > 0) {
+        $chosen = get_book_for_child((int) $p['book_id'], $childId);
+        if ($chosen) {
+            $bookId = (int) $chosen['id'];
+            mark_book_started($bookId);
+        }
+    }
+    $ins = $pdo->prepare("INSERT INTO entries (child_id, entry_date, raamat, book_id, raamat_comment, ekraan, ekraan_comment)
+        VALUES (:cid, :d, :raamat, :bid, :rc, :ekraan, :ec)");
+    $ins->execute([
+        ':cid'    => $childId,
+        ':d'      => $p['entry_date'],
+        ':raamat' => $isRaamat ? (int) $p['minutes'] : 0,
+        ':bid'    => $bookId,
+        ':rc'     => $isRaamat && $p['note'] !== null ? $p['note'] : null,
+        ':ekraan' => $isRaamat ? 0 : (int) $p['minutes'],
+        ':ec'     => !$isRaamat && $p['note'] !== null ? $p['note'] : null,
+    ]);
+    if ($isRaamat && $bookId && (int) $p['current_page'] > 0) {
+        update_book_page($bookId, $childId, (int) $p['current_page']);
+    }
+    $pdo->prepare("DELETE FROM pending_entries WHERE id = :id AND child_id = :cid")
+        ->execute([':id' => $id, ':cid' => $childId]);
+}
+
+function reject_pending_entry(int $id, int $childId): void {
+    $pdo = get_db();
+    $pdo->prepare("DELETE FROM pending_entries WHERE id = :id AND child_id = :cid")
+        ->execute([':id' => $id, ':cid' => $childId]);
+}
+
+/** The pending list. $parent adds Kinnita / Lükka tagasi controls; otherwise
+ *  it is a plain read-only "waiting" list for the child's own view. */
+function render_pending_queue(array $rows, int $childId, bool $parent = true): void {
+    ?>
+    <div class="pending-list">
+        <?php foreach ($rows as $p):
+            $isRaamat = $p['type'] === 'raamat';
+            $label = $p['book_title'] ?: ($p['note'] ?: ($isRaamat ? 'Raamat' : 'Ekraan'));
+        ?>
+        <div class="pending-row">
+            <div class="pending-main">
+                <span class="tag <?= $isRaamat ? 'tag-reading' : 'tag-screen' ?>"><?= emoji_svg($isRaamat ? 'books' : 'screen') ?> <?= (int) $p['minutes'] ?> min</span>
+                <div class="pending-label"><?= htmlspecialchars($label) ?><span class="pending-meta"><?= htmlspecialchars(date('d.m', strtotime($p['entry_date']))) ?><?= $p['source'] === 'taimer' ? ' · taimer' : '' ?></span></div>
+            </div>
+            <?php if ($parent): ?>
+            <div class="pending-actions">
+                <form method="post">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="child" value="<?= $childId ?>">
+                    <input type="hidden" name="action" value="pending_approve">
+                    <input type="hidden" name="pending_id" value="<?= (int) $p['id'] ?>">
+                    <button type="submit" class="btn-approve"><?= icon('check') ?> Kinnita</button>
+                </form>
+                <form method="post" onsubmit="return confirm('Lükata see kanne tagasi?');">
+                    <?= csrf_field() ?>
+                    <input type="hidden" name="child" value="<?= $childId ?>">
+                    <input type="hidden" name="action" value="pending_reject">
+                    <input type="hidden" name="pending_id" value="<?= (int) $p['id'] ?>">
+                    <button type="submit" class="btn-reject">Lükka tagasi</button>
+                </form>
+            </div>
+            <?php else: ?>
+            <span class="pending-wait">⏳ ootel</span>
+            <?php endif; ?>
+        </div>
+        <?php endforeach; ?>
+    </div>
+    <?php
+}
+
 /**
  * Reading vs screen minutes for today / this ISO week (Mon–Sun) / this
  * calendar month / all time, in one query. All values are plain ints.
