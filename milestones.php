@@ -57,7 +57,7 @@ record_milestones($childId);
         <h1 class="app-logo"><img src="logo-mark.png" alt="" width="44" height="44">Ajaraamat</h1>
         <div class="header-actions">
             <button type="button" class="icon-btn" onclick="location.reload();" aria-label="Värskenda" title="Värskenda"><?= icon("refresh") ?></button>
-            <a href="children.php" class="link-muted">Lapsed</a>
+            <a href="children.php" class="link-muted">Pere</a>
             <?php if (is_admin()): ?>
                 <a href="admin.php" class="link-muted">Admin</a>
             <?php endif; ?>
