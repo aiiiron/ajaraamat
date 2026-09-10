@@ -68,6 +68,9 @@ $baseUrl = $scheme . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['SCRIPT_NAME
         <div class="header-actions">
             <button type="button" class="icon-btn" onclick="location.reload();" aria-label="Värskenda" title="Värskenda"><?= icon("refresh") ?></button>
             <a href="children.php" class="link-muted current" aria-current="page">Lapsed</a>
+            <?php if (is_admin()): ?>
+                <a href="admin.php" class="link-muted">Admin</a>
+            <?php endif; ?>
             <a href="logout.php" class="link-muted">Logi välja</a>
         </div>
     </header>
