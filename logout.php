@@ -8,5 +8,6 @@ unset(
     $_SESSION['is_demo']
 );
 session_destroy();
-header('Location: login.php');
+$dest = ($_GET['then'] ?? '') === 'demo' ? 'demo_parent.php' : 'login.php';
+header('Location: ' . $dest);
 exit;
