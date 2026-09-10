@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <form method="post">
         <label for="password">Admini parool</label>
         <input type="password" id="password" name="password" autofocus required>
-        <button type="submit">Logi sisse</button>
+        <button type="submit" class="btn btn-add full-width">Logi sisse</button>
     </form>
     <a href="index.php" class="link-muted login-home-link">← Avaleht</a>
 </div>

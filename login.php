@@ -86,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <label for="password">Parool</label>
         <input type="password" id="password" name="password" required>
 
-        <button type="submit">Logi sisse</button>
+        <button type="submit" class="btn btn-add full-width">Logi sisse</button>
     </form>
     <a href="demo_parent.php" class="link-muted login-home-link">👀 Proovi demot — vanema vaade</a><br>
     <a href="demo_child.php" class="link-muted login-home-link">👦 Proovi demot — lapse vaade</a><br>

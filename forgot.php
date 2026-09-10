@@ -97,7 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label for="email">E-post</label>
             <input type="email" id="email" name="email" value="<?= htmlspecialchars($_POST['email'] ?? '') ?>" autofocus required>
 
-            <button type="submit">Saada lähtestamise link</button>
+            <button type="submit" class="btn btn-add full-width">Saada lähtestamise link</button>
         </form>
         <a href="login.php" class="link-muted login-home-link">← Tagasi sisselogimisse</a>
     <?php endif; ?>

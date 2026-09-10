@@ -36,3 +36,13 @@ define('POEM_BONUS_MULT', 2.0);
 // Vali midagi juhuslikku ja pikka; sama väärtus läheb cron-käsu ?key= külge.
 // Saidi omanik (ADMIN_EMAIL) saab seda ka ilma võtmeta käivitada.
 define('DEMO_SEED_KEY', 'changeme-long-random-string');
+
+// Demo-konto sisselogimised. NB: demo_parent.php ja demo_child.php ei logi
+// enam automaatselt sisse — need on tavalised parool-vormid, mis kontrollivad
+// just neid väärtusi. Nii pole demo enam kõigile avalik: link üksi ei anna
+// ligipääsu, ilma õige parooli teadmiseta. Muuda mõlemad reaalses config.php-s;
+// need näidisväärtused ei jõua kunagi GitHubi.
+define('DEMO_PARENT_EMAIL', 'changeme-parent@example.com');
+define('DEMO_PARENT_PASSWORD', 'changeme-parent-password');
+define('DEMO_CHILD_EMAIL', 'changeme-child@example.com');
+define('DEMO_CHILD_PASSWORD', 'changeme-child-password');

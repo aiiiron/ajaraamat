@@ -82,7 +82,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label for="child_name">Lapse nimi</label>
             <input type="text" id="child_name" name="child_name" value="<?= htmlspecialchars($_POST['child_name'] ?? '') ?>" placeholder="nt. Mari" required>
 
-            <button type="submit">Loo konto</button>
+            <button type="submit" class="btn btn-add full-width">Loo konto</button>
         </form>
         <a href="login.php" class="link-muted login-home-link">Konto juba olemas? Logi sisse</a>
     <?php endif; ?>

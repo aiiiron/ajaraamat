@@ -641,6 +641,7 @@ function count_pending_entries(int $childId): int {
 }
 
 /** Turn one pending entry into a real entry, then drop it from the queue. */
+/** Approve a pending entry exactly as the child submitted it. */
 function approve_pending_entry(int $id, int $childId): void {
     $pdo = get_db();
     $stmt = $pdo->prepare("SELECT * FROM pending_entries WHERE id = :id AND child_id = :cid");
@@ -648,31 +649,60 @@ function approve_pending_entry(int $id, int $childId): void {
     $p = $stmt->fetch();
     if (!$p) return;
 
-    $isRaamat = $p['type'] === 'raamat';
-    $bookId = null;
-    if ($isRaamat && (int) $p['book_id'] > 0) {
-        $chosen = get_book_for_child((int) $p['book_id'], $childId);
+    approve_pending_entry_with_edits(
+        $id, $childId, (string) $p['entry_date'], (string) $p['type'], (int) $p['minutes'],
+        $p['book_id'] ? (int) $p['book_id'] : null, $p['note'],
+        $p['current_page'] ? (int) $p['current_page'] : null
+    );
+}
+
+/** Approve a pending entry, but with a parent's corrections applied first —
+ *  saves re-typing it as a fresh entry for a small fix (wrong minutes, wrong
+ *  book, ...). Used by edit_pending.php. */
+function approve_pending_entry_with_edits(int $id, int $childId, string $date, string $type, int $minutes, ?int $bookId, ?string $note, ?int $currentPage): void {
+    $pdo = get_db();
+    $stmt = $pdo->prepare("SELECT id FROM pending_entries WHERE id = :id AND child_id = :cid");
+    $stmt->execute([':id' => $id, ':cid' => $childId]);
+    if (!$stmt->fetch()) return;
+
+    $isRaamat = $type === 'raamat';
+    $minutes = max(1, min(600, $minutes));
+    $note = trim((string) $note);
+    $note = $note !== '' ? mb_substr($note, 0, 255) : null;
+
+    $realBookId = null;
+    if ($isRaamat && $bookId) {
+        $chosen = get_book_for_child($bookId, $childId);
         if ($chosen) {
-            $bookId = (int) $chosen['id'];
-            mark_book_started($bookId);
+            $realBookId = (int) $chosen['id'];
+            mark_book_started($realBookId);
         }
     }
     $ins = $pdo->prepare("INSERT INTO entries (child_id, entry_date, raamat, book_id, raamat_comment, ekraan, ekraan_comment)
         VALUES (:cid, :d, :raamat, :bid, :rc, :ekraan, :ec)");
     $ins->execute([
         ':cid'    => $childId,
-        ':d'      => $p['entry_date'],
-        ':raamat' => $isRaamat ? (int) $p['minutes'] : 0,
-        ':bid'    => $bookId,
-        ':rc'     => $isRaamat && $p['note'] !== null ? $p['note'] : null,
-        ':ekraan' => $isRaamat ? 0 : (int) $p['minutes'],
-        ':ec'     => !$isRaamat && $p['note'] !== null ? $p['note'] : null,
+        ':d'      => $date,
+        ':raamat' => $isRaamat ? $minutes : 0,
+        ':bid'    => $realBookId,
+        ':rc'     => $isRaamat ? $note : null,
+        ':ekraan' => $isRaamat ? 0 : $minutes,
+        ':ec'     => !$isRaamat ? $note : null,
     ]);
-    if ($isRaamat && $bookId && (int) $p['current_page'] > 0) {
-        update_book_page($bookId, $childId, (int) $p['current_page']);
+    if ($isRaamat && $realBookId && $currentPage !== null && $currentPage > 0) {
+        update_book_page($realBookId, $childId, $currentPage);
     }
     $pdo->prepare("DELETE FROM pending_entries WHERE id = :id AND child_id = :cid")
         ->execute([':id' => $id, ':cid' => $childId]);
+}
+
+function get_pending_entry_for_child(int $id, int $childId): ?array {
+    $pdo = get_db();
+    $stmt = $pdo->prepare("SELECT p.*, b.title AS book_title
+        FROM pending_entries p LEFT JOIN books b ON b.id = p.book_id
+        WHERE p.id = :id AND p.child_id = :cid");
+    $stmt->execute([':id' => $id, ':cid' => $childId]);
+    return $stmt->fetch() ?: null;
 }
 
 function reject_pending_entry(int $id, int $childId): void {
@@ -697,6 +727,7 @@ function render_pending_queue(array $rows, int $childId, bool $parent = true): v
             </div>
             <?php if ($parent): ?>
             <div class="pending-actions">
+                <a class="pending-edit" href="edit_pending.php?id=<?= (int) $p['id'] ?>&child=<?= $childId ?>" aria-label="Muuda" title="Muuda enne kinnitamist"><?= icon('pencil') ?></a>
                 <form method="post">
                     <?= csrf_field() ?>
                     <input type="hidden" name="child" value="<?= $childId ?>">

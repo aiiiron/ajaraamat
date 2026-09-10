@@ -1595,8 +1595,16 @@ select:focus { outline: 2px solid var(--accent-purple); border-color: transparen
   color: var(--text-muted);
   font-family: var(--font-body);
 }
-.pending-actions { display: flex; gap: 8px; flex: none; }
+.pending-actions { display: flex; align-items: center; gap: 8px; flex: none; }
 .pending-actions form { margin: 0; }
+.pending-edit {
+  display: inline-flex;
+  align-items: center;
+  color: var(--text-muted);
+  flex: none;
+}
+.pending-edit svg { width: 16px; height: 16px; }
+.pending-edit:active { transform: scale(0.9); }
 .btn-approve,
 .btn-reject {
   border: none;

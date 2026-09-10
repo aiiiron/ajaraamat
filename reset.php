@@ -78,7 +78,7 @@ if (!$invalid && $_SERVER['REQUEST_METHOD'] === 'POST') {
             <label for="password_confirm">Uus parool uuesti</label>
             <input type="password" id="password_confirm" name="password_confirm" required minlength="6">
 
-            <button type="submit">Salvesta uus parool</button>
+            <button type="submit" class="btn btn-add full-width">Salvesta uus parool</button>
         </form>
         <a href="login.php" class="link-muted login-home-link">← Tagasi sisselogimisse</a>
     <?php endif; ?>

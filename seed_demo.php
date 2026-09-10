@@ -18,19 +18,26 @@ if (!$allowed) {
     exit('Forbidden');
 }
 
+if (!defined('DEMO_PARENT_EMAIL') || !defined('DEMO_PARENT_PASSWORD')) {
+    http_response_code(500);
+    exit("DEMO_PARENT_EMAIL / DEMO_PARENT_PASSWORD not set in config.php — see config.example.php.\n");
+}
+
 $pdo = get_db();
 $pdo->beginTransaction();
 
 try {
 
-// ---- 1. demo family -------------------------------------------------------
+// ---- 1. demo family ---------------------------------------------------------
+$parentHash = password_hash(DEMO_PARENT_PASSWORD, PASSWORD_DEFAULT);
 $familyId = (int) $pdo->query("SELECT id FROM families WHERE is_demo = 1 ORDER BY id ASC LIMIT 1")->fetchColumn();
 if ($familyId === 0) {
     $ins = $pdo->prepare("INSERT INTO families (email, password_hash, status, is_demo) VALUES (:e, :h, 'approved', 1)");
-    $ins->execute([':e' => 'demo@ajaraamat.local', ':h' => password_hash(bin2hex(random_bytes(16)), PASSWORD_DEFAULT)]);
+    $ins->execute([':e' => DEMO_PARENT_EMAIL, ':h' => $parentHash]);
     $familyId = (int) $pdo->lastInsertId();
 } else {
-    $pdo->prepare("UPDATE families SET status = 'approved', is_demo = 1 WHERE id = :id")->execute([':id' => $familyId]);
+    $pdo->prepare("UPDATE families SET email = :e, password_hash = :h, status = 'approved', is_demo = 1 WHERE id = :id")
+        ->execute([':e' => DEMO_PARENT_EMAIL, ':h' => $parentHash, ':id' => $familyId]);
 }
 
 // ---- 2. wipe old content ------------------------------------------------------
