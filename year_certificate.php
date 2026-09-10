@@ -167,7 +167,7 @@ $certDensity = $bookCount > 40 ? 'cert-dense' : ($bookCount > 12 ? 'cert-compact
         <?php endif; ?>
 
         <?php if (!empty($milestones)): ?>
-            <p class="cert-section-title">Verstapostid</p>
+            <p class="cert-section-title">Saavutused</p>
             <div class="cert-milestones">
                 <?php foreach ($milestones as $m): [$icon, $text] = milestone_text($m); ?>
                     <span class="cert-ms"><?= htmlspecialchars($icon) ?> <?= htmlspecialchars($text) ?></span>
