@@ -120,23 +120,52 @@ $featureFlags = get_feature_flags();
     </section>
 
     <section class="card">
-        <h2>Pere+ funktsioonid</h2>
+        <h2>Plaanide võrdlus</h2>
         <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px;">
-            Lülita, millised funktsioonid on hetkel Pere+ jaoks (lülita välja, et teha
-            kõigile tasuta — nt kui katsetad hinnastust või piirad ajutiselt midagi muud).
+            Iga funktsioon kuulub kas Tasuta või Pere+ plaani. Klõpsa punktiirringil,
+            et tõsta funktsioon teise plaani alla — muudatus kehtib kohe kõigile peredele,
+            kelle enda plaani sa pole eraldi määranud.
         </p>
-        <?php foreach ($featureFlags as $flag): ?>
-            <form method="post" style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid var(--border);">
-                <?= csrf_field() ?>
-                <input type="hidden" name="action" value="toggle_feature">
-                <input type="hidden" name="flag_id" value="<?= htmlspecialchars($flag['id']) ?>">
-                <input type="hidden" name="is_premium" value="<?= $flag['is_premium'] ? '0' : '1' ?>">
-                <span style="font-size:14px;"><?= htmlspecialchars($flag['label']) ?></span>
-                <button type="submit" class="tag <?= $flag['is_premium'] ? 'tag-reading' : '' ?>" style="border:none;cursor:pointer;white-space:nowrap;">
-                    <?= $flag['is_premium'] ? '🌟 Pere+' : 'Tasuta kõigile' ?>
-                </button>
-            </form>
-        <?php endforeach; ?>
+        <div class="table-scroll">
+        <table class="entries-table plan-table">
+            <thead>
+                <tr><th>Funktsioon</th><th class="plan-col">Tasuta</th><th class="plan-col">Pere+</th></tr>
+            </thead>
+            <tbody>
+            <?php foreach ($featureFlags as $flag): ?>
+                <tr>
+                    <td><?= htmlspecialchars($flag['label']) ?></td>
+                    <td class="plan-col">
+                        <?php if (!$flag['is_premium']): ?>
+                            <span class="plan-check" title="Tasuta kõigile">✓</span>
+                        <?php else: ?>
+                            <form method="post">
+                                <?= csrf_field() ?>
+                                <input type="hidden" name="action" value="toggle_feature">
+                                <input type="hidden" name="flag_id" value="<?= htmlspecialchars($flag['id']) ?>">
+                                <input type="hidden" name="is_premium" value="0">
+                                <button type="submit" class="plan-move-btn" title="Tee kõigile tasuta">→</button>
+                            </form>
+                        <?php endif; ?>
+                    </td>
+                    <td class="plan-col">
+                        <?php if ($flag['is_premium']): ?>
+                            <span class="plan-check" title="Pere+ jaoks">✓</span>
+                        <?php else: ?>
+                            <form method="post">
+                                <?= csrf_field() ?>
+                                <input type="hidden" name="action" value="toggle_feature">
+                                <input type="hidden" name="flag_id" value="<?= htmlspecialchars($flag['id']) ?>">
+                                <input type="hidden" name="is_premium" value="1">
+                                <button type="submit" class="plan-move-btn" title="Tee Pere+ jaoks">←</button>
+                            </form>
+                        <?php endif; ?>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+        </div>
     </section>
 
     <section class="card">
