@@ -76,7 +76,7 @@ $chartEkraan = array_map(fn($d) => $d['ekraan'], $daily);
 <body>
 <div class="wrap">
     <header class="topbar">
-        <h1 class="app-logo"><img src="logo-mark.png" alt="" width="44" height="44">Ajaraamat</h1>
+        <h1 class="app-logo"><img src="logo-mark.png?v=2" alt="" width="44" height="44">Ajaraamat</h1>
         <div class="header-actions">
             <button type="button" class="icon-btn" onclick="location.reload();" aria-label="Värskenda" title="Värskenda"><?= icon("refresh") ?></button>
             <a href="children.php" class="link-muted">Pere</a>

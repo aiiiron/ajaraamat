@@ -144,7 +144,7 @@ $canNoWatermark = has_feature($familyId, 'certificate_no_watermark');
 
     <div class="cert-page <?= $certDensity ?>">
       <div class="cert-body">
-        <div class="cert-mark"><img src="logo-mark.png" alt=""></div>
+        <div class="cert-mark"><img src="logo-mark.png?v=2" alt=""></div>
         <p class="cert-kicker">Lugemistunnistus</p>
         <p class="cert-name"><?= htmlspecialchars($child['name']) ?></p>
         <p class="cert-year"><?= $year ?>. aasta lugemine</p>

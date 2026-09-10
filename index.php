@@ -161,7 +161,7 @@ if (!empty($_SESSION['family_id'])) {
 <body>
 
 <header class="top">
-  <div class="logo"><img src="logo-mark.png" alt="" width="46" height="46" style="border-radius:10px;"> Ajaraamat</div>
+  <div class="logo"><img src="logo-mark.png?v=2" alt="" width="46" height="46" style="border-radius:10px;"> Ajaraamat</div>
   <nav class="top-links">
     <a href="#omadused">Omadused</a>
     <a href="#vaade">Vaata lähemalt</a>
@@ -184,7 +184,7 @@ if (!empty($_SESSION['family_id'])) {
   <div class="mock-wrap">
     <div class="streak-chip">🔥 6 päeva järjest</div>
     <div class="mock-card">
-      <div class="mock-head"><img src="logo-mark.png" alt="" width="24" height="24" style="border-radius:6px;"> Ajaraamat</div>
+      <div class="mock-head"><img src="logo-mark.png?v=2" alt="" width="24" height="24" style="border-radius:6px;"> Ajaraamat</div>
       <div class="mock-balance">
         <div class="l">Lugemise tasakaal</div>
         <div class="v">42 min lugemise boonust</div>
