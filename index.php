@@ -99,7 +99,7 @@ $adminEmail = defined('ADMIN_EMAIL') ? trim((string) ADMIN_EMAIL) : '';
   .btn-ghost:hover { box-shadow: 0 10px 24px -12px rgba(61,51,88,0.45); }
 
   .mock-wrap { position: relative; }
-  .mock-card { background: var(--paper-raised); border: none; border-radius: 22px; box-shadow: 0 24px 60px -20px rgba(139,92,246,0.35); padding: 20px; transform: rotate(-2.2deg); }
+  .mock-card { position: relative; z-index: 1; background: var(--paper-raised); border: none; border-radius: 22px; box-shadow: 0 24px 60px -20px rgba(139,92,246,0.35); padding: 20px; transform: rotate(-2.2deg); }
   .mock-card .mock-head { font-family: 'Baloo 2', sans-serif; font-size: 13px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 6px; }
   .mock-balance { border-radius: 14px; background: #F7F4FC; padding: 14px 16px; margin-bottom: 14px; position: relative; overflow: hidden; }
   .mock-balance::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 5px; background: linear-gradient(90deg, var(--reading), var(--screen)); }
@@ -118,7 +118,7 @@ $adminEmail = defined('ADMIN_EMAIL') ? trim((string) ADMIN_EMAIL) : '';
   .mock-pill.em { background: var(--reading-tint); color: #C93E68; }
   .mock-pill.in { background: var(--screen-tint); color: #4A5FB5; }
   .mock-pill .emo { width: 1.25em; height: 1.25em; vertical-align: -0.25em; display: inline-block; }
-  .streak-chip { position: absolute; top: -14px; right: 18px; background: linear-gradient(90deg, #FFC98A, #FFA8CB); color: #93450A; font-family: 'Baloo 2', sans-serif; font-size: 13px; font-weight: 700; padding: 8px 14px; border-radius: 99px; box-shadow: 0 8px 20px -8px rgba(147,69,10,0.3); transform: rotate(3deg); }
+  .streak-chip { position: absolute; z-index: 2; top: -14px; right: 18px; background: linear-gradient(90deg, #FFC98A, #FFA8CB); color: #93450A; font-family: 'Baloo 2', sans-serif; font-size: 13px; font-weight: 700; padding: 8px 14px; border-radius: 99px; box-shadow: 0 8px 20px -8px rgba(147,69,10,0.3); transform: rotate(3deg); }
 
   section { padding: 60px 0; }
   section + section { padding-top: 0; }
@@ -134,10 +134,13 @@ $adminEmail = defined('ADMIN_EMAIL') ? trim((string) ADMIN_EMAIL) : '';
   .feature h3 { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
   .feature p { font-size: 14.5px; }
 
-  .screens { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
-  .screen-card { background: var(--paper-raised); border: none; border-radius: 20px; padding: 18px; box-shadow: 0 16px 40px -24px rgba(61,51,88,0.35); }
-  .screen-card h4 { font-family: 'Baloo 2', sans-serif; font-size: 14px; font-weight: 700; margin-bottom: 12px; color: var(--ink-soft); }
-  .screen-inner { background: #F7F4FC; border-radius: 14px; padding: 16px; }
+  /* Real in-app screenshots — horizontally scrollable, like an app-store gallery */
+  .gallery { display: flex; gap: 20px; overflow-x: auto; padding: 6px 6px 18px; margin: 0 -6px; scroll-snap-type: x proximity; -webkit-overflow-scrolling: touch; }
+  .gallery-item { flex: 0 0 auto; width: 230px; scroll-snap-align: start; }
+  .gallery-frame { border-radius: 20px; overflow: hidden; background: var(--paper-raised); box-shadow: 0 16px 40px -22px rgba(61,51,88,0.4); height: 400px; }
+  .gallery-frame img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; }
+  .gallery-cap { margin-top: 12px; font-family: 'Baloo 2', sans-serif; font-size: 14.5px; font-weight: 700; text-align: center; }
+  .gallery-cap span { display: block; font-family: 'Nunito', sans-serif; font-size: 12.5px; font-weight: 600; color: var(--ink-soft); margin-top: 2px; }
 
   /* Tasuta vs. Pere+ */
   .plans { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; align-items: stretch; }
@@ -172,7 +175,6 @@ $adminEmail = defined('ADMIN_EMAIL') ? trim((string) ADMIN_EMAIL) : '';
     .hero { grid-template-columns: 1fr; }
     .hero h1 { font-size: 32px; }
     .features { grid-template-columns: 1fr; }
-    .screens { grid-template-columns: 1fr; }
     .plans { grid-template-columns: 1fr; }
     .steps { grid-template-columns: 1fr; }
     nav.top-links a:not(.cta-link) { display: none; }
@@ -375,38 +377,45 @@ $adminEmail = defined('ADMIN_EMAIL') ? trim((string) ADMIN_EMAIL) : '';
 <section id="vaade">
   <div class="wrap">
     <div class="section-head">
-      <span class="section-kicker">Kaks vaadet</span>
-      <h2>Kaks vaadet, üks tasakaal</h2>
-      <p>Vanem näeb tervikpilti ja saab kandeid hallata. Laps näeb oma enda tasakaalu — lihtsalt ja selgelt.</p>
+      <span class="section-kicker">Vaata lähemalt</span>
+      <h2>Otse rakendusest — päris vaated</h2>
+      <p>Ehtsad kuvatõmmised meie avalikust demo perest: vanema töölaud, pere ülevaade, raamatud, saavutused ja lapse enda vaade.</p>
     </div>
-    <div class="screens">
-      <div class="screen-card">
-        <h4>Vanema töölaud</h4>
-        <div class="screen-inner">
-          <div class="mock-balance" style="margin-bottom:10px;">
-            <div class="l">Lugemise tasakaal</div>
-            <div class="v">7 min lugemist võlgu</div>
-          </div>
-          <div class="mock-rows">
-            <div class="mock-row"><span class="mock-pill em"><?= emoji_svg('books') ?> 60 min</span> Meister</div>
-            <div class="mock-row"><span class="mock-pill in"><?= emoji_svg('screen') ?> 77 min</span> Youtube</div>
-          </div>
-        </div>
+    <div class="gallery">
+      <div class="gallery-item">
+        <div class="gallery-frame"><img src="screens/01_dashboard.webp" width="640" height="1000" alt="Vanema töölaud Ajaraamatus — kinnitamist ootavad kanded ja tasakaal" loading="lazy"></div>
+        <p class="gallery-cap">Vanema töölaud<span>Kinnitusootel kanded, tasakaal, eesmärk</span></p>
       </div>
-      <div class="screen-card">
-        <h4>Lapse vaade (ilma sisselogimiseta)</h4>
-        <div class="screen-inner">
-          <div class="mock-balance" style="margin-bottom:10px;">
-            <div class="l">Sinu tasakaal</div>
-            <div class="v">Tasakaalus!</div>
-          </div>
-          <div class="mock-rows">
-            <div class="mock-row"><span class="mock-pill em"><?= emoji_svg('books') ?> 45 min</span> Sipsik</div>
-            <div class="mock-row">🏆 Väljakutse: 8/10 raamatut</div>
-          </div>
-        </div>
+      <div class="gallery-item">
+        <div class="gallery-frame"><img src="screens/02_overview.webp" width="640" height="820" alt="Pere ülevaade — kõik lapsed korraga" loading="lazy"></div>
+        <p class="gallery-cap">Pere ülevaade<span>Kõik lapsed ühel lehel</span></p>
+      </div>
+      <div class="gallery-item">
+        <div class="gallery-frame"><img src="screens/03_books.webp" width="640" height="1200" alt="Raamatute nimekiri ja lugemisväljakutse" loading="lazy"></div>
+        <p class="gallery-cap">Raamatud ja väljakutsed<span>Aasta kokkuvõte, väljakutse, raamaturiiul</span></p>
+      </div>
+      <div class="gallery-item">
+        <div class="gallery-frame"><img src="screens/04_milestones.webp" width="640" height="1033" alt="Saavutuste vaade koos automaatsete verstapostidega" loading="lazy"></div>
+        <p class="gallery-cap">Saavutused<span>Automaatsed ja oma lisatud verstapostid</span></p>
+      </div>
+      <div class="gallery-item">
+        <div class="gallery-frame"><img src="screens/05_week.webp" width="640" height="867" alt="Iganädalane kokkuvõte tipphetkedega" loading="lazy"></div>
+        <p class="gallery-cap">Iganädalane kokkuvõte<span>Nädala tipphetked ja eesmärgi täitmine</span></p>
+      </div>
+      <div class="gallery-item">
+        <div class="gallery-frame"><img src="screens/06_certificate.webp" width="640" height="1133" alt="Väljaprinditav aastane lugemistunnistus" loading="lazy"></div>
+        <p class="gallery-cap">Aastane lugemistunnistus<span>Ilus, allalaaditav PDF</span></p>
+      </div>
+      <div class="gallery-item">
+        <div class="gallery-frame"><img src="screens/07_child.webp" width="640" height="1143" alt="Lapse enda vaade ilma sisselogimiseta" loading="lazy"></div>
+        <p class="gallery-cap">Lapse vaade<span>Ilma sisselogimiseta, oma lingiga</span></p>
+      </div>
+      <div class="gallery-item">
+        <div class="gallery-frame"><img src="screens/08_child_milestones.webp" width="640" height="762" alt="Lapse enda saavutuste vaade" loading="lazy"></div>
+        <p class="gallery-cap">Lapse enda saavutused<span>Motiveeriv, lapsele mõistetav</span></p>
       </div>
     </div>
+    <p style="text-align:center;margin-top:8px;"><a href="demo_parent.php" class="btn btn-ghost">👀 Proovi ise, vanema vaade</a> <a href="demo_child.php" class="btn btn-ghost">👦 Proovi ise, lapse vaade</a></p>
   </div>
 </section>
 
