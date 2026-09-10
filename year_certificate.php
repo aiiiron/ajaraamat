@@ -19,6 +19,17 @@ $summary = get_year_summary($childId, $year);
 $books = get_books_finished_in_year($childId, $year);
 $milestones = get_milestones_in_year($childId, $year);
 $nf = fn($n) => number_format((int) $n, 0, ',', "\u{202F}");
+
+// The certificate is a single printed page, always — never spill to a second.
+// As the book list grows, switch to two columns and progressively smaller
+// type instead of letting it overflow; past a point, cap the list outright.
+$bookCount = count($books);
+$moreBooks = 0;
+if ($bookCount > 60) {
+    $moreBooks = $bookCount - 60;
+    $books = array_slice($books, 0, 60);
+}
+$certDensity = $bookCount > 40 ? 'cert-dense' : ($bookCount > 12 ? 'cert-compact' : '');
 ?>
 <!DOCTYPE html>
 <html lang="et">
@@ -63,11 +74,41 @@ $nf = fn($n) => number_format((int) $n, 0, ',', "\u{202F}");
     font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 13px; color: #7B7096;
     text-transform: uppercase; letter-spacing: 0.05em; margin: 22px 0 8px;
   }
-  .cert-books { list-style: none; margin: 0; padding: 0; }
-  .cert-books li { padding: 5px 0; font-size: 14px; border-bottom: 1px solid #F0E6F5; }
+  .cert-books { list-style: none; margin: 0; padding: 0; column-count: 1; column-gap: 28px; }
+  .cert-books li { padding: 5px 0; font-size: 14px; border-bottom: 1px solid #F0E6F5; break-inside: avoid; }
   .cert-books li:last-child { border-bottom: none; }
   .cert-books .a { color: #7B7096; font-size: 12px; }
+  .cert-books-more { font-size: 12px; color: #7B7096; margin-top: 6px; }
   .cert-milestones { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  /* Density tiers — a long book list gets two columns and smaller type
+     instead of pushing the certificate onto a second page. */
+  .cert-compact .cert-page { padding: 30px 30px; }
+  .cert-compact .cert-mark img { width: 48px; height: 48px; }
+  .cert-compact .cert-name { font-size: 24px; margin-top: 4px; }
+  .cert-compact .cert-kicker { margin-top: 10px; }
+  .cert-compact .cert-stats { margin: 16px 0; }
+  .cert-compact .cert-stat-n { font-size: 19px; }
+  .cert-compact .cert-section-title { margin: 14px 0 6px; }
+  .cert-compact .cert-books { column-count: 2; }
+  .cert-compact .cert-books li { font-size: 12.5px; padding: 3px 0; }
+  .cert-compact .cert-footer { margin-top: 18px; }
+
+  .cert-dense .cert-page { padding: 24px 28px; }
+  .cert-dense .cert-mark img { width: 40px; height: 40px; }
+  .cert-dense .cert-kicker { margin-top: 8px; font-size: 11px; }
+  .cert-dense .cert-name { font-size: 21px; margin-top: 3px; }
+  .cert-dense .cert-year { font-size: 13px; }
+  .cert-dense .cert-stats { margin: 12px 0; gap: 6px; }
+  .cert-dense .cert-stat-n { font-size: 16px; }
+  .cert-dense .cert-stat-l { font-size: 9.5px; }
+  .cert-dense .cert-section-title { margin: 10px 0 4px; font-size: 11px; }
+  .cert-dense .cert-books { column-count: 2; }
+  .cert-dense .cert-books li { font-size: 10.5px; padding: 2px 0; }
+  .cert-dense .cert-books .a { font-size: 9px; }
+  .cert-dense .cert-milestones { gap: 5px; }
+  .cert-dense .cert-ms { font-size: 10px; padding: 4px 9px; }
+  .cert-dense .cert-footer { margin-top: 12px; font-size: 10.5px; }
   .cert-ms { display: flex; align-items: center; gap: 6px; background: #FBF5FF; border-radius: 999px; padding: 6px 12px; font-size: 12px; font-weight: 700; }
   .cert-footer { margin-top: 34px; display: flex; justify-content: space-between; align-items: flex-end; font-size: 12px; color: #7B7096; }
   .cert-sign { border-top: 1.5px solid #D9C6F5; padding-top: 4px; min-width: 180px; text-align: center; }
@@ -98,7 +139,7 @@ $nf = fn($n) => number_format((int) $n, 0, ',', "\u{202F}");
     </div>
     <p class="child-link-note no-print" style="text-align:right;margin:-10px 0 14px;">Vali avanevas aknas sihtkohaks „Salvesta PDF-ina" (Save as PDF) ja luba „Taustapildid"/„Background graphics".</p>
 
-    <div class="cert-page">
+    <div class="cert-page <?= $certDensity ?>">
         <div class="cert-mark"><img src="logo-mark.png" alt=""></div>
         <p class="cert-kicker">Lugemistunnistus</p>
         <p class="cert-name"><?= htmlspecialchars($child['name']) ?></p>
@@ -120,6 +161,9 @@ $nf = fn($n) => number_format((int) $n, 0, ',', "\u{202F}");
                     <li><?= htmlspecialchars($b['title']) ?><?php if ($b['author']): ?> <span class="a">— <?= htmlspecialchars($b['author']) ?></span><?php endif; ?></li>
                 <?php endforeach; ?>
             </ul>
+            <?php if ($moreBooks > 0): ?>
+                <p class="cert-books-more">… ja veel <?= $moreBooks ?> raamatut.</p>
+            <?php endif; ?>
         <?php endif; ?>
 
         <?php if (!empty($milestones)): ?>
