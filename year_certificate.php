@@ -35,12 +35,9 @@ $nf = fn($n) => number_format((int) $n, 0, ',', "\u{202F}");
   .cert-toolbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
   .cert-page {
     background: #FFFFFF; color: #392F4D; border-radius: 22px;
-    padding: 40px 32px; position: relative; overflow: hidden;
+    padding: 40px 32px; position: relative;
     border: 3px solid #EADCFB;
     box-shadow: 0 20px 46px -24px rgba(139,92,246,0.4);
-  }
-  .cert-page::before {
-    content: ''; position: absolute; inset: 10px; border: 1.5px dashed #D9C6F5; border-radius: 14px; pointer-events: none;
   }
   .cert-mark { text-align: center; }
   .cert-mark img { width: 64px; height: 64px; border-radius: 16px; }
@@ -75,13 +72,16 @@ $nf = fn($n) => number_format((int) $n, 0, ',', "\u{202F}");
   .cert-footer { margin-top: 34px; display: flex; justify-content: space-between; align-items: flex-end; font-size: 12px; color: #7B7096; }
   .cert-sign { border-top: 1.5px solid #D9C6F5; padding-top: 4px; min-width: 180px; text-align: center; }
   .cert-empty { color: #7B7096; font-size: 13px; }
+  @page { size: A4; margin: 14mm 16mm; }
   @media print {
-    body { background: #fff !important; }
+    html, body { background: #fff !important; }
     .no-print { display: none !important; }
     .wrap { max-width: none; padding: 0; }
-    .cert-page { border: none; box-shadow: none; padding: 0; }
-    .cert-page::before { border-color: #E5D6F7; }
-    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .cert-page { box-shadow: none; }
+    .cert-stats, .cert-mark, .cert-kicker, .cert-name, .cert-year,
+    .cert-section-title, .cert-footer { break-inside: avoid; }
+    .cert-books li, .cert-ms { break-inside: avoid; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; color-adjust: exact; }
   }
 </style>
 </head>
@@ -93,10 +93,10 @@ $nf = fn($n) => number_format((int) $n, 0, ',', "\u{202F}");
             <?php if ($year > $minYear): ?><a href="?child=<?= $childId ?>&year=<?= $year - 1 ?>" class="icon-btn" aria-label="Eelmine aasta">‹</a><?php endif; ?>
             <strong><?= $year ?></strong>
             <?php if ($year < $maxYear): ?><a href="?child=<?= $childId ?>&year=<?= $year + 1 ?>" class="icon-btn" aria-label="Järgmine aasta">›</a><?php endif; ?>
-            <button type="button" class="btn btn-add" onclick="window.print()" style="flex:none;">⬇️ Lae alla PDF</button>
+            <button type="button" class="btn btn-add" onclick="printCertificate()" style="flex:none;">⬇️ Lae alla PDF</button>
         </div>
     </div>
-    <p class="child-link-note no-print" style="text-align:right;margin:-10px 0 14px;">Vali avanevas aknas sihtkohaks „Salvesta PDF-ina" (Save as PDF).</p>
+    <p class="child-link-note no-print" style="text-align:right;margin:-10px 0 14px;">Vali avanevas aknas sihtkohaks „Salvesta PDF-ina" (Save as PDF) ja luba „Taustapildid"/„Background graphics".</p>
 
     <div class="cert-page">
         <div class="cert-mark"><img src="logo-mark.png" alt=""></div>
@@ -137,5 +137,16 @@ $nf = fn($n) => number_format((int) $n, 0, ',', "\u{202F}");
         </div>
     </div>
 </div>
+<script>
+// Wait for the Baloo 2 / Nunito webfonts to finish loading before printing —
+// otherwise a fast click can snapshot the page in the generic fallback font.
+function printCertificate() {
+    if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(function () { window.print(); });
+    } else {
+        window.print();
+    }
+}
+</script>
 </body>
 </html>
