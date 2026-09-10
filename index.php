@@ -195,7 +195,8 @@ $adminEmail = defined('ADMIN_EMAIL') ? trim((string) ADMIN_EMAIL) : '';
   .cta-band h2 { color: #fff; font-size: 30px; margin-bottom: 14px; text-align: left; }
   .cta-band p { color: #C9C4DE; font-size: 16px; max-width: 44ch; margin: 0 0 26px; text-align: left; }
   .cta-band .btn-primary { background: var(--gradient-primary); }
-  .form-note { font-size: 13px; color: #9C96B8; margin-top: 26px; }
+  .form-note { font-size: 13px; color: #9C96B8; }
+  .cta-band .form-note { margin-top: 26px; }
   .cta-visual { position: relative; height: 170px; }
   .cta-chip { position: absolute; background: #fff; color: var(--ink); font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 13.5px; padding: 10px 16px; border-radius: 14px; box-shadow: 0 16px 32px -14px rgba(0,0,0,0.5); white-space: nowrap; }
 
