@@ -138,7 +138,7 @@ $baseUrl = $scheme . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['SCRIPT_NAME
         <a href="paren.php" class="tab">Töölaud</a>
         <a href="history.php" class="tab">Kanded</a>
         <a href="books.php" class="tab">Raamatud</a>
-        <a href="milestones.php" class="tab">Verstapostid</a>
+        <a href="milestones.php" class="tab">Saavutused</a>
     </nav>
 
     <?php if ($error): ?><p class="error"><?= htmlspecialchars($error) ?></p><?php endif; ?>

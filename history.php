@@ -66,7 +66,7 @@ $totals = get_totals($childId);
         <a href="paren.php?child=<?= $childId ?>" class="tab">Töölaud</a>
         <a href="history.php?child=<?= $childId ?>" class="tab active">Kanded</a>
         <a href="books.php?child=<?= $childId ?>" class="tab">Raamatud</a>
-        <a href="milestones.php?child=<?= $childId ?>" class="tab">Verstapostid</a>
+        <a href="milestones.php?child=<?= $childId ?>" class="tab">Saavutused</a>
     </nav>
 
     <?php render_child_switcher($children, $childId, 'history.php'); ?>

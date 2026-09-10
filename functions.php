@@ -1290,7 +1290,7 @@ function milestone_phrase(string $kind, int $n): array {
         case 'days':   return ['📅', $n . ($n === 1 ? ' lugemispäev' : ' lugemispäeva')];
         case 'streak': return ['🔥', $n . ($n === 1 ? ' päev järjest tasakaalus' : ' päeva järjest tasakaalus')];
     }
-    return ['⭐', 'Verstapost'];
+    return ['⭐', 'Saavutus'];
 }
 
 /** Current running totals a child is measured against for automatic milestones. */
@@ -1372,7 +1372,7 @@ function milestone_text(array $m): array {
     if (($m['kind'] ?? '') === 'challenge') {
         $def = ['🏆', 'Väljakutse täidetud: ' . ((string) ($m['label'] ?? 'väljakutse'))];
     } elseif (($m['kind'] ?? '') === 'custom') {
-        $def = ['⭐', 'Verstapost'];
+        $def = ['⭐', 'Saavutus'];
     } else {
         $def = milestone_phrase((string) $m['kind'], $n);
     }
@@ -1452,15 +1452,15 @@ function render_milestone_banner(int $childId): void {
     $m = $stmt->fetch();
     if (!$m) return;
     [$icon, $text] = milestone_text($m);
-    echo '<div class="achievement-banner">🎉 ' . htmlspecialchars($icon . ' Verstapost: ' . $text . '!') . '</div>';
+    echo '<div class="achievement-banner">🎉 ' . htmlspecialchars($icon . ' Saavutus: ' . $text . '!') . '</div>';
 }
 
-/** Full achievement list for the Verstapostid page. When $editable (parent view)
+/** Full achievement list for the Saavutused page. When $editable (parent view)
  *  each row links to edit_milestone.php. */
 function render_milestones_list(int $childId, bool $editable = false): void {
     $rows = get_milestones($childId);
     if (empty($rows)) {
-        echo '<p class="empty">Verstaposte pole veel. Loe raamatuid ja täida väljakutseid!</p>';
+        echo '<p class="empty">Saavutusi pole veel. Loe raamatuid ja täida väljakutseid!</p>';
         return;
     }
     echo '<ul class="ms-list">';

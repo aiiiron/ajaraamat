@@ -62,7 +62,7 @@ $yearSummary = get_year_summary($childId, $year);
     <nav class="tabs">
         <a href="child.php?token=<?= htmlspecialchars($token) ?>" class="tab">Kokkuvõte</a>
         <a href="child_books.php?token=<?= htmlspecialchars($token) ?>" class="tab active">Raamatud</a>
-        <a href="child_milestones.php?token=<?= htmlspecialchars($token) ?>" class="tab">Verstapostid</a>
+        <a href="child_milestones.php?token=<?= htmlspecialchars($token) ?>" class="tab">Saavutused</a>
     </nav>
 
     <div class="card">

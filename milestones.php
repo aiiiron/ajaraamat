@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'miles
     $emoji = trim($_POST['emoji'] ?? '');
     $date  = $_POST['achieved_on'] ?? '';
     if ($label === '') {
-        $error = 'Sisesta verstaposti nimi.';
+        $error = 'Sisesta saavutuse nimi.';
     } elseif (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date)) {
         $error = 'Vali kuupäev.';
     } else {
@@ -36,7 +36,7 @@ record_milestones($childId);
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Verstapostid — Ajaraamat</title>
+<title>Saavutused — Ajaraamat</title>
 <link rel="icon" href="favicon.ico?v=2" sizes="any">
 <link rel="icon" href="icon-192.png?v=2" type="image/png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
@@ -69,7 +69,7 @@ record_milestones($childId);
         <a href="paren.php?child=<?= $childId ?>" class="tab">Töölaud</a>
         <a href="history.php?child=<?= $childId ?>" class="tab">Kanded</a>
         <a href="books.php?child=<?= $childId ?>" class="tab">Raamatud</a>
-        <a href="milestones.php?child=<?= $childId ?>" class="tab active">Verstapostid</a>
+        <a href="milestones.php?child=<?= $childId ?>" class="tab active">Saavutused</a>
     </nav>
 
     <?php render_child_switcher($children, $childId, 'milestones.php'); ?>
@@ -83,7 +83,7 @@ record_milestones($childId);
         <?php render_milestones_list($childId, true); ?>
 
         <details class="chal-new"<?= $error ? ' open' : '' ?>>
-            <summary>+ Lisa verstapost</summary>
+            <summary>+ Lisa saavutus</summary>
             <form method="post">
                 <?= csrf_field() ?>
                 <input type="hidden" name="action" value="milestone_new">
@@ -94,13 +94,13 @@ record_milestones($childId);
                 </div>
                 <label for="achieved_on">Kuupäev</label>
                 <input type="date" id="achieved_on" name="achieved_on" value="<?= htmlspecialchars($_POST['achieved_on'] ?? date('Y-m-d')) ?>" required>
-                <button type="submit" class="btn btn-add full-width">Lisa verstapost</button>
+                <button type="submit" class="btn btn-add full-width">Lisa saavutus</button>
             </form>
         </details>
     </div>
 
     <div class="card">
-        <h2>Kõik automaatsed verstapostid</h2>
+        <h2>Kõik automaatsed saavutused</h2>
         <p class="child-link-note" style="text-align:left;margin:4px 0 14px;">Need tekivad ise, kui laps piirini jõuab. Number pealkirja kõrval on praegune seis.</p>
         <?php render_milestone_catalog($childId); ?>
     </div>

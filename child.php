@@ -91,7 +91,7 @@ if ($owed > 0) {
     <nav class="tabs">
         <a href="child.php?token=<?= htmlspecialchars($token) ?>" class="tab active">Kokkuvõte</a>
         <a href="child_books.php?token=<?= htmlspecialchars($token) ?>" class="tab">Raamatud</a>
-        <a href="child_milestones.php?token=<?= htmlspecialchars($token) ?>" class="tab">Verstapostid</a>
+        <a href="child_milestones.php?token=<?= htmlspecialchars($token) ?>" class="tab">Saavutused</a>
     </nav>
 
     <?php if (($_GET['saved'] ?? '') === '1'): ?>

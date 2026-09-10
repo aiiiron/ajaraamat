@@ -91,7 +91,7 @@ $chartEkraan = array_map(fn($d) => $d['ekraan'], $daily);
         <a href="paren.php?child=<?= $childId ?>" class="tab active">Töölaud</a>
         <a href="history.php?child=<?= $childId ?>" class="tab">Kanded</a>
         <a href="books.php?child=<?= $childId ?>" class="tab">Raamatud</a>
-        <a href="milestones.php?child=<?= $childId ?>" class="tab">Verstapostid</a>
+        <a href="milestones.php?child=<?= $childId ?>" class="tab">Saavutused</a>
     </nav>
 
     <?php render_child_switcher($children, $childId, 'paren.php'); ?>
