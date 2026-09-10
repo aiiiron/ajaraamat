@@ -165,7 +165,7 @@ $adminEmail = defined('ADMIN_EMAIL') ? trim((string) ADMIN_EMAIL) : '';
   .tour-preview { display: flex; justify-content: center; position: sticky; top: 24px; }
   .tour-frame { position: relative; width: 300px; max-width: 100%; border-radius: 32px; background: #fff; padding: 30px 10px 10px; box-shadow: 0 30px 60px -24px rgba(61,51,88,0.45); border: 1px solid #F0E6F5; }
   .tour-notch { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 70px; height: 16px; background: #392F4D; border-radius: 999px; }
-  .tour-frame img { width: 100%; border-radius: 18px; display: block; }
+  .tour-frame img { width: 100%; height: 520px; object-fit: cover; object-position: top center; border-radius: 18px; display: block; }
   .tour-frame img[hidden] { display: none; }
   .tour-cta { text-align: center; margin-top: 32px; }
 
@@ -195,7 +195,7 @@ $adminEmail = defined('ADMIN_EMAIL') ? trim((string) ADMIN_EMAIL) : '';
   .cta-band h2 { color: #fff; font-size: 30px; margin-bottom: 14px; text-align: left; }
   .cta-band p { color: #C9C4DE; font-size: 16px; max-width: 44ch; margin: 0 0 26px; text-align: left; }
   .cta-band .btn-primary { background: var(--gradient-primary); }
-  .form-note { font-size: 13px; color: #9C96B8; margin-top: 16px; }
+  .form-note { font-size: 13px; color: #9C96B8; margin-top: 26px; }
   .cta-visual { position: relative; height: 170px; }
   .cta-chip { position: absolute; background: #fff; color: var(--ink); font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 13.5px; padding: 10px 16px; border-radius: 14px; box-shadow: 0 16px 32px -14px rgba(0,0,0,0.5); white-space: nowrap; }
 
