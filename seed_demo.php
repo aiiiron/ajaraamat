@@ -38,7 +38,7 @@ $pdo->prepare("DELETE FROM children WHERE family_id = :fid")->execute([':fid' =>
 $pdo->prepare("DELETE FROM family_logins WHERE family_id = :fid")->execute([':fid' => $familyId]);
 
 // second parent login on the demo family, so the "Vanemate ligipääs" list shows two
-$pdo->prepare("INSERT INTO family_logins (family_id, email, name, password_hash) VALUES (:fid, :e, 'Teine vanem', :h)")
+$pdo->prepare("INSERT INTO family_logins (family_id, email, name, password_hash) VALUES (:fid, :e, 'Peeter', :h)")
     ->execute([':fid' => $familyId, ':e' => 'teine.vanem+' . $familyId . '@ajaraamat.local', ':h' => password_hash(bin2hex(random_bytes(16)), PASSWORD_DEFAULT)]);
 
 // ---- 3. helpers ------------------------------------------------------------
