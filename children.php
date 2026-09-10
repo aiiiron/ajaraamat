@@ -22,7 +22,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $d = (int) ($_POST['daily_goal_min'] ?? 0);
             $w = (int) ($_POST['weekly_goal_min'] ?? 0);
             $r = (int) ($_POST['screen_reward_cap_min'] ?? 0);
-            set_child_goal($cid, $d > 0 ? $d : null, $w > 0 ? $w : null, $r > 0 ? $r : null);
+            $ratio = (float) str_replace(',', '.', (string) ($_POST['reading_ratio'] ?? ''));
+            $ratio = $ratio > 0 ? min(9.99, round($ratio, 2)) : 0.0;
+            set_child_goal($cid, $d > 0 ? $d : null, $w > 0 ? $w : null, $r > 0 ? $r : null, $ratio > 0 ? $ratio : null);
         }
         header('Location: children.php');
         exit;
@@ -124,9 +126,13 @@ $baseUrl = $scheme . $_SERVER['HTTP_HOST'] . rtrim(dirname($_SERVER['SCRIPT_NAME
                     <label for="rc<?= $c['id'] ?>">Ekraaniaja tasu ülempiir (min/p)</label>
                     <input type="number" id="rc<?= $c['id'] ?>" name="screen_reward_cap_min" min="0" inputmode="numeric" placeholder="nt. 60" value="<?= (int) ($c['screen_reward_cap_min'] ?? 0) ?: '' ?>">
                 </div>
-                <button type="submit" class="btn btn-add">Salvesta</button>
+                <div>
+                    <label for="rr<?= $c['id'] ?>">Lugemise ja ekraani suhe</label>
+                    <input type="number" id="rr<?= $c['id'] ?>" name="reading_ratio" min="0.1" max="9.99" step="0.1" inputmode="decimal" placeholder="1" value="<?= isset($c['reading_ratio']) && $c['reading_ratio'] !== null ? (float) $c['reading_ratio'] : '' ?>">
+                </div>
             </div>
-            <p class="goal-form-note">Ekraaniaja tasu: kui laps loeb rohkem kui vaatab, näeb ta „teenitud" ekraaniaega (kuni ülempiirini). Tühi = väljas.</p>
+            <button type="submit" class="btn btn-add full-width">Salvesta</button>
+            <p class="goal-form-note">Ekraaniaja tasu: kui laps loeb rohkem kui vaatab, näeb ta „teenitud" ekraaniaega (kuni ülempiirini). Tühi = väljas.<br>Suhe: mitu minutit lugemist tasakaalustab 1 ekraaniminuti. 1 = võrdne, 2 = ekraan „kallim", 0.5 = „soodsam". Tühi = üldreegel (<?= (float) READING_RATIO ?>).</p>
         </form>
     </div>
     <?php endforeach; ?>

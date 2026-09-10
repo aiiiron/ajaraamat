@@ -166,10 +166,10 @@ function rename_child(int $childId, string $name): void {
 }
 
 /** Sets a child's reading goals + earned-screen-time cap; pass null to clear one. */
-function set_child_goal(int $childId, ?int $daily, ?int $weekly, ?int $rewardCap): void {
+function set_child_goal(int $childId, ?int $daily, ?int $weekly, ?int $rewardCap, ?float $ratio = null): void {
     $pdo = get_db();
-    $stmt = $pdo->prepare("UPDATE children SET daily_goal_min = :d, weekly_goal_min = :w, screen_reward_cap_min = :r WHERE id = :id");
-    $stmt->execute([':d' => $daily, ':w' => $weekly, ':r' => $rewardCap, ':id' => $childId]);
+    $stmt = $pdo->prepare("UPDATE children SET daily_goal_min = :d, weekly_goal_min = :w, screen_reward_cap_min = :r, reading_ratio = :ratio WHERE id = :id");
+    $stmt->execute([':d' => $daily, ':w' => $weekly, ':r' => $rewardCap, ':ratio' => $ratio, ':id' => $childId]);
 }
 
 /** "Earned screen time" card. Opt-in: only renders when a cap is set and the
@@ -456,6 +456,20 @@ function send_password_reset_email(string $toEmail, string $link): bool {
 // Reading / screen entries (per child)
 // =========================================================
 
+/** Reading-minutes owed per screen minute for this child. A per-child
+ *  children.reading_ratio overrides the site-wide READING_RATIO default. */
+function child_reading_ratio(int $childId): float {
+    static $cache = [];
+    if (!array_key_exists($childId, $cache)) {
+        $pdo = get_db();
+        $stmt = $pdo->prepare("SELECT reading_ratio FROM children WHERE id = :id");
+        $stmt->execute([':id' => $childId]);
+        $r = $stmt->fetchColumn();
+        $cache[$childId] = ($r !== false && $r !== null && (float) $r > 0) ? (float) $r : (float) READING_RATIO;
+    }
+    return $cache[$childId];
+}
+
 function get_totals(int $childId): array {
     $pdo = get_db();
     $stmt = $pdo->prepare("SELECT
@@ -468,7 +482,7 @@ function get_totals(int $childId): array {
     $raamat = (int) $row['raamat'];
     $ekraan = (int) $row['ekraan'];
     $bonus  = (int) round($row['poem'] * (POEM_BONUS_MULT - 1)); // luuletuse lisakrediit
-    $owed = round($ekraan * READING_RATIO) - $raamat - $bonus; // positive = lugemist võlgu (reading owed)
+    $owed = round($ekraan * child_reading_ratio($childId)) - $raamat - $bonus; // positive = lugemist võlgu
     return ['raamat' => $raamat, 'ekraan' => $ekraan, 'owed' => $owed, 'poem' => (int) $row['poem']];
 }
 
@@ -1317,6 +1331,7 @@ function get_daily_totals_range(int $childId, int $days = 30): array {
 
 function get_current_streak(int $childId): int {
     $pdo = get_db();
+    $ratio = child_reading_ratio($childId);
     $stmt = $pdo->prepare("SELECT entry_date,
         SUM(raamat) as raamat,
         SUM(ekraan) as ekraan,
@@ -1329,7 +1344,7 @@ function get_current_streak(int $childId): int {
         $raamat = (int) $row['raamat'];
         $ekraan = (int) $row['ekraan'];
         $bonus  = (int) round($row['poem'] * (POEM_BONUS_MULT - 1));
-        if (round($ekraan * READING_RATIO) - $raamat - $bonus <= 0) {
+        if (round($ekraan * $ratio) - $raamat - $bonus <= 0) {
             $streak++;
         } else {
             break;
@@ -1382,13 +1397,13 @@ function render_balance_bar(int $raamat, int $ekraan): void {
 }
 
 /** 30-day heatmap: one square per day, colored by whether that day was balanced. */
-function render_heatmap(array $dailyTotals): void {
+function render_heatmap(array $dailyTotals, float $ratio = READING_RATIO): void {
     ?>
     <div class="heatmap">
         <?php foreach ($dailyTotals as $d):
             $hasData = $d['raamat'] > 0 || $d['ekraan'] > 0;
             $bonus = (int) round(($d['poem'] ?? 0) * (POEM_BONUS_MULT - 1));
-            $owed = round($d['ekraan'] * READING_RATIO) - $d['raamat'] - $bonus;
+            $owed = round($d['ekraan'] * $ratio) - $d['raamat'] - $bonus;
             if (!$hasData) {
                 $class = 'hm-empty';
                 $state = 'Kandeid pole';

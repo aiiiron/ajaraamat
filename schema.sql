@@ -20,6 +20,7 @@ CREATE TABLE IF NOT EXISTS children (
     daily_goal_min INT DEFAULT NULL,
     weekly_goal_min INT DEFAULT NULL,
     screen_reward_cap_min INT DEFAULT NULL,
+    reading_ratio DECIMAL(3,2) DEFAULT NULL,   -- per-child override for READING_RATIO; NULL = use the site default
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (family_id) REFERENCES families(id) ON DELETE CASCADE
 );

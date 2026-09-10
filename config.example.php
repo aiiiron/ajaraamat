@@ -20,8 +20,9 @@ define('ADMIN_PASSWORD', 'changeme');
 // vaja. Jäta tühjaks (''), et kasutada ainult ADMIN_PASSWORD-i.
 define('ADMIN_EMAIL', '');
 
-// Reegel: mitu minutit lugemist ("Raamat") on vaja iga ekraaniminuti kohta.
-// 1.0 = 1:1 reegel. Kehtib kõigile peredele ühtemoodi.
+// Vaikereegel: mitu minutit lugemist ("Raamat") on vaja iga ekraaniminuti kohta.
+// 1.0 = 1:1. Iga lapse profiilis (Lapsed) saab selle üle kirjutada väljaga
+// "Lugemise ja ekraani suhe" (children.reading_ratio); tühi = see vaikeväärtus.
 define('READING_RATIO', 1.0);
 
 // Luuletuse pähe õppimine (kanne kind = 'luuletus'): loeb tavalise

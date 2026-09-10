@@ -139,7 +139,7 @@ $chartEkraan = array_map(fn($d) => $d['ekraan'], $daily);
 
     <section class="card">
         <h2>Kuu ülevaade</h2>
-        <?php render_heatmap($daily); ?>
+        <?php render_heatmap($daily, child_reading_ratio($childId)); ?>
     </section>
 
     <?php if (!empty($topBooks) || !empty($topScreen)): ?>
