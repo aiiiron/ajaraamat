@@ -46,6 +46,9 @@ $currentBooks = array_values(array_filter($books, fn($b) => $b['status'] === 'lo
 $error = '';
 
 $type = ($_POST['type'] ?? 'raamat') === 'ekraan' ? 'ekraan' : 'raamat';
+$today = date('Y-m-d');
+$date = $_POST['date'] ?? $today;
+if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) || $date > $today) $date = $today;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $minutes = (int) ($_POST['minutes'] ?? 0);
@@ -68,7 +71,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 if ($chosen) $bookId = (int) $chosen['id'];
             }
         }
-        add_pending_entry($childId, date('Y-m-d'), $type, $minutes, $bookId, $note, $currentPage, null);
+        add_pending_entry($childId, $date, $type, $minutes, $bookId, $note, $currentPage, null);
         header('Location: child.php?token=' . urlencode($token) . '&pending=1');
         exit;
     }
@@ -113,6 +116,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <input type="radio" name="type" value="ekraan" <?= $type === 'ekraan' ? 'checked' : '' ?> hidden> <?= emoji_svg('screen') ?> Ekraan
                 </label>
             </div>
+
+            <label for="date">Mis päeval?</label>
+            <input type="date" id="date" name="date" value="<?= htmlspecialchars($date) ?>" max="<?= htmlspecialchars($today) ?>">
 
             <label for="minutes">Mitu minutit?</label>
             <input type="number" id="minutes" name="minutes" min="1" max="600" inputmode="numeric" placeholder="nt. 20" value="<?= htmlspecialchars($_POST['minutes'] ?? '') ?>" autofocus>

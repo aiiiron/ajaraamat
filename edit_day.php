@@ -45,6 +45,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $raamatComment = trim($_POST['raamat_comment'] ?? '');
         $ekraanComment = trim($_POST['ekraan_comment'] ?? '');
         $isPoem = !empty($_POST['is_poem']);
+        $entryDate = $_POST['entry_date'] ?? $date;
+        if (!preg_match('/^\d{4}-\d{2}-\d{2}$/', $entryDate)) $entryDate = $date;
 
         // A single-type entry only keeps its own side.
         if ($type === 'raamat') {
@@ -75,8 +77,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
             }
 
-            $stmt = $pdo->prepare("UPDATE entries SET raamat = :raamat, kind = :kind, book_id = :book_id, raamat_comment = :raamat_comment, ekraan = :ekraan, ekraan_comment = :ekraan_comment WHERE id = :id");
+            $stmt = $pdo->prepare("UPDATE entries SET entry_date = :entry_date, raamat = :raamat, kind = :kind, book_id = :book_id, raamat_comment = :raamat_comment, ekraan = :ekraan, ekraan_comment = :ekraan_comment WHERE id = :id");
             $stmt->execute([
+                ':entry_date' => $entryDate,
                 ':raamat' => $raamat,
                 ':kind' => ($raamat > 0 && $isPoem) ? 'luuletus' : null,
                 ':book_id' => $bookId,
@@ -85,7 +88,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ':ekraan_comment' => $ekraan > 0 && $ekraanComment !== '' ? $ekraanComment : null,
                 ':id' => $id,
             ]);
-            header('Location: edit_day.php?date=' . urlencode($date) . '&child=' . $childId);
+            // Land on whichever day the entry now belongs to — the same day
+            // unless the date was just changed.
+            header('Location: edit_day.php?date=' . urlencode($entryDate) . '&child=' . $childId);
             exit;
         }
     }
@@ -145,6 +150,9 @@ $dateLabel = date('d.m.Y', strtotime($date));
             <input type="hidden" name="child" value="<?= $childId ?>">
             <input type="hidden" name="action" value="update">
             <input type="hidden" name="id" value="<?= $e['id'] ?>">
+
+            <label for="entry_date_<?= $e['id'] ?>">Kuupäev</label>
+            <input type="date" id="entry_date_<?= $e['id'] ?>" name="entry_date" value="<?= htmlspecialchars($e['entry_date']) ?>" required>
 
             <?php if ($eMixed): ?>
                 <input type="hidden" name="type" value="mixed">
