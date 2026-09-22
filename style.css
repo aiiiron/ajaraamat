@@ -444,7 +444,7 @@ h2 { font-size: 18px; margin: 0 0 16px; }
   /* Always its own line under the icon + label, indented to line up with
      the label text, so a long lifetime total ("1 päev 3 h 31 min") gets
      the tile's full width to wrap into instead of squeezing next to the
-     icon — the label stays "up", the count sits "under it". */
+     icon: the label stays "up", the count sits "under it". */
   flex-basis: 100%;
   margin-left: 34px;
   text-align: left;
