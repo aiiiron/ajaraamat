@@ -420,7 +420,7 @@ h2 { font-size: 18px; margin: 0 0 16px; }
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 8px;
+  gap: 2px 8px; /* tight row-gap between the label and the value under it, normal column-gap between icon and label */
   font-family: var(--font-body);
   font-weight: 700;
   font-size: 12px;
