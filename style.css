@@ -404,6 +404,7 @@ h2 { font-size: 18px; margin: 0 0 16px; }
   border-radius: 18px;
   padding: 14px;
   box-shadow: 0 10px 24px -16px rgba(57, 47, 77, 0.22);
+  min-width: 0; /* let the grid track shrink below the tile's content width */
 }
 .pt-label {
   font-size: 11px;
@@ -440,7 +441,12 @@ h2 { font-size: 18px; margin: 0 0 16px; }
 .pt-row.pt-screen .pt-k  { background: var(--screen-bg); }
 .pt-v {
   margin-left: auto;
-  white-space: nowrap;
+  text-align: right;
+  /* No white-space: nowrap here. format_duration() already keeps each
+     "number unit" pair unbreakable via U+00A0, but a lifetime total like
+     "1 päev 3 h 31 min" is long enough that forcing the whole string onto
+     one line blew out the grid tile (and the page) on narrow phones. Let
+     it wrap between parts instead. */
   font-variant-numeric: tabular-nums;
 }
 .pt-row.pt-reading .pt-v { color: #C93E68; }
