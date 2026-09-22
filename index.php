@@ -489,14 +489,27 @@ $adminEmail = defined('ADMIN_EMAIL') ? trim((string) ADMIN_EMAIL) : '';
       <div class="tour-preview">
         <div class="tour-frame">
           <span class="tour-notch"></span>
-          <img src="screens/01_dashboard.webp" width="640" height="1000" alt="Vanema töölaud" data-i="0">
-          <img src="screens/02_overview.webp" width="640" height="820" alt="Pere ülevaade" data-i="1" hidden>
-          <img src="screens/03_books.webp" width="640" height="1200" alt="Raamatud ja väljakutsed" data-i="2" hidden>
-          <img src="screens/04_milestones.webp" width="640" height="1033" alt="Saavutused" data-i="3" hidden>
-          <img src="screens/05_week.webp" width="640" height="867" alt="Iganädalane kokkuvõte" data-i="4" hidden>
-          <img src="screens/06_certificate.webp" width="640" height="1133" alt="Aastane lugemistunnistus" data-i="5" hidden>
-          <img src="screens/07_child.webp" width="640" height="1143" alt="Lapse vaade" data-i="6" hidden>
-          <img src="screens/08_child_milestones.webp" width="640" height="762" alt="Lapse enda saavutused" data-i="7" hidden>
+          <?php
+          // Each screen has a light and a dark capture (same crop, same
+          // aspect ratio as the frame itself, so object-fit never has to
+          // cut anything off). JS picks the right one for the tab and the
+          // viewer's current colour scheme; only tab 0 / light shows
+          // without JS.
+          $tourScreens = [
+              ['01_dashboard', 'Vanema töölaud'],
+              ['02_overview', 'Pere ülevaade'],
+              ['03_books', 'Raamatud ja väljakutsed'],
+              ['04_milestones', 'Saavutused'],
+              ['05_week', 'Iganädalane kokkuvõte'],
+              ['06_certificate', 'Aastane lugemistunnistus'],
+              ['07_child', 'Lapse vaade'],
+              ['08_child_milestones', 'Lapse enda saavutused'],
+          ];
+          foreach ($tourScreens as $i => [$slug, $alt]):
+          ?>
+          <img src="screens/<?= $slug ?>.webp" width="640" height="1188" alt="<?= htmlspecialchars($alt) ?>" data-i="<?= $i ?>" data-theme="light"<?= $i === 0 ? '' : ' hidden' ?>>
+          <img src="screens/<?= $slug ?>_dark.webp" width="640" height="1188" alt="<?= htmlspecialchars($alt) ?>" data-i="<?= $i ?>" data-theme="dark" hidden>
+          <?php endforeach; ?>
         </div>
       </div>
     </div>
@@ -557,13 +570,28 @@ $adminEmail = defined('ADMIN_EMAIL') ? trim((string) ADMIN_EMAIL) : '';
 (function () {
   var tabs = document.querySelectorAll('.tour-tab');
   var imgs = document.querySelectorAll('.tour-frame img');
+  var darkMq = window.matchMedia('(prefers-color-scheme: dark)');
+
+  function showActive() {
+    var active = document.querySelector('.tour-tab.active');
+    var i = active ? active.getAttribute('data-i') : '0';
+    var theme = darkMq.matches ? 'dark' : 'light';
+    imgs.forEach(function (img) {
+      img.hidden = !(img.getAttribute('data-i') === i && img.getAttribute('data-theme') === theme);
+    });
+  }
+
   tabs.forEach(function (tab) {
     tab.addEventListener('click', function () {
-      var i = tab.getAttribute('data-i');
       tabs.forEach(function (t) { t.classList.toggle('active', t === tab); });
-      imgs.forEach(function (img) { img.hidden = (img.getAttribute('data-i') !== i); });
+      showActive();
     });
   });
+
+  // Live theme switches (e.g. macOS auto dark mode at sunset) swap the
+  // currently-shown screenshot too, not just the page chrome.
+  if (darkMq.addEventListener) darkMq.addEventListener('change', showActive);
+  showActive();
 })();
 </script>
 </body>
