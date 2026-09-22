@@ -415,18 +415,20 @@ h2 { font-size: 18px; margin: 0 0 16px; }
   margin-bottom: 8px;
 }
 .pt-row {
+  /* Text size/weight/font here matches .chal-dates / .chal-prog / .chal-pages
+     (the Väljakutse card's meta lines) so the two cards read consistently. */
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 8px;
-  font-family: var(--font-heading);
+  font-family: var(--font-body);
   font-weight: 700;
-  font-size: 15px;
+  font-size: 12px;
 }
 .pt-row + .pt-row { margin-top: 10px; }
 .pt-t {
   color: var(--text-muted);
-  font-size: 13px;
+  font-size: 12px;
 }
 .pt-k {
   flex: none;
@@ -448,7 +450,7 @@ h2 { font-size: 18px; margin: 0 0 16px; }
   flex-basis: 100%;
   margin-left: 34px;
   text-align: left;
-  font-size: 17px;
+  font-size: 12px;
   /* No white-space: nowrap here. format_duration() already keeps each
      "number unit" pair unbreakable via U+00A0, but a lifetime total like
      "1 päev 3 h 31 min" is long enough that forcing the whole string onto
