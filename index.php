@@ -49,6 +49,11 @@ $adminEmail = defined('ADMIN_EMAIL') ? trim((string) ADMIN_EMAIL) : '';
     --screen-tint: #E8EEFF;
     --gradient-primary: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
     --line: #F0E6F5;
+    /* Fixed regardless of theme. The CTA band is always the darkest
+       surface on the page, by design, not just "dark because --ink is
+       dark right now". Keeping it off --ink means it doesn't flip to a
+       pale color once --ink itself becomes the dark-mode text color. */
+    --band-bg: #392F4D;
   }
   * { box-sizing: border-box; }
   html { scroll-behavior: smooth; }
@@ -95,7 +100,7 @@ $adminEmail = defined('ADMIN_EMAIL') ? trim((string) ADMIN_EMAIL) : '';
   .btn { display: inline-block; padding: 15px 26px; border-radius: 16px; font-family: 'Baloo 2', sans-serif; font-size: 15px; font-weight: 700; text-decoration: none; border: none; cursor: pointer; }
   .btn-primary { background: var(--gradient-primary); color: #fff; box-shadow: 0 12px 26px -10px rgba(139,92,246,0.55); }
   .btn-primary:hover { filter: brightness(1.05); }
-  .btn-ghost { background: #fff; color: var(--ink); border: none; box-shadow: 0 8px 20px -14px rgba(61,51,88,0.35); }
+  .btn-ghost { background: var(--paper-raised); color: var(--ink); border: none; box-shadow: 0 8px 20px -14px rgba(61,51,88,0.35); }
   .btn-ghost:hover { box-shadow: 0 10px 24px -12px rgba(61,51,88,0.45); }
 
   .mock-wrap { position: relative; }
@@ -159,11 +164,11 @@ $adminEmail = defined('ADMIN_EMAIL') ? trim((string) ADMIN_EMAIL) : '';
   .tour-tab { display: block; width: 100%; text-align: left; background: transparent; border: none; border-radius: 14px; padding: 13px 16px; cursor: pointer; font-family: 'Nunito', sans-serif; }
   .tour-tab strong { display: block; font-family: 'Baloo 2', sans-serif; font-size: 14.5px; color: var(--ink); }
   .tour-tab span { display: block; font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; }
-  .tour-tab.active { background: #fff; box-shadow: 0 10px 26px -16px rgba(61,51,88,0.4); }
+  .tour-tab.active { background: var(--paper-raised); box-shadow: 0 10px 26px -16px rgba(61,51,88,0.4); }
   .tour-tab.active strong { color: var(--reading); }
   .tour-tab:hover:not(.active) { background: rgba(255,255,255,0.6); }
   .tour-preview { display: flex; justify-content: center; position: sticky; top: 24px; }
-  .tour-frame { position: relative; width: 300px; max-width: 100%; border-radius: 32px; background: #fff; padding: 30px 10px 10px; box-shadow: 0 30px 60px -24px rgba(61,51,88,0.45); border: 1px solid #F0E6F5; }
+  .tour-frame { position: relative; width: 300px; max-width: 100%; border-radius: 32px; background: var(--paper-raised); padding: 30px 10px 10px; box-shadow: 0 30px 60px -24px rgba(61,51,88,0.45); border: 1px solid var(--line); }
   .tour-notch { position: absolute; top: 12px; left: 50%; transform: translateX(-50%); width: 70px; height: 16px; background: #392F4D; border-radius: 999px; }
   .tour-frame img { width: 100%; height: 520px; object-fit: cover; object-position: top center; border-radius: 18px; display: block; }
   .tour-frame img[hidden] { display: none; }
@@ -191,14 +196,16 @@ $adminEmail = defined('ADMIN_EMAIL') ? trim((string) ADMIN_EMAIL) : '';
   .step h3 { font-size: 17px; margin: 0 0 8px; }
   .step p { font-size: 15px; }
 
-  .cta-band { background: var(--ink); color: #fff; border-radius: 24px; padding: 56px 48px; display: grid; grid-template-columns: 1.3fr 0.7fr; gap: 30px; align-items: center; }
+  .cta-band { background: var(--band-bg); color: #fff; border-radius: 24px; padding: 56px 48px; display: grid; grid-template-columns: 1.3fr 0.7fr; gap: 30px; align-items: center; }
   .cta-band h2 { color: #fff; font-size: 30px; margin-bottom: 14px; text-align: left; }
   .cta-band p { color: #C9C4DE; font-size: 16px; max-width: 44ch; margin: 0 0 26px; text-align: left; }
   .cta-band .btn-primary { background: var(--gradient-primary); }
   .form-note { font-size: 13px; color: #9C96B8; }
   .cta-band .form-note { margin-top: 26px; }
   .cta-visual { position: relative; height: 170px; }
-  .cta-chip { position: absolute; background: #fff; color: var(--ink); font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 13.5px; padding: 10px 16px; border-radius: 14px; box-shadow: 0 16px 32px -14px rgba(0,0,0,0.5); white-space: nowrap; }
+  /* Sits on the always-dark .cta-band, so the chip itself is a fixed
+     white sticker with fixed dark text in both themes, not tied to --ink. */
+  .cta-chip { position: absolute; background: #fff; color: #392F4D; font-family: 'Baloo 2', sans-serif; font-weight: 800; font-size: 13.5px; padding: 10px 16px; border-radius: 14px; box-shadow: 0 16px 32px -14px rgba(0,0,0,0.5); white-space: nowrap; }
 
   footer { padding: 40px 0 60px; text-align: center; }
   footer p { font-size: 14px; color: var(--ink-soft); }
@@ -225,6 +232,54 @@ $adminEmail = defined('ADMIN_EMAIL') ? trim((string) ADMIN_EMAIL) : '';
     .cta-band h2, .cta-band p { text-align: center; margin-left: auto; margin-right: auto; }
     .cta-visual { display: none; }
     nav.top-links a:not(.cta-link) { display: none; }
+  }
+
+  /* Dark mode: automatic, follows the device's colour-scheme, same as the
+     rest of the app (style.css). Same palette tokens, so the landing page
+     and the real dashboard look like one product regardless of theme. */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg-grad-start: #221B34;
+      --bg-grad-mid: #2A1D3A;
+      --bg-grad-end: #1A1928;
+      --paper-raised: #2C2745;
+      --ink: #ECE8F6;
+      --ink-soft: #A79EC4;
+      --reading: #FF7BA6;
+      --reading-tint: #3E2334;
+      --screen: #86A6FF;
+      --screen-tint: #232A45;
+      --gradient-primary: linear-gradient(135deg, #7349DD 0%, #CC4686 100%);
+      --line: #3B3357;
+    }
+
+    /* Raised surfaces need a real shadow. The light purple glow disappears
+       against a dark page, same fix style.css makes for the in-app cards. */
+    .mock-card, .feature, .feature-panel, .plan-card, .tour-frame, .btn-ghost {
+      box-shadow: 0 16px 34px -20px rgba(0,0,0,0.6), 0 2px 10px -6px rgba(0,0,0,0.4);
+    }
+    .tour-tab.active { box-shadow: 0 10px 24px -14px rgba(0,0,0,0.55); }
+    .tour-tab:hover:not(.active) { background: rgba(255,255,255,0.08); }
+    .tour-notch { background: #0F0C1C; }
+
+    /* Inner "recessed" surfaces inside the hero mock card were a flat pale
+       lavender; a subtle white overlay reads the same way on a dark card. */
+    .mock-balance, .mock-stat, .mock-row { background: rgba(255,255,255,0.06); }
+    .mock-pill.em { color: #FF9DBE; }
+    .mock-pill.in { color: #A6BCFF; }
+
+    /* Warm accent chip: dial the gold back so it doesn't blaze, matching
+       the in-app streak/milestone banners in dark mode. */
+    .streak-chip { background: linear-gradient(90deg, #CFA062, #C98AAC); color: #2E1E00; }
+
+    .path-features::before { border-top-color: rgba(255,255,255,0.15); }
+    .path-badge { border-color: #241D3A; }
+
+    .plan-card.highlight {
+      background: linear-gradient(160deg, #2E2650 0%, #34213D 100%);
+      border-color: rgba(183,158,255,0.35);
+    }
+    .plan-list li::before { color: #A6BCFF; }
   }
 
   :focus-visible { outline: 2px solid var(--screen); outline-offset: 2px; }
