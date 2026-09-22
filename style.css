@@ -416,13 +416,14 @@ h2 { font-size: 18px; margin: 0 0 16px; }
 }
 .pt-row {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 8px;
   font-family: var(--font-heading);
   font-weight: 700;
   font-size: 15px;
 }
-.pt-row + .pt-row { margin-top: 6px; }
+.pt-row + .pt-row { margin-top: 10px; }
 .pt-t {
   color: var(--text-muted);
   font-size: 13px;
@@ -440,8 +441,14 @@ h2 { font-size: 18px; margin: 0 0 16px; }
 .pt-row.pt-reading .pt-k { background: var(--reading-bg); }
 .pt-row.pt-screen .pt-k  { background: var(--screen-bg); }
 .pt-v {
-  margin-left: auto;
-  text-align: right;
+  /* Always its own line under the icon + label, indented to line up with
+     the label text, so a long lifetime total ("1 päev 3 h 31 min") gets
+     the tile's full width to wrap into instead of squeezing next to the
+     icon — the label stays "up", the count sits "under it". */
+  flex-basis: 100%;
+  margin-left: 34px;
+  text-align: left;
+  font-size: 17px;
   /* No white-space: nowrap here. format_duration() already keeps each
      "number unit" pair unbreakable via U+00A0, but a lifetime total like
      "1 päev 3 h 31 min" is long enough that forcing the whole string onto
