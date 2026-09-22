@@ -506,9 +506,11 @@ $adminEmail = defined('ADMIN_EMAIL') ? trim((string) ADMIN_EMAIL) : '';
               ['08_child_milestones', 'Lapse enda saavutused'],
           ];
           foreach ($tourScreens as $i => [$slug, $alt]):
+              $lightV = @filemtime(__DIR__ . "/screens/{$slug}.webp");
+              $darkV = @filemtime(__DIR__ . "/screens/{$slug}_dark.webp");
           ?>
-          <img src="screens/<?= $slug ?>.webp" width="640" height="1188" alt="<?= htmlspecialchars($alt) ?>" data-i="<?= $i ?>" data-theme="light"<?= $i === 0 ? '' : ' hidden' ?>>
-          <img src="screens/<?= $slug ?>_dark.webp" width="640" height="1188" alt="<?= htmlspecialchars($alt) ?>" data-i="<?= $i ?>" data-theme="dark" hidden>
+          <img src="screens/<?= $slug ?>.webp?v=<?= $lightV ?>" width="640" height="1188" alt="<?= htmlspecialchars($alt) ?>" data-i="<?= $i ?>" data-theme="light"<?= $i === 0 ? '' : ' hidden' ?>>
+          <img src="screens/<?= $slug ?>_dark.webp?v=<?= $darkV ?>" width="640" height="1188" alt="<?= htmlspecialchars($alt) ?>" data-i="<?= $i ?>" data-theme="dark" hidden>
           <?php endforeach; ?>
         </div>
       </div>
